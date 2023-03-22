@@ -8,12 +8,13 @@ import com.licicat.screens.FavouritesScreen
 import com.licicat.screens.HomeScreen
 import com.licicat.screens.ChatScreen
 import com.licicat.screens.ProfileScreen
+import com.licicat.screens.LoginScreen
 
 //elemento composable encargado de dirigir la navegacion correcta entre las pantallas
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController() //controla estado de navegacion actual entre pantallas (propagar entre pantallas)
-    NavHost(navController= navController, startDestination = AppScreens.HomeScreen.route) {
+    NavHost(navController= navController, startDestination = AppScreens.LoginScreen.route) {
         //tantos composables como diferentes pantallas accesibles
         composable(route = AppScreens.HomeScreen.route) {
             HomeScreen(navController)
@@ -26,6 +27,9 @@ fun AppNavigation() {
         }
         composable(route = AppScreens.ProfileScreen.route) {
             ProfileScreen(navController)
+        }
+        composable(route = AppScreens.LoginScreen.route) {
+            LoginScreen(navController)
         }
     }
 }
