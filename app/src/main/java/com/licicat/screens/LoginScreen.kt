@@ -19,7 +19,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.*
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import com.licicat.R
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -39,6 +41,7 @@ fun LoginScreen(navController: NavController) {
 @Composable
 fun LoginContent(modifier: Modifier, navController: NavController) {
     Column(modifier = modifier) {
+        HeaderImage(Modifier.align(Alignment.CenterHorizontally))
         Spacer(modifier = Modifier.padding(16.dp))
         EmailField("email")
         Spacer(modifier = Modifier.padding(4.dp))
@@ -117,6 +120,16 @@ fun EmailField(email: String) {
         )
     )
 }
+
+@Composable
+fun HeaderImage(modifier: Modifier) {
+    Image(
+        painter = painterResource(id = R.drawable.licicat),
+        contentDescription = "Header",
+        modifier = modifier
+    )
+}
+
 
 /*
     Column(
