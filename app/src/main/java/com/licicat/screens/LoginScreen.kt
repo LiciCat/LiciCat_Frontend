@@ -21,6 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
 import com.licicat.R
 
 
@@ -47,8 +49,13 @@ fun LoginContent(modifier: Modifier, navController: NavController) {
         Spacer(modifier = Modifier.padding(4.dp))
         PasswordField("password");
         Spacer(modifier = Modifier.padding(8.dp))
-        ForgotPassword(Modifier.align(Alignment.End))
-        Spacer(modifier = Modifier.padding(16.dp))
+        Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
+            CreaCompteEntitatPublica(modifier = Modifier.weight(1f))
+            CreaCompteEmpresa(modifier = Modifier.weight(1f))
+        }
+        Spacer(modifier = Modifier.padding(8.dp))
+        ForgotPassword(modifier = Modifier.align(Alignment.End))
+        Spacer(modifier = Modifier.padding(40.dp))
         LoginButton(true,navController);
     }
 }
@@ -78,6 +85,28 @@ fun LoginButton(loginEnable: Boolean, navController: NavController) {
 fun ForgotPassword(modifier: Modifier) {
     Text(
         text = "Olvidaste la contraseña?",
+        modifier = modifier.clickable { },
+        fontSize = 12.sp,
+        fontWeight = FontWeight.Bold,
+        color = Color(0xFFFB9600)
+    )
+}
+
+@Composable
+fun CreaCompteEmpresa(modifier: Modifier) {
+    Text(
+        text = "Crear compte d'empresa",
+        modifier = modifier.clickable { },
+        fontSize = 12.sp,
+        fontWeight = FontWeight.Bold,
+        color = Color(0xFFFB9600)
+    )
+}
+
+@Composable
+fun CreaCompteEntitatPublica(modifier: Modifier) {
+    Text(
+        text = "Crear compte d'entitat pública",
         modifier = modifier.clickable { },
         fontSize = 12.sp,
         fontWeight = FontWeight.Bold,
@@ -129,7 +158,6 @@ fun HeaderImage(modifier: Modifier) {
         modifier = modifier
     )
 }
-
 
 /*
     Column(
