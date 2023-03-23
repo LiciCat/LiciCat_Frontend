@@ -13,10 +13,15 @@ import com.licicat.navigation.AppScreens
 
 
 @Composable
-fun BottomBarNavigation(
-    navController: NavController,
-    items: List<AppScreens>
-) {
+fun BottomBarNavigation(navController: NavController) {
+
+    val items = listOf(
+        AppScreens.HomeScreen,
+        AppScreens.FavouritesScreen,
+        AppScreens.ChatScreen,
+        AppScreens.ProfileScreen,
+    )
+
     BottomNavigation {
         val currentRoute = currentRoute(navController)
         items.forEach { screen ->
