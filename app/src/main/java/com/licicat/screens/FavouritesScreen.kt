@@ -14,7 +14,7 @@ fun FavouritesScreen(navController: NavController) {
         AppScreens.HomeScreen,
         AppScreens.FavouritesScreen,
         AppScreens.ChatScreen,
-        AppScreens.ProfileScreen
+        AppScreens.ProfileScreen,
     )
 
     Scaffold(
