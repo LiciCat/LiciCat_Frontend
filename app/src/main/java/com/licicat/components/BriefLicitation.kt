@@ -2,6 +2,8 @@ package com.licicat.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 
 import androidx.compose.foundation.shape.*
 import androidx.compose.material.*
@@ -19,24 +21,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 
-@Composable
-@Preview
-fun BriefLicitation (){
-    CardWithIconAndPrice(
-        title = "Ajuntament de Barcelona",
-        description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
-        icon = Icons.Default.Person,
-        price = "198.000€",
-        date = "23/05/2023"
-    )
-
-}
-
 
 @Composable
-fun CardWithIconAndPrice(
+fun CardLicitacio(
     icon: ImageVector,
     title: String,
     description: String,
@@ -74,10 +64,10 @@ fun CardWithIconAndPrice(
                     style = MaterialTheme.typography.h6,
                     modifier = Modifier.padding(start = 16.dp)
                 )
+                Spacer(Modifier.weight(1f))
                 IconButton(
                     onClick = { isFavorite = !isFavorite },
                     modifier = Modifier.align(Alignment.CenterVertically)
-                    .padding(end = 2.dp)
                 ) {
                     Icon(
                         imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
@@ -92,9 +82,7 @@ fun CardWithIconAndPrice(
                 modifier = Modifier.padding(top = 12.dp)
             )
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 12.dp),
+                modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
@@ -110,5 +98,6 @@ fun CardWithIconAndPrice(
         }
     }
 }
+
 
 
