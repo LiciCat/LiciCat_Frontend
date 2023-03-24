@@ -49,12 +49,12 @@ fun LoginContent(modifier: Modifier, navController: NavController) {
         Spacer(modifier = Modifier.padding(4.dp))
         PasswordField("password");
         Spacer(modifier = Modifier.padding(8.dp))
-        Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
-            CreaCompteEntitatPublica(modifier = Modifier.weight(1f))
+        Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             CreaCompteEmpresa(modifier = Modifier.weight(1f))
+            ForgotPassword(modifier = Modifier.align(Alignment.CenterVertically) )
         }
-        Spacer(modifier = Modifier.padding(8.dp))
-        ForgotPassword(modifier = Modifier.align(Alignment.End))
+        //Spacer(modifier = Modifier.padding(8.dp))
+        CreaCompteEntitatPublica(Modifier.align(Alignment.Start))
         Spacer(modifier = Modifier.padding(40.dp))
         LoginButton(true,navController);
     }
@@ -67,7 +67,7 @@ fun LoginButton(loginEnable: Boolean, navController: NavController) {
             .fillMaxWidth()
             .height(48.dp),
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = Color(0xFFFF4303),
+            backgroundColor = Color(0xFFFF454A),
             disabledBackgroundColor = Color(0xFFF78058),
             contentColor = Color.White,
             disabledContentColor = Color.White
@@ -77,18 +77,18 @@ fun LoginButton(loginEnable: Boolean, navController: NavController) {
             navController.navigate(route = AppScreens.HomeScreen.route)
         }
     ) {
-        Text(text = "Iniciar sesión")
+        Text(text = "Iniciar sessió")
     }
 }
 
 @Composable
 fun ForgotPassword(modifier: Modifier) {
     Text(
-        text = "Olvidaste la contraseña?",
+        text = "Has oblidat la contrasenya?",
         modifier = modifier.clickable { },
         fontSize = 12.sp,
         fontWeight = FontWeight.Bold,
-        color = Color(0xFFFB9600)
+        color = Color(0xFFFF454A)
     )
 }
 
@@ -99,7 +99,7 @@ fun CreaCompteEmpresa(modifier: Modifier) {
         modifier = modifier.clickable { },
         fontSize = 12.sp,
         fontWeight = FontWeight.Bold,
-        color = Color(0xFFFB9600)
+        color = Color(0xFFFF454A)
     )
 }
 
@@ -110,7 +110,7 @@ fun CreaCompteEntitatPublica(modifier: Modifier) {
         modifier = modifier.clickable { },
         fontSize = 12.sp,
         fontWeight = FontWeight.Bold,
-        color = Color(0xFFFB9600)
+        color = Color(0xFFFF454A)
     )
 }
 
