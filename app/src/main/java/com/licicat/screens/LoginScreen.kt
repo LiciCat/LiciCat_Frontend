@@ -20,6 +20,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
@@ -50,12 +51,11 @@ fun LoginContent(modifier: Modifier, navController: NavController) {
         PasswordField("password");
         Spacer(modifier = Modifier.padding(8.dp))
         Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            CreaCompteEmpresa(modifier = Modifier.weight(1f))
+            CreaCompteEmpresa(modifier = Modifier.weight(1f), navController)
             ForgotPassword(modifier = Modifier.align(Alignment.CenterVertically) )
         }
-        //Spacer(modifier = Modifier.padding(8.dp))
         CreaCompteEntitatPublica(Modifier.align(Alignment.Start))
-        Spacer(modifier = Modifier.padding(40.dp))
+        Spacer(modifier = Modifier.padding(20.dp))
         LoginButton(true,navController);
     }
 }
@@ -63,6 +63,7 @@ fun LoginContent(modifier: Modifier, navController: NavController) {
 @Composable
 fun LoginButton(loginEnable: Boolean, navController: NavController) {
     Button(
+        shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .fillMaxWidth()
             .height(48.dp),
@@ -85,7 +86,7 @@ fun LoginButton(loginEnable: Boolean, navController: NavController) {
 fun ForgotPassword(modifier: Modifier) {
     Text(
         text = "Has oblidat la contrasenya?",
-        modifier = modifier.clickable { },
+        modifier = modifier.clickable {},
         fontSize = 12.sp,
         fontWeight = FontWeight.Bold,
         color = Color(0xFFFF454A)
@@ -93,10 +94,10 @@ fun ForgotPassword(modifier: Modifier) {
 }
 
 @Composable
-fun CreaCompteEmpresa(modifier: Modifier) {
+fun CreaCompteEmpresa(modifier: Modifier, navController: NavController) {
     Text(
         text = "Crear compte d'empresa",
-        modifier = modifier.clickable { },
+        modifier = modifier.clickable {navController.navigate(route = AppScreens.SignUpCompanyScreen.route)  },
         fontSize = 12.sp,
         fontWeight = FontWeight.Bold,
         color = Color(0xFFFF454A)

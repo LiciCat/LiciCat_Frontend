@@ -5,11 +5,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.licicat.screens.FavouritesScreen
-import com.licicat.screens.HomeScreen
-import com.licicat.screens.ChatScreen
-import com.licicat.screens.ProfileScreen
-import com.licicat.screens.LoginScreen
+import com.licicat.screens.*
 
 //elemento composable encargado de dirigir la navegacion correcta entre las pantallas
 @Preview
@@ -32,6 +28,9 @@ fun AppNavigation() {
         }
         composable(route = AppScreens.LoginScreen.route) {
             LoginScreen(navController)
+        }
+        composable(route = AppScreens.SignUpCompanyScreen.route) {
+            SignUpCompanyScreen(navController)
         }
     }
 }
