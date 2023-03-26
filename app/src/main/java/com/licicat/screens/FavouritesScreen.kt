@@ -10,16 +10,9 @@ import com.licicat.navigation.AppScreens
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun FavouritesScreen(navController: NavController) {
-    val bottomNavigationItems = listOf(
-        AppScreens.HomeScreen,
-        AppScreens.FavouritesScreen,
-        AppScreens.ChatScreen,
-        AppScreens.ProfileScreen,
-    )
-
     Scaffold(
         bottomBar = {
-            BottomBarNavigation(navController, bottomNavigationItems)
+            BottomBarNavigation(navController)
         }
     ) {
 
