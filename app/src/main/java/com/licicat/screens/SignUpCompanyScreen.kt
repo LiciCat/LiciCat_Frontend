@@ -24,13 +24,16 @@ fun SignUpCompanyScreen(navController: NavController) {
     val itemsList = listOf("Empresa", "Nom i Cognoms", "Email", "Contrasenya", "NIF", "Telèfon")
 
     Surface(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(modifier = Modifier) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             item {
-                Text(text = "Registre\n d'empresa",
-                    style = MaterialTheme.typography.h3,
+                Text(text = "Registre d'empresa",
+                    style = MaterialTheme.typography.h4,
                     color = Color(0xFFFF454A),
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 16.dp),
+                    modifier = Modifier.padding(20.dp),
                     fontWeight = FontWeight.Bold,
 
                 )
