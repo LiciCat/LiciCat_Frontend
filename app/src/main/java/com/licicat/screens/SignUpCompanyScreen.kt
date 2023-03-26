@@ -9,7 +9,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -44,11 +43,6 @@ fun SignUpCompanyScreen(navController: NavController) {
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
                 ) {
-                    /*Text(
-                        //text = item,
-                        //style = MaterialTheme.typography.h6,
-                        modifier = Modifier.padding(top = 16.dp)
-                    )*/
                     Spacer(modifier = Modifier.padding(8.dp))
 
                     if (item == "Contrasenya") {

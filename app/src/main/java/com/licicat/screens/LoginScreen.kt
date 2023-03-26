@@ -22,8 +22,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.compose.rememberNavController
 import com.licicat.R
 
 
@@ -160,18 +158,3 @@ fun HeaderImage(modifier: Modifier) {
     )
 }
 
-/*
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
-    ) {
-        Text("Bienvenido")
-        Button(onClick = {
-            navController.navigate(route = AppScreens.HomeScreen.route)
-        }) {
-            Text("Navega")
-        }
-    }
-}
-*/
