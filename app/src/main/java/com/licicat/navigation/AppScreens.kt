@@ -10,4 +10,5 @@ sealed class AppScreens(val route: String, val title: String, val icon: Int) {
     object ChatScreen: AppScreens("chat_screen", "Chats", R.drawable.baseline_chat_bubble_24)
     object ProfileScreen: AppScreens("profile_screen", "Profile", R.drawable.baseline_person_24)
     object LoginScreen: AppScreens("login_screen", "Login", R.drawable.baseline_person_24)
+    object SignUpCompanyScreen: AppScreens("signup_screen", "SignUp", R.drawable.baseline_person_24)
 }
