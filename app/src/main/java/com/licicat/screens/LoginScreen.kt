@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.TextFieldValue
 import com.licicat.R
 
 
@@ -115,9 +116,10 @@ fun CreaCompteEntitatPublica(modifier: Modifier) {
 
 @Composable
 fun PasswordField(password: String) {
+    var password by remember { mutableStateOf(TextFieldValue("")) }
     TextField(
-        value = password, onValueChange = { password -> "*" },
-        placeholder = { Text(text = "Contraseña") },
+        value = password, onValueChange = { password = it },
+        placeholder = { Text(text = "password") },
         modifier = Modifier.fillMaxWidth(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         singleLine = true,
@@ -133,10 +135,11 @@ fun PasswordField(password: String) {
 
 @Composable
 fun EmailField(email: String) {
+    var email by remember { mutableStateOf(TextFieldValue("")) }
     TextField(
-        value = email,onValueChange = { email },
+        value = email,onValueChange = { email = it },
         modifier = Modifier.fillMaxWidth(),
-        placeholder = { Text(text = "Email") },
+        placeholder = { Text(text = "email") },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
         singleLine = true,
         maxLines = 1,
