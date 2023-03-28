@@ -46,16 +46,16 @@ fun SignUpCompanyScreen(navController: NavController) {
                 ) {
                     Spacer(modifier = Modifier.padding(8.dp))
 
-                    if (item == "Contrasenya") {
+                    /*if (item == "Contrasenya") {
                         PasswordTextField()
-                    } else {
+                    } else {*/
                         var us by remember { mutableStateOf(TextFieldValue("")) }
                         TextField(
                             value = us,onValueChange = { us = it },
                             label = { Text(text = "$item") },
                             modifier = Modifier.fillMaxWidth()
                         )
-                    }
+                  //  }
                     Spacer(modifier = Modifier.padding(8.dp))
                 }
             }
