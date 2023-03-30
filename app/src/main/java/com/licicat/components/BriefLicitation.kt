@@ -1,8 +1,8 @@
 package com.licicat.components
 
+import android.icu.text.DecimalFormat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 
 import androidx.compose.foundation.shape.*
@@ -23,15 +23,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-
+import java.text.NumberFormat
+import java.util.*
 
 @Composable
 fun CardLicitacio(
     icon: ImageVector,
-    title: String,
-    description: String,
-    date: String,
-    price: String
+    title: String?,
+    description: String?,
+    date: String?,
+    price: String?
 ) {
     Card(
         modifier = Modifier
@@ -59,45 +60,67 @@ fun CardLicitacio(
                         tint = Color.White
                     )
                 }
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.h6,
-                    modifier = Modifier.padding(start = 16.dp)
-                )
-                Spacer(Modifier.weight(1f))
-                IconButton(
-                    onClick = { isFavorite = !isFavorite },
-                    modifier = Modifier.align(Alignment.CenterVertically)
-                ) {
-                    Icon(
-                        imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                        contentDescription = "Botón de favorito"
+                Spacer(Modifier.width(16.dp))
+                if (title != null) {
+                    Text(
+                        text = title,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.h6,
+                        modifier = Modifier
+                            .weight(1f)
+                            .wrapContentWidth(align = Alignment.CenterHorizontally)
                     )
                 }
+                Box(
+                    modifier = Modifier
+                        .width(48.dp)
+                        .height(48.dp)
+                        .align(Alignment.CenterVertically)
+                ) {
+                    IconButton(
+                        onClick = { isFavorite = !isFavorite },
+                        modifier = Modifier.align(Alignment.Center)
+                    ) {
+                        Icon(
+                            imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                            contentDescription = "Botón de favorito"
+                        )
+                    }
+                }
             }
-            Text(
-                text = description,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(top = 12.dp)
-            )
+            if (description != null) {
+                Text(
+                    text = description,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(top = 12.dp)
+                )
+            }
             Row(
                 modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = date,
-                    style = MaterialTheme.typography.body2
-                )
-                Text(
-                    text = price,
-                    style = MaterialTheme.typography.body2,
-                    fontWeight = FontWeight.Bold
-                )
+                if (date != null) {
+                    Text(
+                        text = date,
+                        style = MaterialTheme.typography.body2
+                    )
+                }
+                if (price != null) {
+                    Text(
+                        text = price,
+                        style = MaterialTheme.typography.body2,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
     }
 }
+
+
+
 
 
 
