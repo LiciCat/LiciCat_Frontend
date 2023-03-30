@@ -17,6 +17,20 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '11'
+          distribution: 'adopt'
+          
+      - name: Give execute permission to gradlew
+        run: chmod +x gradlew
 
-      - name: Build and package APK
-        run: ./gradlew assembleDebug
+
+      - name: Clean and Build APK
+        run: |
+          ./gradlew clean
+          ./gradlew assembleDebug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+
