@@ -46,5 +46,6 @@ data class Licitacio (
     var enllac_publicacio : String? = null,
     var es_agregada : String? = null,
     var data_adjudicacio_contracte : Timestamp? = null,
-    var data_formalitzacio_contracte : Timestamp? = null
+    var data_formalitzacio_contracte : Timestamp? = null,
+    var pressupost_licitacio_asString : String ? = null
 )

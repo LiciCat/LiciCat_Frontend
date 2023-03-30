@@ -25,6 +25,7 @@ class LicitacionsRepository {
         val no = json.optString("nom_organ", "no disponible")
         val tc = json.optString("tipus_contracte", "no disponible")
         val pl = json.optInt("pressupost_licitacio", 0)
+        val formattedPl = String.format(Locale.getDefault(), "%,d", pl).replace(",", ".")
         val lle = json.optString("lloc_execucio", "no disponible")
         val desc = json.optString("objecte_contracte", "no disponible")
         val tp = json.optString("termini_presentacio_ofertes", "no disponible");
@@ -39,7 +40,7 @@ class LicitacionsRepository {
         licitacio.nom_organ = no;
         licitacio.termini_presentacio_ofertes = fechaDestino
         licitacio.tipus_contracte = tc;
-        licitacio.pressupost_licitacio = pl;
+        licitacio.pressupost_licitacio_asString = formattedPl;
         licitacio.lloc_execucio = lle;
         licitacio.objecte_contracte= desc;
 
@@ -113,7 +114,7 @@ class LicitacionsRepository {
             println("Licitacio-------------")
             println(elem.nom_organ)
             println(elem?.objecte_contracte)
-            println(elem?.pressupost_licitacio)
+            println(elem?.pressupost_licitacio_asString)
             println(elem?.termini_presentacio_ofertes)
             println(elem?.lloc_execucio)
         }
