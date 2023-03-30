@@ -18,6 +18,10 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
+          
+      - name: Give execute permission to gradlew
+        run: chmod +x gradlew
+
 
       - name: Clean and Build APK
         run: |
