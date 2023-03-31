@@ -9,6 +9,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.licicat.navigation.AppNavigation
 import com.licicat.ui.theme.LiciCatTheme
+import kotlinx.coroutines.*
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import org.json.JSONObject
+import java.io.IOException
+import com.example.licicat.Licitacio
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,4 +28,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
 }
+
