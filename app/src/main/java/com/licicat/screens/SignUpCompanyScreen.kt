@@ -19,9 +19,16 @@ import androidx.navigation.NavController
 import com.licicat.navigation.AppScreens
 
 
+var empresaString: String = ""
+var nomString: String = ""
+var emailString: String = ""
+var passwordString: String = ""
+var NifString: String = ""
+var telefonString: String = ""
+
 @Composable
 fun SignUpCompanyScreen(navController: NavController) {
-    val itemsList = listOf("Empresa", "Nom i Cognoms", "Email", "Contrasenya", "NIF", "Telèfon")
+    val itemsList = listOf("Empresa", "Nom i Cognoms", "Email", "Contrasenya", "NIF", "Telefon")
 
     Surface(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
@@ -54,7 +61,26 @@ fun SignUpCompanyScreen(navController: NavController) {
                             value = us,onValueChange = { us = it },
                             label = { Text(text = "$item") },
                             modifier = Modifier.fillMaxWidth()
+
                         )
+                        if(item == "Empresa"){
+                            empresaString = us.text
+                        }
+                        if(item == "Nom i Cognoms"){
+                            nomString = us.text
+                        }
+                        if(item == "Email"){
+                            emailString = us.text
+                        }
+                        if(item == "Contrasenya"){
+                            passwordString = us.text
+                        }
+                        if(item == "NIF"){
+                            NifString = us.text
+                        }
+                        if(item == "Telefon"){
+                            telefonString = us.text
+                        }
                   //  }
                     Spacer(modifier = Modifier.padding(8.dp))
                 }
@@ -95,4 +121,14 @@ fun PasswordTextField() {
         modifier = Modifier.fillMaxWidth()
     )
 }
+
+fun getStringEmpresa(): String {return empresaString}
+fun getStringNom(): String {return nomString}
+fun getStringEmail(): String {return emailString}
+fun getStringPassword(): String {return passwordString}
+fun getStringNif(): String {return NifString}
+fun getStringTelefon(): String {return telefonString}
+
+
+
 
