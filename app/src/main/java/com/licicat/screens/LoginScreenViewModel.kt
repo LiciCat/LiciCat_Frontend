@@ -33,4 +33,22 @@ class LoginScreenViewModel: ViewModel() {
 
         }
     }
+
+    fun createUserWithEmailAndPassword(email: String, password: String, home: () -> Unit){
+        if(_loading.value == false){
+            _loading.value = true
+            auth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task->
+                    if (task.isSuccessful){
+                        home()
+                    }
+                    else{
+                        Log.d("Licicat", "Error: ${task.result.toString()}")
+                    }
+                    _loading.value = false
+                }
+        }
+    }
+
+
 }
