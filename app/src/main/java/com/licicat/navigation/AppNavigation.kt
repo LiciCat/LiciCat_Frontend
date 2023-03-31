@@ -30,7 +30,7 @@ fun AppNavigation() {
             LoginScreen(navController)
         }
         composable(route = AppScreens.SignUpCompanyScreen.route) {
-            SignUpCompanyScreen(navController)
+            SignUpScreenEmpresa(navController)
         }
     }
 }

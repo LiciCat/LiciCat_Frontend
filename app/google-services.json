@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "387718764018",
+    "project_id": "licicat-e14ef",
+    "storage_bucket": "licicat-e14ef.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:387718764018:android:2def3ee60a17c79354c76b",
+        "android_client_info": {
+          "package_name": "com.licicat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "387718764018-150uenb57ckilpaem1mkuqv2teqvlqsv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0jOC6bG3shTTsxlttvtLF1Cl-AtkVwA8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "387718764018-150uenb57ckilpaem1mkuqv2teqvlqsv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
