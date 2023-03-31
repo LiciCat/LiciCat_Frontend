@@ -50,5 +50,18 @@ class LoginScreenViewModel: ViewModel() {
         }
     }
 
+   /* private fun createUserEmpresa(
+        empresa: String?,
+        nom: String?,
+        nif: String?,
+        telefon: String?
+    ){
+        val userId = auth.currentUser?.uid
+        val user = mutableMapOf<String, Any>()
+
+        user["user_id"] = userId.toString()
+
+    }*/
+
 
 }
