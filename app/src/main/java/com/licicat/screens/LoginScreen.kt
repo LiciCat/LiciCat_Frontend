@@ -1,6 +1,7 @@
 package com.licicat.screens
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 //import androidx.compose.material.icons.filled.Visibility
 //import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -33,8 +35,7 @@ import com.licicat.R
 
 
 
-var emailStringLogin: String = ""
-var passwordStringLogin: String = ""
+
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -48,13 +49,13 @@ fun LoginScreen(
                .fillMaxSize()
                .padding(16.dp)
        ) {
-           //LoginContent(Modifier.align(Alignment.Center), navController)
+           val context = LocalContext.current
            UserForm(
                Modifier.align(Alignment.Center),
                navController
            ){
                email, password ->
-               viewModel.signInWithEmailAndPassword(email, password){
+               viewModel.signInWithEmailAndPassword(email, password, context){
                    navController.navigate(route = AppScreens.HomeScreen.route)
                }
            }
@@ -175,31 +176,12 @@ fun EmailInput(
 }
 
 
-/*
-@Composable
-fun LoginContent(modifier: Modifier, navController: NavController) {
-    Column(modifier = modifier) {
-        HeaderImage(Modifier.align(Alignment.CenterHorizontally))
-        Spacer(modifier = Modifier.padding(16.dp))
-        EmailField("email")
-        Spacer(modifier = Modifier.padding(4.dp))
-        PasswordField("password");
-        Spacer(modifier = Modifier.padding(8.dp))
-        Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            CreaCompteEmpresa(modifier = Modifier.weight(1f), navController)
-            ForgotPassword(modifier = Modifier.align(Alignment.CenterVertically) )
-        }
-        CreaCompteEntitatPublica(Modifier.align(Alignment.Start))
-        Spacer(modifier = Modifier.padding(20.dp))
-        LoginButton(true,navController);
-    }
-}*/
-
 @Composable
 fun LoginButton(
     inputValido: Boolean,
-    onClic: ()->Unit
+    onClic: () -> Unit
 ) {
+
     Button(
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
@@ -252,45 +234,6 @@ fun CreaCompteEntitatPublica(modifier: Modifier) {
     )
 }
 
-@Composable
-fun PasswordField(password: String) {
-    var password by remember { mutableStateOf(TextFieldValue("")) }
-    TextField(
-        value = password, onValueChange = { password = it },
-        placeholder = { Text(text = "password") },
-        modifier = Modifier.fillMaxWidth(),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        singleLine = true,
-        maxLines = 1,
-        colors = TextFieldDefaults.textFieldColors(
-            textColor = Color(0xFF636262),
-            backgroundColor = Color(0xFFDEDDDD),
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
-        )
-    )
-    passwordStringLogin = password.text
-}
-
-@Composable
-fun EmailField(email: String) {
-    var email by remember { mutableStateOf(TextFieldValue("")) }
-    TextField(
-        value = email,onValueChange = { email = it },
-        modifier = Modifier.fillMaxWidth(),
-        placeholder = { Text(text = "email") },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-        singleLine = true,
-        maxLines = 1,
-        colors = TextFieldDefaults.textFieldColors(
-            textColor = Color(0xFF636262),
-            backgroundColor = Color(0xFFDEDDDD),
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
-        )
-    )
-    emailStringLogin = email.text
-}
 
 @Composable
 fun HeaderImage(modifier: Modifier) {
