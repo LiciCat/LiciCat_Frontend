@@ -33,6 +33,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 //import androidx.compose.material.icons.filled.Visibility
 //import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -144,12 +145,13 @@ fun SignUpScreenEmpresa(
     Surface(
         modifier = Modifier.fillMaxSize()
     ) {
+        val context = LocalContext.current
         UserSignUpForm(
             modifier = Modifier,
             navController
         ){
             email, password ->
-            viewModel.createUserWithEmailAndPassword(email, password) {
+            viewModel.createUserWithEmailAndPassword(email, password, context) {
                 navController.navigate(route = AppScreens.HomeScreen.route)
             }
         }
@@ -183,9 +185,13 @@ fun UserSignUpForm(
     val telefon = rememberSaveable {
         mutableStateOf("")
     }
-    val valido = remember(email.value, password.value){
+    val valido = remember(email.value, password.value, nom.value, empresa.value, nif.value, telefon.value){
         email.value.trim().isNotEmpty() &&
-                password.value.trim().isNotEmpty()
+                password.value.trim().isNotEmpty() &&
+                nom.value.trim().isNotEmpty() &&
+                empresa.value.trim().isNotEmpty() &&
+                nif.value.trim().isNotEmpty() &&
+                telefon.value.trim().isNotEmpty()
     }
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -202,18 +208,18 @@ fun UserSignUpForm(
                 )
         }
         item { Spacer(modifier = Modifier.padding(8.dp))}
-       /* item {
+       item {
             EmpresaInput(
                 empresaState = empresa
             )
         }
         item { Spacer(modifier = Modifier.padding(8.dp))}
-        item {
+         item {
             NomInput(
                 NomState = nom
             )
         }
-        item { Spacer(modifier = Modifier.padding(8.dp))}*/
+        item { Spacer(modifier = Modifier.padding(8.dp))}
         item {
             EmailInput(
                 emailState = email
@@ -229,7 +235,7 @@ fun UserSignUpForm(
 
         }
         item { Spacer(modifier = Modifier.padding(8.dp))}
-        /*item {
+        item {
             NifInput(
                 NifState = nif
             )
@@ -240,7 +246,7 @@ fun UserSignUpForm(
                 TelefonState = telefon
             )
         }
-        item { Spacer(modifier = Modifier.padding(8.dp))}*/
+        item { Spacer(modifier = Modifier.padding(8.dp))}
 
         item {
             SignUpButton(
@@ -250,6 +256,78 @@ fun UserSignUpForm(
         }
 
     }
+}
+
+@Composable
+fun TelefonInput(
+    TelefonState: MutableState<String>,
+    labelId : String = "Telèfon",
+    isSingleLine: Boolean = true
+) {
+    OutlinedTextField(
+        value = TelefonState.value,
+        onValueChange = {TelefonState.value = it},
+        label = {Text(text = labelId)},
+        singleLine = isSingleLine,
+        modifier = Modifier.fillMaxWidth(),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Phone
+        )
+    )
+}
+
+@Composable
+fun NifInput(
+    NifState: MutableState<String>,
+    labelId : String = "NIF",
+    isSingleLine: Boolean = true
+) {
+    OutlinedTextField(
+        value = NifState.value,
+        onValueChange = {NifState.value = it},
+        label = {Text(text = labelId)},
+        singleLine = isSingleLine,
+        modifier = Modifier.fillMaxWidth(),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Password
+        )
+    )
+}
+
+@Composable
+fun NomInput(
+    NomState: MutableState<String>,
+    labelId : String = "Nom i Cognoms",
+    isSingleLine: Boolean = true
+) {
+    OutlinedTextField(
+        value = NomState.value,
+        onValueChange = {NomState.value = it},
+        label = {Text(text = labelId)},
+        singleLine = isSingleLine,
+        modifier = Modifier.fillMaxWidth(),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Text
+        )
+    )
+}
+
+@Composable
+fun EmpresaInput(
+    empresaState: MutableState<String>,
+    labelId : String = "Empresa",
+    isSingleLine: Boolean = true
+) {
+    OutlinedTextField(
+        value = empresaState.value,
+        onValueChange = {empresaState.value = it},
+        label = {Text(text = labelId)},
+        singleLine = isSingleLine,
+        modifier = Modifier.fillMaxWidth(),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Text
+        )
+    )
 }
 
 @Composable

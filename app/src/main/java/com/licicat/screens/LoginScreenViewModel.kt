@@ -56,18 +56,28 @@ class LoginScreenViewModel: ViewModel() {
 
     }
 
-    fun createUserWithEmailAndPassword(email: String, password: String, home: () -> Unit){
+    fun createUserWithEmailAndPassword(email: String, password: String, context: Context, home: () -> Unit){
         if(_loading.value == false){
             _loading.value = true
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task->
-                    if (task.isSuccessful){
-                        home()
+                    try{
+                        if (task.isSuccessful){
+                            home()
+                        }
+                        else{
+                            Log.d("Licicat", "Error: ${task.result.toString()}")
+                            Toast.makeText(context, "Registre incorrecte.",
+                                Toast.LENGTH_SHORT).show()
+                        }
+                        _loading.value = false
                     }
-                    else{
-                        Log.d("Licicat", "Error: ${task.result.toString()}")
+                    catch (e: Exception) {
+                        Log.d("Licicat", "Excepcion-log: ${e.message}")
+                       Toast.makeText(context, "Registre incorrecte.",
+                            Toast.LENGTH_SHORT).show()
                     }
-                    _loading.value = false
+
                 }
         }
     }
