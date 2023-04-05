@@ -43,99 +43,10 @@ import com.licicat.R
 
 
 
-val itemsList = listOf("Empresa", "Nom i Cognoms", "Email", "Contrasenya", "NIF", "Telefon")
 
 
-/*@Composable
-fun SignUpCompanyScreen(navController: NavController,
-                        viewModel: LoginScreenViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
-) {
-    val itemsList = listOf("Empresa", "Nom i Cognoms", "Email", "Contrasenya", "NIF", "Telefon")
-
-    Surface(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
 
 
-            item {
-                Text(text = "Registre d'empresa",
-                    style = MaterialTheme.typography.h4,
-                    color = Color(0xFFFF454A),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(20.dp),
-                    fontWeight = FontWeight.Bold,
-
-                )
-            }
-            items(itemsList) { item ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                ) {
-                    Spacer(modifier = Modifier.padding(8.dp))
-
-                    /*if (item == "Contrasenya") {
-                        PasswordTextField()
-                    } else {*/
-                        var us by remember { mutableStateOf(TextFieldValue("")) }
-                        TextField(
-                            value = us,onValueChange = { us = it },
-                            label = { Text(text = "$item") },
-                            modifier = Modifier.fillMaxWidth()
-
-                        )
-                        if(item == "Empresa"){
-                            empresaString = us.text
-                        }
-                        if(item == "Nom i Cognoms"){
-                            nomString = us.text
-                        }
-                        if(item == "Email"){
-                            emailString = us.text
-                        }
-                        if(item == "Contrasenya"){
-                            passwordString = us.text
-                        }
-                        if(item == "NIF"){
-                            NifString = us.text
-                        }
-                        if(item == "Telefon"){
-                            telefonString = us.text
-                        }
-                  //  }
-
-                    Spacer(modifier = Modifier.padding(8.dp))
-                }
-            }
-            item{
-                Button(
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(30.dp)
-                        .height(48.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = Color(0xFFFF454A),
-                        disabledBackgroundColor = Color(0xFFF78058),
-                        contentColor = Color.White,
-                        disabledContentColor = Color.White
-
-                    ),
-                    onClick = {
-                        navController.navigate(route = AppScreens.HomeScreen.route)
-                    }
-                ) {
-                    Text(text = "Registrar-se")
-                }
-            }
-
-        }
-    }
-}
-*/
 
 @Composable
 fun SignUpScreenEmpresa(
@@ -150,8 +61,8 @@ fun SignUpScreenEmpresa(
             modifier = Modifier,
             navController
         ){
-            email, password ->
-            viewModel.createUserWithEmailAndPassword(email, password, context) {
+            email, password, nom, empresa, nif, telefon ->
+            viewModel.createUserWithEmailAndPassword(email, password, nom, empresa, nif, telefon, context) {
                 navController.navigate(route = AppScreens.HomeScreen.route)
             }
         }
@@ -162,7 +73,7 @@ fun SignUpScreenEmpresa(
 fun UserSignUpForm(
     modifier: Modifier,
     navController: NavController,
-    onDone: (String, String) -> Unit = {email, pwd -> }
+    onDone: (String, String, String, String, String, String) -> Unit = {email, pwd, nom, empresa, nif, telefon -> }
 ) {
     val email = rememberSaveable {
         mutableStateOf("")
@@ -252,7 +163,7 @@ fun UserSignUpForm(
             SignUpButton(
                 inputValido = valido
             ){
-                onDone(email.value.trim(), password.value.trim())            }
+                onDone(email.value.trim(), password.value.trim(), nom.value.trim(), empresa.value.trim(), nif.value.trim(), telefon.value.trim() )            }
         }
 
     }
@@ -356,16 +267,7 @@ fun SignUpButton(
 }
 
 
-@Composable
-fun PasswordTextField() {
-    TextField(
-        value = "",
-        onValueChange = {},
-        label = { Text(text = "Contrasenya") },
-        visualTransformation = PasswordVisualTransformation(),
-        modifier = Modifier.fillMaxWidth()
-    )
-}
+
 
 
 
