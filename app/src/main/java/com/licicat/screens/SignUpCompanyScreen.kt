@@ -33,6 +33,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 //import androidx.compose.material.icons.filled.Visibility
 //import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -42,99 +43,10 @@ import com.licicat.R
 
 
 
-val itemsList = listOf("Empresa", "Nom i Cognoms", "Email", "Contrasenya", "NIF", "Telefon")
 
 
-/*@Composable
-fun SignUpCompanyScreen(navController: NavController,
-                        viewModel: LoginScreenViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
-) {
-    val itemsList = listOf("Empresa", "Nom i Cognoms", "Email", "Contrasenya", "NIF", "Telefon")
-
-    Surface(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
 
 
-            item {
-                Text(text = "Registre d'empresa",
-                    style = MaterialTheme.typography.h4,
-                    color = Color(0xFFFF454A),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(20.dp),
-                    fontWeight = FontWeight.Bold,
-
-                )
-            }
-            items(itemsList) { item ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                ) {
-                    Spacer(modifier = Modifier.padding(8.dp))
-
-                    /*if (item == "Contrasenya") {
-                        PasswordTextField()
-                    } else {*/
-                        var us by remember { mutableStateOf(TextFieldValue("")) }
-                        TextField(
-                            value = us,onValueChange = { us = it },
-                            label = { Text(text = "$item") },
-                            modifier = Modifier.fillMaxWidth()
-
-                        )
-                        if(item == "Empresa"){
-                            empresaString = us.text
-                        }
-                        if(item == "Nom i Cognoms"){
-                            nomString = us.text
-                        }
-                        if(item == "Email"){
-                            emailString = us.text
-                        }
-                        if(item == "Contrasenya"){
-                            passwordString = us.text
-                        }
-                        if(item == "NIF"){
-                            NifString = us.text
-                        }
-                        if(item == "Telefon"){
-                            telefonString = us.text
-                        }
-                  //  }
-
-                    Spacer(modifier = Modifier.padding(8.dp))
-                }
-            }
-            item{
-                Button(
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(30.dp)
-                        .height(48.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = Color(0xFFFF454A),
-                        disabledBackgroundColor = Color(0xFFF78058),
-                        contentColor = Color.White,
-                        disabledContentColor = Color.White
-
-                    ),
-                    onClick = {
-                        navController.navigate(route = AppScreens.HomeScreen.route)
-                    }
-                ) {
-                    Text(text = "Registrar-se")
-                }
-            }
-
-        }
-    }
-}
-*/
 
 @Composable
 fun SignUpScreenEmpresa(
@@ -144,12 +56,13 @@ fun SignUpScreenEmpresa(
     Surface(
         modifier = Modifier.fillMaxSize()
     ) {
+        val context = LocalContext.current
         UserSignUpForm(
             modifier = Modifier,
             navController
         ){
-            email, password ->
-            viewModel.createUserWithEmailAndPassword(email, password) {
+            email, password, nom, empresa, nif, telefon ->
+            viewModel.createUserWithEmailAndPassword(email, password, nom, empresa, nif, telefon, context) {
                 navController.navigate(route = AppScreens.HomeScreen.route)
             }
         }
@@ -160,7 +73,7 @@ fun SignUpScreenEmpresa(
 fun UserSignUpForm(
     modifier: Modifier,
     navController: NavController,
-    onDone: (String, String) -> Unit = {email, pwd -> }
+    onDone: (String, String, String, String, String, String) -> Unit = {email, pwd, nom, empresa, nif, telefon -> }
 ) {
     val email = rememberSaveable {
         mutableStateOf("")
@@ -183,9 +96,13 @@ fun UserSignUpForm(
     val telefon = rememberSaveable {
         mutableStateOf("")
     }
-    val valido = remember(email.value, password.value){
+    val valido = remember(email.value, password.value, nom.value, empresa.value, nif.value, telefon.value){
         email.value.trim().isNotEmpty() &&
-                password.value.trim().isNotEmpty()
+                password.value.trim().isNotEmpty() &&
+                nom.value.trim().isNotEmpty() &&
+                empresa.value.trim().isNotEmpty() &&
+                nif.value.trim().isNotEmpty() &&
+                telefon.value.trim().isNotEmpty()
     }
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -202,18 +119,18 @@ fun UserSignUpForm(
                 )
         }
         item { Spacer(modifier = Modifier.padding(8.dp))}
-       /* item {
+       item {
             EmpresaInput(
                 empresaState = empresa
             )
         }
         item { Spacer(modifier = Modifier.padding(8.dp))}
-        item {
+         item {
             NomInput(
                 NomState = nom
             )
         }
-        item { Spacer(modifier = Modifier.padding(8.dp))}*/
+        item { Spacer(modifier = Modifier.padding(8.dp))}
         item {
             EmailInput(
                 emailState = email
@@ -229,7 +146,7 @@ fun UserSignUpForm(
 
         }
         item { Spacer(modifier = Modifier.padding(8.dp))}
-        /*item {
+        item {
             NifInput(
                 NifState = nif
             )
@@ -240,16 +157,88 @@ fun UserSignUpForm(
                 TelefonState = telefon
             )
         }
-        item { Spacer(modifier = Modifier.padding(8.dp))}*/
+        item { Spacer(modifier = Modifier.padding(8.dp))}
 
         item {
             SignUpButton(
                 inputValido = valido
             ){
-                onDone(email.value.trim(), password.value.trim())            }
+                onDone(email.value.trim(), password.value.trim(), nom.value.trim(), empresa.value.trim(), nif.value.trim(), telefon.value.trim() )            }
         }
 
     }
+}
+
+@Composable
+fun TelefonInput(
+    TelefonState: MutableState<String>,
+    labelId : String = "Telèfon",
+    isSingleLine: Boolean = true
+) {
+    OutlinedTextField(
+        value = TelefonState.value,
+        onValueChange = {TelefonState.value = it},
+        label = {Text(text = labelId)},
+        singleLine = isSingleLine,
+        modifier = Modifier.fillMaxWidth(),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Phone
+        )
+    )
+}
+
+@Composable
+fun NifInput(
+    NifState: MutableState<String>,
+    labelId : String = "NIF",
+    isSingleLine: Boolean = true
+) {
+    OutlinedTextField(
+        value = NifState.value,
+        onValueChange = {NifState.value = it},
+        label = {Text(text = labelId)},
+        singleLine = isSingleLine,
+        modifier = Modifier.fillMaxWidth(),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Password
+        )
+    )
+}
+
+@Composable
+fun NomInput(
+    NomState: MutableState<String>,
+    labelId : String = "Nom i Cognoms",
+    isSingleLine: Boolean = true
+) {
+    OutlinedTextField(
+        value = NomState.value,
+        onValueChange = {NomState.value = it},
+        label = {Text(text = labelId)},
+        singleLine = isSingleLine,
+        modifier = Modifier.fillMaxWidth(),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Text
+        )
+    )
+}
+
+@Composable
+fun EmpresaInput(
+    empresaState: MutableState<String>,
+    labelId : String = "Empresa",
+    isSingleLine: Boolean = true
+) {
+    OutlinedTextField(
+        value = empresaState.value,
+        onValueChange = {empresaState.value = it},
+        label = {Text(text = labelId)},
+        singleLine = isSingleLine,
+        modifier = Modifier.fillMaxWidth(),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Text
+        )
+    )
 }
 
 @Composable
@@ -278,16 +267,7 @@ fun SignUpButton(
 }
 
 
-@Composable
-fun PasswordTextField() {
-    TextField(
-        value = "",
-        onValueChange = {},
-        label = { Text(text = "Contrasenya") },
-        visualTransformation = PasswordVisualTransformation(),
-        modifier = Modifier.fillMaxWidth()
-    )
-}
+
 
 
 
