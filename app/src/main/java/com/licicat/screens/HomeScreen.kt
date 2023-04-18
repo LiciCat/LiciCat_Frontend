@@ -48,7 +48,6 @@ fun HomeScreen(navController: NavController) {
                             date = licitacio.termini_presentacio_ofertes.toString(),
                             price = licitacio.pressupost_licitacio_asString+"€"
                         )
-
                 }
             }
         }
