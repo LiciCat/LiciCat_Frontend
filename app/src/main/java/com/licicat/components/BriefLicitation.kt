@@ -1,30 +1,26 @@
 package com.licicat.components
 
-import android.icu.text.DecimalFormat
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.items
-
 import androidx.compose.foundation.shape.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.*
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.*
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import java.text.NumberFormat
-import java.util.*
+import androidx.navigation.NavController
+import com.licicat.navigation.AppScreens
+
 
 @Composable
 fun CardLicitacio(
@@ -32,7 +28,9 @@ fun CardLicitacio(
     title: String?,
     description: String?,
     date: String?,
-    price: String?
+    price: String?,
+    navController: NavController,
+    location: String?,
 ) {
     Card(
         modifier = Modifier
@@ -71,6 +69,24 @@ fun CardLicitacio(
                             .weight(1f)
                             .wrapContentWidth(align = Alignment.CenterHorizontally)
                     )
+                }
+                Box(
+                    modifier = Modifier
+                        .width(48.dp)
+                        .height(48.dp)
+                        .align(Alignment.CenterVertically)
+                ) {
+                    IconButton(
+                        onClick = {
+                            navController.navigate(AppScreens.withArgs(location,title))
+                        },
+                        modifier = Modifier.align(Alignment.Center)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = AppScreens.MapScreen.icon),
+                            contentDescription = AppScreens.MapScreen.title
+                        )
+                    }
                 }
                 Box(
                     modifier = Modifier
@@ -118,8 +134,6 @@ fun CardLicitacio(
         }
     }
 }
-
-
 
 
 

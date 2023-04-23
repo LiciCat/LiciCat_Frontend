@@ -1,6 +1,7 @@
 package com.licicat.navigation
 
 import com.licicat.R
+import com.licicat.navigation.AppScreens.ChatScreen.route
 
 //classe en la cual se guardan todas las pantallas a las quales se puede navegar (ruta,titulo,icono)
 
@@ -11,4 +12,16 @@ sealed class AppScreens(val route: String, val title: String, val icon: Int) {
     object ProfileScreen: AppScreens("profile_screen", "Profile", R.drawable.baseline_person_24)
     object LoginScreen: AppScreens("login_screen", "Login", R.drawable.baseline_person_24)
     object SignUpCompanyScreen: AppScreens("signup_screen", "SignUp", R.drawable.baseline_person_24)
+    object MapScreen: AppScreens("map_screen", "See on map", R.drawable.baseline_fmd_good_24)
+    companion object {
+        fun withArgs(location: String?, title:String?): String {
+            return buildString {
+                append(MapScreen.route)
+                append("/$location")
+                append("/$title")
+            }
+        }
+    }
 }
+
+
