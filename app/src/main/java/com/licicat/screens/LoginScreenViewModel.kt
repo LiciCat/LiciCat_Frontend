@@ -94,17 +94,17 @@ class LoginScreenViewModel: ViewModel() {
     ) {
         val userId = auth.currentUser?.uid
         val userEmpresa = usersEmpresa(
-            userId = userId.toString(),
-            Empresa = empresa,
-            Nom = nom,
+            user_id = userId.toString(),
+            empresa = empresa,
+            nom_cognoms = nom,
             email = email,
-            avatarUrl = "",
-            NIF =  nif,
-            Telefon = telefon,
-            id = null
+            avatar_url = "",
+            nif =  nif,
+            telefon = telefon,
+            id = userId.toString()
         ).toMap()
 
-        FirebaseFirestore.getInstance().collection("usersEmpresa")
+            FirebaseFirestore.getInstance().collection("usersEmpresa")
             .add(userEmpresa)
             .addOnSuccessListener {
                 Log.d("LiciCat", "Creat ${it.id}")
