@@ -95,13 +95,13 @@ class LoginScreenViewModel: ViewModel() {
         val userId = auth.currentUser?.uid
         val userEmpresa = usersEmpresa(
             user_id = userId.toString(),
-            empresa = empresa,
-            nom_cognoms = nom,
+            Empresa = empresa,
+            Nom = nom,
             email = email,
-            avatar_url = "",
-            nif =  nif,
-            telefon = telefon,
-            id = userId.toString()
+            avatarUrl = "",
+            NIF =  nif,
+            Telefon = telefon,
+            id = null
         ).toMap()
 
             FirebaseFirestore.getInstance().collection("usersEmpresa")
