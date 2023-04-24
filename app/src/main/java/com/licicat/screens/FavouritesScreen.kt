@@ -35,7 +35,7 @@ fun FavouritesScreen(navController: NavController) {
         val db = Firebase.firestore
         val current_user = FirebaseAuth.getInstance().currentUser
         val id_del_user = current_user?.uid
-
+        val numeros = mutableListOf<Int>()
 
         db.collection("usersEmpresa")
             .whereEqualTo("user_id", id_del_user)
@@ -43,23 +43,14 @@ fun FavouritesScreen(navController: NavController) {
             .addOnSuccessListener { documents ->
                 for (document in documents) {
                     Log.d("app", "${document.id} => ${document.data}")
-                    println(document.get("favorits"))
-                    val refs = document.get("favorits") as List<DocumentReference>
-                    for (ref in refs) {
-                        ref.get().addOnSuccessListener { refDoc ->
-                            if (refDoc.exists()) {
-                                val hola = refDoc.getString("date")
-                                println(hola)
-                            }
-                        }
-                    }
-
+                    val numerosDocument = document.get("favorits") as List<Long>
+                    numeros.addAll(numerosDocument.map { it.toInt() })
                 }
+                trobar_lic(numeros)
             }
             .addOnFailureListener { exception ->
                 Log.w("app", "Error getting documents: ", exception)
             }
-
 
         /*
         val current_user = FirebaseAuth.getInstance().currentUser
@@ -98,6 +89,23 @@ fun FavouritesScreen(navController: NavController) {
     }
 }
 
+
+fun trobar_lic(numeros: List<Int>) {
+    val db = Firebase.firestore
+    for (numero in numeros) {
+        db.collection("licitacionsFavorits")
+            .whereEqualTo("lic_id", numero)
+            .get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    Log.d("app", "${document.id} => ${document.data}")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.w("app", "Error getting documents: ", exception)
+            }
+    }
+}
 
 /*
 val userId = user.uid
