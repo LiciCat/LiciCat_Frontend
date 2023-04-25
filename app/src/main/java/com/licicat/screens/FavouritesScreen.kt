@@ -32,12 +32,14 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.licicat.LicitacionsRepository
 import com.licicat.components.BottomBarNavigation
 import com.licicat.components.CardLicitacio
 
 
-var licitacions_favs: MutableList<Licitacio> = mutableListOf()
+
+val licitacions_favs: MutableLiveData<List<Licitacio>> = MutableLiveData(emptyList())
 var presentacio =  mutableStateOf(false)
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -48,11 +50,13 @@ fun FavouritesScreen(navController: NavController) {
             BottomBarNavigation(navController)
         }
     ) {
-        licitacions_favs.clear()
+
+        licitacions_favs.value = emptyList()
         val db = Firebase.firestore
         val current_user = FirebaseAuth.getInstance().currentUser
         val id_del_user = current_user?.uid
         val numeros = mutableListOf<Int>()
+        presentacio.value = false
 
         LaunchedEffect(true) {
             db.collection("usersEmpresa")
@@ -72,14 +76,27 @@ fun FavouritesScreen(navController: NavController) {
             }
         }
         if (presentacio.value == true) {
-            LicitacionsList()
+            LazyColumn(modifier = Modifier
+                .padding(bottom = 56.dp)
+                .fillMaxWidth()) {
+
+                items(items = licitacions_favs.value ?: emptyList()) { licitacio ->
+                    CardLicitacio(
+                        icon = Icons.Filled.AccountCircle,
+                        title = licitacio.nom_organ,
+                        description = licitacio.objecte_contracte,
+                        date = licitacio.termini_presentacio_ofertes.toString(),
+                        price = licitacio.pressupost_licitacio_asString
+                    )
+                }
+            }
         }
 }
 
 @Composable
 fun LicitacionsList() {
     LazyColumn {
-        items(items = licitacions_favs) { licitacio ->
+        items(items = licitacions_favs.value ?: emptyList()) { licitacio ->
                 CardLicitacio(
                     icon = Icons.Filled.AccountCircle,
                     title = licitacio.nom_organ,
@@ -106,7 +123,9 @@ fun trobar_lic(numeros: List<Int>) {
                     licitacio.objecte_contracte = document.get("description") as String;
                     licitacio.termini_presentacio_ofertes = document.get("date") as String;
                     licitacio.pressupost_licitacio_asString = document.get("price") as String;
-                    licitacions_favs.add(licitacio);
+                    val listaActual = licitacions_favs.value?.toMutableList() ?: mutableListOf()
+                    listaActual.add(licitacio)
+                    licitacions_favs.value = listaActual
                 }
                 documentosCompletados++
                 if (documentosCompletados == numeros.size) {
