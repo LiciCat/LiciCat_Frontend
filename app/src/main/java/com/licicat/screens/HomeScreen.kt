@@ -8,12 +8,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import com.example.licicat.Licitacio
@@ -39,18 +38,29 @@ fun HomeScreen(navController: NavController) {
             // Muestra un indicador de carga mientras se obtienen los datos
             CircularProgressIndicator()
         } else {
-            LazyColumn {
-                items(items = licitacions.value) { licitacio ->
+
+            var searchText by remember { mutableStateOf("") }
+            Column() {
+                TextField(
+                    value = searchText,
+                    onValueChange = { searchText = it },
+                    placeholder = { Text("Cerca") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                LazyColumn {
+                    items(items = licitacions.value) { licitacio ->
                         CardLicitacio(
                             icon = Icons.Filled.AccountCircle,
                             title = licitacio.nom_organ,
                             description = licitacio.objecte_contracte,
                             date = licitacio.termini_presentacio_ofertes.toString(),
-                            price = licitacio.pressupost_licitacio_asString+"€"
+                            price = licitacio.pressupost_licitacio_asString + "€"
                         )
-
+                    }
                 }
             }
+
         }
     }
 
