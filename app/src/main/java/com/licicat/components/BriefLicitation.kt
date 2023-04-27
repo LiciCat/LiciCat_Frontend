@@ -20,6 +20,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.licicat.navigation.AppScreens
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import android.util.Log
+import kotlin.random.Random
 
 
 @Composable
@@ -39,6 +44,28 @@ fun CardLicitacio(
         elevation = 8.dp
     ) {
         var isFavorite by remember { mutableStateOf(false) }
+        var id_lic by remember { mutableStateOf(0) }
+        val db = Firebase.firestore
+        val current_user = FirebaseAuth.getInstance().currentUser
+
+        db.collection("licitacionsFavorits")
+            .whereEqualTo("title", title)
+            .whereEqualTo("description", description)
+            .whereEqualTo("date", date)
+            .whereEqualTo("price", price)
+            .whereArrayContains("users_ids", current_user?.uid.toString())
+            .get()
+            .addOnSuccessListener { documents ->
+                if (!documents.isEmpty) {
+                    isFavorite = true
+                }
+                for (document in documents) {
+                    id_lic = document.getLong("lic_id")?.toInt() ?: 0
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.w("app", "Error getting documents: ", exception)
+            }
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -95,7 +122,80 @@ fun CardLicitacio(
                         .align(Alignment.CenterVertically)
                 ) {
                     IconButton(
-                        onClick = { isFavorite = !isFavorite },
+                        onClick = {
+                            if (isFavorite) {
+                                db.collection("licitacionsFavorits")
+                                    .whereEqualTo("title", title)
+                                    .whereEqualTo("description", description)
+                                    .whereEqualTo("date", date)
+                                    .whereEqualTo("price", price)
+                                    .whereArrayContains("users_ids", current_user?.uid.toString())
+                                    .get()
+                                    .addOnSuccessListener { documents ->
+                                        for (document in documents) {
+                                            val usersIds = document.get("users_ids") as MutableList<String>
+                                            usersIds.remove(current_user?.uid.toString())
+                                            document.reference.update("users_ids", usersIds)
+                                        }
+                                    }
+                                db.collection("usersEmpresa")
+                                    .whereEqualTo("user_id", current_user?.uid)
+                                    .get()
+                                    .addOnSuccessListener { documents ->
+                                        for (document in documents) {
+                                            val favsIds = document.get("favorits") as MutableList<Int>
+                                            val newfavsIds = favsIds.filter { it != id_lic.toInt() }
+                                            document.reference.update("favorits", newfavsIds )
+                                        }
+                                    }
+                            }
+                            else {
+                                db.collection("licitacionsFavorits")
+                                    .whereEqualTo("title", title)
+                                    .whereEqualTo("description", description)
+                                    .whereEqualTo("date", date)
+                                    .whereEqualTo("price", price)
+                                    .get()
+                                    .addOnSuccessListener { documents ->
+                                        if (!documents.isEmpty) {
+                                            for (document in documents) {
+                                                val usersIds = document.get("users_ids") as MutableList<String>
+                                                usersIds.add(current_user?.uid.toString())
+                                                document.reference.update("users_ids", usersIds)
+                                            }
+                                        } else {
+                                            val users = listOf(current_user?.uid.toString())
+                                            id_lic = Random.nextLong(0, 2147483647).toInt()
+                                            val data = hashMapOf(
+                                                "title" to title,
+                                                "description" to description,
+                                                "date" to date,
+                                                "price" to price,
+                                                "lic_id" to id_lic,
+                                                "location" to location,
+                                                "users_ids" to users
+                                            )
+                                            db.collection("licitacionsFavorits").add(data)
+                                        }
+
+                                        db.collection("usersEmpresa")
+                                            .whereEqualTo("user_id", current_user?.uid)
+                                            .get()
+                                            .addOnSuccessListener { documents ->
+                                                for (document in documents) {
+
+                                                    println("id_lic es igual a $id_lic")
+
+                                                    val favsIds = document.get("favorits") as MutableList<Int>
+                                                    favsIds.add(id_lic)
+                                                    document.reference.update("favorits", favsIds)
+                                                }
+                                            }
+                                    }
+
+                            }
+                            isFavorite = !isFavorite
+                        },
                         modifier = Modifier.align(Alignment.Center)
                     ) {
                         Icon(
