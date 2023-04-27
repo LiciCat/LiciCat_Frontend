@@ -14,6 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import com.example.licicat.Licitacio
@@ -30,7 +31,7 @@ var licitacions: List<Licitacio>? = null
 fun HomeScreen(navController: NavController) {
     val licitacions = remember { mutableStateOf(emptyList<Licitacio>()) }
     val isLoading = remember { mutableStateOf(true) }
-
+    val expanded = remember { mutableStateOf(false) }
     Scaffold(
         bottomBar = {
             BottomBarNavigation(navController)
@@ -40,21 +41,34 @@ fun HomeScreen(navController: NavController) {
             // Muestra un indicador de carga mientras se obtienen los datos
             CircularProgressIndicator()
         } else {
-            LazyColumn {
-                items(items = licitacions.value) { licitacio ->
+            Column (modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally){
+                FloatingActionButton(
+                    onClick = { expanded.value = true },
+                    content = { Icon(Icons.Filled.AccountCircle, contentDescription = "Filtro") },
+                    modifier = Modifier.padding(16.dp)
+                )
+                LazyColumn {
+                    items(items = licitacions.value) { licitacio ->
                         CardLicitacio(
                             icon = Icons.Filled.AccountCircle,
                             title = licitacio.nom_organ,
                             description = licitacio.objecte_contracte,
                             date = licitacio.termini_presentacio_ofertes.toString(),
-                            price = licitacio.pressupost_licitacio_asString+"€",
+                            price = licitacio.pressupost_licitacio_asString + "€",
                             navController = navController, // Nuevo parámetro agregado
                             location = licitacio.lloc_execucio // ubicación de la licitación
                         )
+
+                    }
                 }
             }
         }
     }
+
+
+
 
     LaunchedEffect(true) {
         // Inicia una coroutine para obtener los datos desde la API
