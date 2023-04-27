@@ -8,10 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -32,6 +29,7 @@ fun HomeScreen(navController: NavController) {
     val licitacions = remember { mutableStateOf(emptyList<Licitacio>()) }
     val isLoading = remember { mutableStateOf(true) }
     val expanded = remember { mutableStateOf(false) }
+    var filtroSeleccionado by remember { mutableStateOf<String?>(null) }
     Scaffold(
         bottomBar = {
             BottomBarNavigation(navController)
@@ -49,8 +47,37 @@ fun HomeScreen(navController: NavController) {
                     content = { Icon(Icons.Filled.AccountCircle, contentDescription = "Filtro") },
                     modifier = Modifier.padding(16.dp)
                 )
+                if (expanded.value) {
+                DropdownMenu(
+                    expanded = expanded.value,
+                    onDismissRequest = { expanded.value = false }
+                ) {
+                    DropdownMenuItem(onClick = { filtroSeleccionado = "Barcelona" }) {
+                        Text("Barcelona")
+                    }
+                    DropdownMenuItem(onClick = { filtroSeleccionado = "Catalunya" }) {
+                        Text("Catalunya")
+                    }
+                    DropdownMenuItem(onClick = { /* Filtro por Tarragona */ }) {
+                        Text("Tarragona")
+                    }
+                    DropdownMenuItem(onClick = { /* Filtro por Espanya */ }) {
+                        Text("Espanya")
+                    }
+                    DropdownMenuItem(onClick = { filtroSeleccionado = "Girona" }) {
+                        Text("Girona")
+                    }
+                }
+            }
+
+                val licitacionesFiltradas = licitacions.value.filter { licitacion ->
+                filtroSeleccionado == null || licitacion.lloc_execucio == filtroSeleccionado
+            }
+
+
+
                 LazyColumn {
-                    items(items = licitacions.value) { licitacio ->
+                    items(items = licitacionesFiltradas) { licitacio ->
                         CardLicitacio(
                             icon = Icons.Filled.AccountCircle,
                             title = licitacio.nom_organ,
