@@ -29,7 +29,7 @@ fun HomeScreen(navController: NavController) {
     val licitacions = remember { mutableStateOf(emptyList<Licitacio>()) }
     val isLoading = remember { mutableStateOf(true) }
     val expanded = remember { mutableStateOf(false) }
-    var filtroSeleccionado by remember { mutableStateOf<String?>(null) }
+    var opcionesSeleccionadas by remember { mutableStateOf(emptyList<String>()) }
     Scaffold(
         bottomBar = {
             BottomBarNavigation(navController)
@@ -48,36 +48,21 @@ fun HomeScreen(navController: NavController) {
                     modifier = Modifier.padding(16.dp)
                 )
                 if (expanded.value) {
-                DropdownMenu(
-                    expanded = expanded.value,
-                    onDismissRequest = { expanded.value = false }
-                ) {
-                    DropdownMenuItem(onClick = { filtroSeleccionado = "Barcelona" }) {
-                        Text("Barcelona")
-                    }
-                    DropdownMenuItem(onClick = { filtroSeleccionado = "Catalunya" }) {
-                        Text("Catalunya")
-                    }
-                    DropdownMenuItem(onClick = { /* Filtro por Tarragona */ }) {
-                        Text("Tarragona")
-                    }
-                    DropdownMenuItem(onClick = { /* Filtro por Espanya */ }) {
-                        Text("Espanya")
-                    }
-                    DropdownMenuItem(onClick = { filtroSeleccionado = "Girona" }) {
-                        Text("Girona")
-                    }
+                    val onDismiss = { expanded.value = false }
+                    PantallaSeleccion(onApplyFilter = { opciones ->
+                        opcionesSeleccionadas = opciones?.split(", ") ?: emptyList() }, onDismiss = onDismiss)
                 }
-            }
 
-                val licitacionesFiltradas = licitacions.value.filter { licitacion ->
-                filtroSeleccionado == null || licitacion.lloc_execucio == filtroSeleccionado
-            }
-
-
+                val licitacionsFiltradas = if (!opcionesSeleccionadas.isEmpty()) {
+                    // Filtrar por ubicación
+                    licitacions.value.filter { it.lloc_execucio in opcionesSeleccionadas }
+                } else {
+                    // Mostrar todas las licitaciones
+                    licitacions.value
+                }
 
                 LazyColumn {
-                    items(items = licitacionesFiltradas) { licitacio ->
+                    items(items = licitacionsFiltradas) { licitacio ->
                         CardLicitacio(
                             icon = Icons.Filled.AccountCircle,
                             title = licitacio.nom_organ,
