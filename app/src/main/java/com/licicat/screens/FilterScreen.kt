@@ -28,13 +28,16 @@ fun PantallaSeleccion(onApplyFilter: (String?) -> Unit, onDismiss: () -> Unit) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-       // Text(text = "Filtros", fontSize = 20.dp, fontWeight = FontWeight.Bold)
+        // Text(text = "Filtros", fontSize = 20.dp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ) {
-            Text("Selecciona una ubicación:", modifier = Modifier.clickable(onClick = { expanded = true }))
+            Text(
+                "Selecciona una ubicación:",
+                modifier = Modifier.clickable(onClick = { expanded = true })
+            )
             Spacer(modifier = Modifier.width(16.dp))
             DropdownMenu(
                 expanded = expanded,
@@ -76,15 +79,30 @@ fun PantallaSeleccion(onApplyFilter: (String?) -> Unit, onDismiss: () -> Unit) {
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+        Row( modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center) {
+            Button(
+                modifier = Modifier.padding(8.dp),
+                onClick = {
+                    onApplyFilter(opcionesSeleccionadas.value.joinToString(", "))
+                    onDismiss()
+                }
+
+            ) {
+                Text(text = "Aplicar filtre")
+            }
+
         Button(
+            modifier = Modifier.padding(8.dp),
             onClick = {
-                onApplyFilter(opcionesSeleccionadas.value.joinToString(", "))
+                onApplyFilter(null)
                 onDismiss()
-            },
-            modifier = Modifier.align(Alignment.End)
+            }
+
         ) {
-            Text(text = "Aplicar filtro")
+            Text(text = "Cancel·lar")
         }
+    }
     }
 }
 

@@ -40,27 +40,30 @@ fun HomeScreen(navController: NavController) {
             CircularProgressIndicator()
         } else {
             Column (modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally){
-                FloatingActionButton(
+                if(!expanded.value) {
+                    FloatingActionButton(
                     onClick = { expanded.value = true },
                     content = { Icon(Icons.Filled.AccountCircle, contentDescription = "Filtro") },
                     modifier = Modifier.padding(16.dp)
-                )
+                    )
+                }
                 if (expanded.value) {
                     val onDismiss = { expanded.value = false }
                     PantallaSeleccion(onApplyFilter = { opciones ->
-                        opcionesSeleccionadas = opciones?.split(", ") ?: emptyList() }, onDismiss = onDismiss)
+                        opcionesSeleccionadas = if (opciones?.isNotBlank() == true) opciones.split(", ") else emptyList()
+                    }, onDismiss = onDismiss)
+
                 }
 
-                val licitacionsFiltradas = if (!opcionesSeleccionadas.isEmpty()) {
+                val licitacionsFiltradas = if (opcionesSeleccionadas.isNotEmpty()) {
                     // Filtrar por ubicación
                     licitacions.value.filter { it.lloc_execucio in opcionesSeleccionadas }
                 } else {
                     // Mostrar todas las licitaciones
                     licitacions.value
                 }
-
                 LazyColumn {
                     items(items = licitacionsFiltradas) { licitacio ->
                         CardLicitacio(
