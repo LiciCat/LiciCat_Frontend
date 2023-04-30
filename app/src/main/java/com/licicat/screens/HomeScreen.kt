@@ -30,6 +30,7 @@ fun HomeScreen(navController: NavController) {
     val isLoading = remember { mutableStateOf(true) }
     val expanded = remember { mutableStateOf(false) }
     var opcionesSeleccionadas by remember { mutableStateOf(emptyList<String>()) }
+    var  rangoPrecios by remember { mutableStateOf(Pair(0f,Float.MAX_VALUE)) }
     Scaffold(
         bottomBar = {
             BottomBarNavigation(navController)
@@ -51,8 +52,9 @@ fun HomeScreen(navController: NavController) {
                 }
                 if (expanded.value) {
                     val onDismiss = { expanded.value = false }
-                    PantallaSeleccion(onApplyFilter = { opciones ->
+                    PantallaSeleccion(onApplyFilter = { opciones,rango->
                         opcionesSeleccionadas = if (opciones?.isNotBlank() == true) opciones.split(", ") else emptyList()
+                        rangoPrecios = rango ?: Pair(0f, 5000000f)
                     }, onDismiss = onDismiss)
 
                 }
@@ -63,7 +65,14 @@ fun HomeScreen(navController: NavController) {
                 } else {
                     // Mostrar todas las licitaciones
                     licitacions.value
+                }.filter {
+                    val precio = it.pressupost_licitacio_asString?.replace(".", "")?.toFloatOrNull()
+                    precio != null && precio >= rangoPrecios.first && precio <= rangoPrecios.second
                 }
+
+                Text(text = rangoPrecios.first.toString() + " - " + rangoPrecios.second.toString())
+
+
                 LazyColumn {
                     items(items = licitacionsFiltradas) { licitacio ->
                         CardLicitacio(
