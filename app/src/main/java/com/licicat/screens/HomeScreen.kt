@@ -50,7 +50,9 @@ var licitacions: List<Licitacio>? = null
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun HomeScreen(navController: NavController) {
-    val licitacions = remember { mutableStateOf(emptyList<Licitacio>()) }
+    // Crea una còpia addicional de la llista de licitacions original
+    val originalLicitacions = remember { mutableStateOf(emptyList<Licitacio>()) }
+    var licitacions by remember { mutableStateOf(emptyList<Licitacio>()) }
     val isLoading = remember { mutableStateOf(true) }
 
     Scaffold(
@@ -91,7 +93,20 @@ fun HomeScreen(navController: NavController) {
                     ),
                     keyboardActions = KeyboardActions(
                         onSearch = {
-                            // Acció a realitzar quan es prem "Buscar" al teclat
+                            // Filtra la llista originalLicitacions en funció del text de cerca
+                            licitacions = originalLicitacions.value.filter {
+                                it.nom_organ?.toLowerCase()?.contains(searchText.toLowerCase()) ?: false ||
+                                it.nom_ambit?.toLowerCase()?.contains(searchText.toLowerCase()) ?: false ||
+                                it.nom_departament_ens?.toLowerCase()?.contains(searchText.toLowerCase()) ?: false ||
+                                it.nom_unitat?.toLowerCase()?.contains(searchText.toLowerCase()) ?: false ||
+                                it.tipus_contracte?.toLowerCase()?.contains(searchText.toLowerCase()) ?: false ||
+                                it.subtipus_contracte?.toLowerCase()?.contains(searchText.toLowerCase()) ?: false ||
+                                it.denominacio?.toLowerCase()?.contains(searchText.toLowerCase()) ?: false ||
+                                it.objecte_contracte?.toLowerCase()?.contains(searchText.toLowerCase()) ?: false ||
+                                it.lloc_execucio?.toLowerCase()?.contains(searchText.toLowerCase()) ?: false ||
+                                it.descripcio_lot?.toLowerCase()?.contains(searchText.toLowerCase()) ?: false ||
+                                it.denominacio_adjudicatari?.toLowerCase()?.contains(searchText.toLowerCase()) ?: false
+                            }
                         }
                     ),
                     shape = RoundedCornerShape(8.dp),
@@ -101,11 +116,8 @@ fun HomeScreen(navController: NavController) {
                     )
                 )
 
-
-
-
                 LazyColumn {
-                    items(items = licitacions.value) { licitacio ->
+                    items(items = licitacions) { licitacio ->
                         CardLicitacio(
                             icon = Icons.Filled.AccountCircle,
                             title = licitacio.nom_organ,
@@ -126,7 +138,8 @@ fun HomeScreen(navController: NavController) {
         val licitacionsData = MutableLiveData<List<Licitacio>>()
         licitacionsData.value = emptyList()
         licitacionsData.value = repository.getLicitacions()
-        licitacions.value = licitacionsData.value ?: emptyList()
+        originalLicitacions.value = licitacionsData.value ?: emptyList()
+        licitacions = originalLicitacions.value
         isLoading.value = false
     }
 }
