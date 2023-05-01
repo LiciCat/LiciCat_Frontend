@@ -82,16 +82,18 @@ fun SliderPrecio(
     var range by remember { mutableStateOf(precioMinimo..precioMaximo) }
 
     Column(modifier = modifier) {
-        Text(text = "Precio: ${range.start}€ - ${range.endInclusive}€")
+        Text(text = "Precio: ${range.start}€ - ${range.endInclusive}€", modifier = Modifier.padding(16.dp))
         RangeSlider(
             value = range,
             onValueChange = { range = it; onRangeChanged(Pair(range.start, range.endInclusive)) },
             valueRange = precioMinimo..precioMaximo,
-            steps = 100,
-            modifier = Modifier.fillMaxWidth()
+            steps = 0,
+            modifier = Modifier.fillMaxWidth().padding(16.dp)
         )
     }
 }
+
+
 
 
 @Composable
@@ -113,7 +115,6 @@ fun FilterButtons(
             }
 
         ) {
-            Text(text = rangoPrecio.first.toString() + "-" + rangoPrecio.second.toString())
             Text(text = "Aplicar filtre")
         }
 

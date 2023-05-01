@@ -7,7 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,8 +37,11 @@ fun HomeScreen(navController: NavController) {
         }
     ) {
         if (isLoading.value) {
-            // Muestra un indicador de carga mientras se obtienen los datos
-            CircularProgressIndicator()
+            Column(modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally) {
+                CircularProgressIndicator()
+            }
         } else {
             Column (modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Top,
@@ -46,7 +49,7 @@ fun HomeScreen(navController: NavController) {
                 if(!expanded.value) {
                     FloatingActionButton(
                     onClick = { expanded.value = true },
-                    content = { Icon(Icons.Filled.AccountCircle, contentDescription = "Filtro") },
+                    content = { Icon(Icons.Filled.FilterList, contentDescription = "Filtro") },
                     modifier = Modifier.padding(16.dp)
                     )
                 }
@@ -69,9 +72,6 @@ fun HomeScreen(navController: NavController) {
                     val precio = it.pressupost_licitacio_asString?.replace(".", "")?.toFloatOrNull()
                     precio != null && precio >= rangoPrecios.first && precio <= rangoPrecios.second
                 }
-
-                Text(text = rangoPrecios.first.toString() + " - " + rangoPrecios.second.toString())
-
 
                 LazyColumn {
                     items(items = licitacionsFiltradas) { licitacio ->
