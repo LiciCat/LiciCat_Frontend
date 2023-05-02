@@ -2,9 +2,12 @@ package com.licicat.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.licicat.navigation.AppScreens
 import com.licicat.screens.*
 
 //elemento composable encargado de dirigir la navegacion correcta entre las pantallas
@@ -31,6 +34,17 @@ fun AppNavigation() {
         }
         composable(route = AppScreens.SignUpCompanyScreen.route) {
             SignUpScreenEmpresa(navController)
+        }
+        composable(
+            route = AppScreens.withArgs("{location}","{title}"),
+            arguments = listOf(
+                navArgument("location") { type = NavType.StringType },
+                navArgument("title") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val location = backStackEntry.arguments?.getString("location") ?: ""
+            val title = backStackEntry.arguments?.getString("title") ?: ""
+            MapScreen(navController = navController, adress = location, title = title)
         }
     }
 }

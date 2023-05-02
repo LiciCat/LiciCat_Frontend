@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import com.example.licicat.Licitacio
+import com.google.maps.android.compose.GoogleMap
 import com.licicat.LicitacionsRepository
 import com.licicat.components.BottomBarNavigation
 import com.licicat.components.CardLicitacio
@@ -123,9 +124,10 @@ fun HomeScreen(navController: NavController) {
                             title = licitacio.nom_organ,
                             description = licitacio.objecte_contracte,
                             date = licitacio.termini_presentacio_ofertes.toString(),
-                            price = licitacio.pressupost_licitacio_asString + "€"
+                            price = licitacio.pressupost_licitacio_asString+"€",
+                            navController = navController, // Nuevo parámetro agregado
+                            location = licitacio.lloc_execucio // ubicación de la licitación
                         )
-                    }
                 }
             }
 
@@ -143,6 +145,10 @@ fun HomeScreen(navController: NavController) {
         isLoading.value = false
     }
 }
+
+
+
+
 
 
 
