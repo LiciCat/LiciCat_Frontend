@@ -101,7 +101,8 @@ class LoginScreenViewModel: ViewModel() {
             avatarUrl = "",
             NIF =  nif,
             Telefon = telefon,
-            id = null
+            id = null,
+            favorits =  emptyList<Int>()
         ).toMap()
 
         FirebaseFirestore.getInstance().collection("usersEmpresa")
