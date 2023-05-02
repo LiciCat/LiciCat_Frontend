@@ -35,7 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.licicat.LicitacionsRepository
 import com.licicat.components.BottomBarNavigation
-import com.licicat.components.CardLicitacio
+import com.licicat.components.FavLicitacio
 
 
 
@@ -81,7 +81,7 @@ fun FavouritesScreen(navController: NavController) {
             .fillMaxWidth()) {
 
             items(items = licitacions_favs.value ?: emptyList()) { licitacio ->
-                CardLicitacio(
+                FavLicitacio(
                     icon = Icons.Filled.AccountCircle,
                     title = licitacio.nom_organ,
                     description = licitacio.objecte_contracte,
@@ -110,7 +110,7 @@ fun trobar_lic(numeros: List<Int>) {
                     licitacio.objecte_contracte = document.get("description") as String;
                     licitacio.termini_presentacio_ofertes = document.get("date") as String;
                     licitacio.pressupost_licitacio_asString = document.get("price") as String;
-                    licitacio.lloc_execucio = document.get("location") as String
+                    licitacio.lloc_execucio = document.get("location") as String;
                     val listaActual = licitacions_favs.value?.toMutableList() ?: mutableListOf()
                     listaActual.add(licitacio)
                     licitacions_favs.value = listaActual

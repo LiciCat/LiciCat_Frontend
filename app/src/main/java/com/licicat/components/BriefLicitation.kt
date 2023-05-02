@@ -44,7 +44,7 @@ fun CardLicitacio(
         elevation = 8.dp
     ) {
         var isFavorite by remember { mutableStateOf(false) }
-        var id_lic by remember { mutableStateOf(0) }
+        var id_lic by remember { mutableStateOf(Random.nextLong(1, 2147483647).toInt()) }
         val db = Firebase.firestore
         val current_user = FirebaseAuth.getInstance().currentUser
 
@@ -165,7 +165,7 @@ fun CardLicitacio(
                                             }
                                         } else {
                                             val users = listOf(current_user?.uid.toString())
-                                            id_lic = Random.nextLong(0, 2147483647).toInt()
+                                            id_lic = Random.nextLong(1, 2147483647).toInt()
                                             val data = hashMapOf(
                                                 "title" to title,
                                                 "description" to description,
