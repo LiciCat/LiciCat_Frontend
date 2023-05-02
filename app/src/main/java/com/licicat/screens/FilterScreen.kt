@@ -1,19 +1,21 @@
 package com.licicat.screens
 
-import android.annotation.SuppressLint
+
+
+import android.widget.CalendarView
+import android.widget.LinearLayout
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+
 import androidx.compose.material.*
+
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.licicat.components.BottomBarNavigation
-import com.licicat.navigation.AppScreens
+import androidx.compose.ui.viewinterop.AndroidView
 
 
 
@@ -88,7 +90,9 @@ fun SliderPrecio(
             onValueChange = { range = it; onRangeChanged(Pair(range.start, range.endInclusive)) },
             valueRange = precioMinimo..precioMaximo,
             steps = 0,
-            modifier = Modifier.fillMaxWidth().padding(16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         )
     }
 }
@@ -131,6 +135,39 @@ fun FilterButtons(
     }
 }
 
+
+@Composable
+fun DatePicker(onDateSelected: (year: Int, month: Int, day: Int) -> Unit){
+    var selectedYear = 0
+    var selectedMonth = 0
+    var selectedDay = 0
+    AndroidView(
+        { context ->
+            LinearLayout(context).apply {
+                orientation = LinearLayout.VERTICAL
+                val calendarView = CalendarView(context)
+                addView(calendarView)
+
+
+
+                calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
+                    selectedYear = year
+                    selectedMonth = month
+                    selectedDay = dayOfMonth
+                }
+            }
+        },
+        modifier = Modifier.wrapContentWidth(),
+        update = {}
+    )
+    Button(
+        modifier = Modifier.padding(8.dp),
+        onClick = { onDateSelected(selectedYear, selectedMonth, selectedDay) }
+    ) {Text(text = "Select date") }
+}
+
+
+
 @Composable
 fun PantallaSeleccion(onApplyFilter: (String?, Pair<Float, Float>?) -> Unit, onDismiss: () -> Unit) {
     val opciones = listOf("Barcelona", "Catalunya", "Tarragona", "Espanya", "Girona")
@@ -159,7 +196,9 @@ fun PantallaSeleccion(onApplyFilter: (String?, Pair<Float, Float>?) -> Unit, onD
         )
 
         Spacer(modifier = Modifier.height(16.dp))
-
+        DatePicker(onDateSelected = { year, month, day ->
+            println("Selected date: $year/$month/$day")
+        })
         FilterButtons(
             onApplyFilter = onApplyFilter,
             onDismiss = onDismiss,
