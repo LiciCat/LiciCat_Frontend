@@ -126,12 +126,15 @@ fun HomeScreen(navController: NavController) {
                             date = licitacio.termini_presentacio_ofertes.toString(),
                             price = licitacio.pressupost_licitacio_asString,
                             navController = navController, // Nuevo parámetro agregado
-                            location = licitacio.lloc_execucio // ubicación de la licitación
+                            location = licitacio.lloc_execucio, // ubicación de la licitación
+                            denomination = licitacio.denominacio,
+                            date_inici = licitacio.data_publicacio_anunci,
+                            date_adjudicacio = licitacio.data_publicacio_adjudicacio,
+                            tipus_contracte = licitacio.tipus_contracte
                         )
                     }
                 }
             }
-
         }
     }
 

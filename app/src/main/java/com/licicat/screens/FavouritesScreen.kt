@@ -81,14 +81,18 @@ fun FavouritesScreen(navController: NavController) {
             .fillMaxWidth()) {
 
             items(items = licitacions_favs.value ?: emptyList()) { licitacio ->
-                FavLicitacio(
+                CardLicitacio(
                     icon = Icons.Filled.AccountCircle,
                     title = licitacio.nom_organ,
                     description = licitacio.objecte_contracte,
                     date = licitacio.termini_presentacio_ofertes.toString(),
                     price = licitacio.pressupost_licitacio_asString,
                     navController = navController,
-                    location = licitacio.lloc_execucio
+                    location = licitacio.lloc_execucio,
+                    denomination = licitacio.denominacio,
+                    date_inici = licitacio.data_publicacio_anunci,
+                    date_adjudicacio = licitacio.data_publicacio_adjudicacio,
+                    tipus_contracte = licitacio.tipus_contracte
                 )
             }
         }
@@ -111,6 +115,10 @@ fun trobar_lic(numeros: List<Int>) {
                     licitacio.termini_presentacio_ofertes = document.get("date") as String;
                     licitacio.pressupost_licitacio_asString = document.get("price") as String;
                     licitacio.lloc_execucio = document.get("location") as String;
+                    licitacio.denominacio=document.get("denomination") as String;
+                    licitacio.data_publicacio_anunci=document.get("date_inici") as String;
+                    licitacio.data_publicacio_adjudicacio=document.get("date_adjudicacio") as String;
+                    licitacio.tipus_contracte=document.get("tipus_contracte") as String;
                     val listaActual = licitacions_favs.value?.toMutableList() ?: mutableListOf()
                     listaActual.add(licitacio)
                     licitacions_favs.value = listaActual
