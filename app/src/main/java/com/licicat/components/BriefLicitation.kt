@@ -36,6 +36,10 @@ fun CardLicitacio(
     price: String?,
     navController: NavController,
     location: String?,
+    denomination: String?,
+    date_inici: String?,
+    date_adjudicacio: String?,
+    tipus_contracte: String?
 ) {
     Card(
         modifier = Modifier
@@ -173,6 +177,10 @@ fun CardLicitacio(
                                                 "price" to price,
                                                 "lic_id" to id_lic,
                                                 "location" to location,
+                                                "denomination" to denomination,
+                                                "date_inici" to date_inici,
+                                                "date_adjudicacio" to date_adjudicacio,
+                                                "tipus_contracte" to tipus_contracte,
                                                 "users_ids" to users
                                             )
                                             db.collection("licitacionsFavorits").add(data)

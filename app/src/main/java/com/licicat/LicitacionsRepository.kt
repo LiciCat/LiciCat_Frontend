@@ -22,29 +22,64 @@ class LicitacionsRepository {
 
     fun creallista(json: JSONObject): Licitacio {
 
+        //Nom organització licitació
         val no = json.optString("nom_organ", "no disponible")
+
+        //Descripció general Licitació
+        val denc = json.optString("denominacio", "no disponible")
+
+        //Tipus contracte licitació
         val tc = json.optString("tipus_contracte", "no disponible")
+
+        //Pressupost licitació
         val pl = json.optInt("pressupost_licitacio", 0)
         val formattedPl = String.format(Locale.getDefault(), "%,d", pl).replace(",", ".")
+
+        //Ubicació licitació
         val lle = json.optString("lloc_execucio", "no disponible")
+
+        //Descripció del contracte
         val desc = json.optString("objecte_contracte", "no disponible")
-        val tp = json.optString("termini_presentacio_ofertes", "no disponible");
 
-
+        //Transformacions dates
         val formatoOrigen = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
-        val fechaOrigen = formatoOrigen.parse(tp)
-
         val formatoDestino = SimpleDateFormat("dd/MM/yyyy")
-        val fechaDestino = formatoDestino.format(fechaOrigen)
+
+        //Data inici licitació
+        val il = json.optString("data_publicacio_anunci", "no disponible");
+        var data_inici = il;
+        if (!il.equals("no disponible")) {
+            val il_2 = formatoOrigen.parse(il)
+            data_inici = formatoDestino.format(il_2)
+        }
+
+        //Data termini licitació
+        val dt = json.optString("termini_presentacio_ofertes", "no disponible");
+        var data_fi = dt;
+        if (!dt.equals("no disponible")) {
+            val dt_2 = formatoOrigen.parse(dt)
+            data_fi = formatoDestino.format(dt_2)
+        }
+
+        //Data adjudicació
+        val da = json.optString("data_publicacio_adjudicacio", "no disponible");
+        var data_adjudicacio = da;
+        if (!da.equals("no disponible")) {
+            val da_2 = formatoOrigen.parse(da)
+            data_adjudicacio = formatoDestino.format(da_2)
+        }
+
 
         var licitacio = Licitacio()
         licitacio.nom_organ = no;
-        licitacio.termini_presentacio_ofertes = fechaDestino
-        licitacio.tipus_contracte = tc;
+        licitacio.denominacio = denc;
+        licitacio.objecte_contracte= desc;
         licitacio.pressupost_licitacio_asString = formattedPl;
         licitacio.lloc_execucio = lle;
-        licitacio.objecte_contracte= desc;
-
+        licitacio.data_publicacio_anunci = data_inici;
+        licitacio.termini_presentacio_ofertes = data_fi;
+        licitacio.data_publicacio_adjudicacio = data_adjudicacio;
+        licitacio.tipus_contracte = tc;
         return licitacio
     }
 
@@ -114,10 +149,14 @@ class LicitacionsRepository {
         for (elem in licitacions) {
             println("Licitacio-------------")
             println(elem.nom_organ)
+            println(elem.denominacio)
             println(elem?.objecte_contracte)
             println(elem?.pressupost_licitacio_asString)
-            println(elem?.termini_presentacio_ofertes)
             println(elem?.lloc_execucio)
+            println(elem?.data_publicacio_anunci)
+            println(elem?.termini_presentacio_ofertes)
+            println(elem?.data_publicacio_adjudicacio)
+            println(elem?.tipus_contracte)
         }
         return licitacions
     }
