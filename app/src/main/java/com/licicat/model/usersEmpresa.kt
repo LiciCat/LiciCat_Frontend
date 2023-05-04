@@ -1,5 +1,5 @@
 package com.licicat.model
-
+import kotlin.collections.*
 data class usersEmpresa(
     val id: String?,
     val userId: String,
@@ -8,7 +8,8 @@ data class usersEmpresa(
     val email: String,
     val avatarUrl: String,
     val NIF: String,
-    val Telefon: String
+    val Telefon: String,
+    val favorits: List<Int>
 ){
     fun toMap(): MutableMap<String, Any>{
         return mutableMapOf(
@@ -18,7 +19,8 @@ data class usersEmpresa(
             "email" to this.email,
             "nif" to this.NIF,
             "telefon" to this.Telefon,
-            "avatar_url" to this.avatarUrl
+            "avatar_url" to this.avatarUrl,
+            "favorits" to this.favorits
         )
     }
 }

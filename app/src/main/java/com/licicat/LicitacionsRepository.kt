@@ -30,6 +30,7 @@ class LicitacionsRepository {
         val desc = json.optString("objecte_contracte", "no disponible")
         val tp = json.optString("termini_presentacio_ofertes", "no disponible");
 
+
         val formatoOrigen = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
         val fechaOrigen = formatoOrigen.parse(tp)
 
