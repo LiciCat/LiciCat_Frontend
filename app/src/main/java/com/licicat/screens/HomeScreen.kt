@@ -20,8 +20,23 @@ import com.licicat.LicitacionsRepository
 import com.licicat.components.BottomBarNavigation
 import com.licicat.components.CardLicitacio
 
+import java.text.SimpleDateFormat
+import java.util.*
+
 
 var licitacions: List<Licitacio>? = null
+
+
+fun formatDate(day: Int, month: Int, year: Int): String {
+    val calendar = Calendar.getInstance().apply {
+        set(Calendar.DAY_OF_MONTH, day)
+        set(Calendar.MONTH, month)
+        set(Calendar.YEAR, year)
+    }
+    val date = calendar.time
+    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    return dateFormat.format(date)
+}
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -31,6 +46,9 @@ fun HomeScreen(navController: NavController) {
     val expanded = remember { mutableStateOf(false) }
     var opcionesSeleccionadas by remember { mutableStateOf(emptyList<String>()) }
     var  rangoPrecios by remember { mutableStateOf(Pair(0f,Float.MAX_VALUE)) }
+    var dia by remember { mutableStateOf(0) }
+    var mes by remember { mutableStateOf(0) }
+    var any by remember { mutableStateOf(0) }
     Scaffold(
         bottomBar = {
             BottomBarNavigation(navController)
@@ -55,13 +73,20 @@ fun HomeScreen(navController: NavController) {
                 }
                 if (expanded.value) {
                     val onDismiss = { expanded.value = false }
-                    PantallaSeleccion(onApplyFilter = { opciones,rango->
+                    PantallaSeleccion(onApplyFilter = { opciones,rango, day, month, year->
                         opcionesSeleccionadas = if (opciones?.isNotBlank() == true) opciones.split(", ") else emptyList()
                         rangoPrecios = rango ?: Pair(0f, 5000000f)
+                        dia = day ?: 0
+                        mes = month ?: 0
+                        any = year ?: 0
                     }, onDismiss = onDismiss)
 
                 }
 
+
+                val fechaFormateada = formatDate(dia, mes, any)
+
+                println(fechaFormateada)
                 val licitacionsFiltradas = if (opcionesSeleccionadas.isNotEmpty()) {
                     // Filtrar por ubicación
                     licitacions.value.filter { it.lloc_execucio in opcionesSeleccionadas }
@@ -71,6 +96,12 @@ fun HomeScreen(navController: NavController) {
                 }.filter {
                     val precio = it.pressupost_licitacio_asString?.replace(".", "")?.toFloatOrNull()
                     precio != null && precio >= rangoPrecios.first && precio <= rangoPrecios.second
+                }.let { filteredList ->
+                    if (fechaFormateada == "31/12/0002") {
+                        filteredList
+                    } else {
+                        filteredList.filter { it.termini_presentacio_ofertes.toString() == fechaFormateada }
+                    }
                 }
 
                 LazyColumn {

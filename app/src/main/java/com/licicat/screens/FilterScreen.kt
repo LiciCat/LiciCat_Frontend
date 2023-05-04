@@ -244,7 +244,6 @@ fun PantallaSeleccion(onApplyFilter: (String?, Pair<Float, Float>?, Int?, Int?, 
         // DatePickerDialog
         if (isDatePickerOpen.value) {
             DatePickerDialog(onDateSelected = { year, month, day -> dia.value = day; mes.value = month; any.value = year;
-                println("Selected date: $year/$month/$day")
                 isDatePickerOpen.value = false // Cerramos el diálogo al seleccionar la fecha
             })
         }
