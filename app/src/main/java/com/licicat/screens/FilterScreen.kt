@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -102,10 +103,13 @@ fun SliderPrecio(
 
 @Composable
 fun FilterButtons(
-    onApplyFilter: (String?, Pair<Float, Float>?) -> Unit,
+    onApplyFilter: (String?, Pair<Float, Float>?, Int?, Int?, Int?) -> Unit,
     onDismiss: () -> Unit,
     opcionesSeleccionadas: List<String>,
-    rangoPrecio: Pair<Float, Float>
+    rangoPrecio: Pair<Float, Float>,
+    dia: Int?,
+    mes: Int?,
+    any: Int?
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -114,7 +118,7 @@ fun FilterButtons(
         Button(
             modifier = Modifier.padding(8.dp),
             onClick = {
-                onApplyFilter(opcionesSeleccionadas.joinToString(", "), rangoPrecio)
+                onApplyFilter(opcionesSeleccionadas.joinToString(", "), rangoPrecio, dia, mes, any )
                 onDismiss()
             }
 
@@ -125,7 +129,7 @@ fun FilterButtons(
         Button(
             modifier = Modifier.padding(8.dp),
             onClick = {
-                onApplyFilter(null, null)
+                onApplyFilter(null, null, null, null, null)
                 onDismiss()
             }
 
@@ -137,42 +141,72 @@ fun FilterButtons(
 
 
 @Composable
-fun DatePicker(onDateSelected: (year: Int, month: Int, day: Int) -> Unit){
+fun DatePickerDialog(onDateSelected: (year: Int, month: Int, day: Int) -> Unit) {
     var selectedYear = 0
     var selectedMonth = 0
     var selectedDay = 0
-    AndroidView(
-        { context ->
-            LinearLayout(context).apply {
-                orientation = LinearLayout.VERTICAL
-                val calendarView = CalendarView(context)
-                addView(calendarView)
+    var dialogOpen by remember { mutableStateOf(true) }
 
+    // Esta es la función que se llama cuando se pulsa el botón de "Seleccionar"
+    fun selectDate() {
+        onDateSelected(selectedYear, selectedMonth, selectedDay)
+        dialogOpen = false
+    }
 
-
-                calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
-                    selectedYear = year
-                    selectedMonth = month
-                    selectedDay = dayOfMonth
+    // Creamos un AlertDialog con un DatePicker
+    if (dialogOpen){
+        AlertDialog(
+            onDismissRequest = { },
+            buttons = {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Button(onClick = { selectDate() }) {
+                        Text(text = "Seleccionar")
+                    }
                 }
+            },
+            title = {
+                Text(text = "Selecciona un limit de termini de presentació")
+            },
+            text = {
+                AndroidView(
+                    { context ->
+                        LinearLayout(context).apply {
+                            orientation = LinearLayout.VERTICAL
+                            val calendarView = CalendarView(context)
+                            addView(calendarView)
+
+                            calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
+                                selectedYear = year
+                                selectedMonth = month
+                                selectedDay = dayOfMonth
+                            }
+                        }
+                    },
+                    modifier = Modifier.wrapContentWidth(),
+                    update = {}
+                )
             }
-        },
-        modifier = Modifier.wrapContentWidth(),
-        update = {}
-    )
-    Button(
-        modifier = Modifier.padding(8.dp),
-        onClick = { onDateSelected(selectedYear, selectedMonth, selectedDay) }
-    ) {Text(text = "Select date") }
+        )
+}
 }
 
 
 
+//LLoc_execucio, preu_min & preu_max, dia, mes, any
 @Composable
-fun PantallaSeleccion(onApplyFilter: (String?, Pair<Float, Float>?) -> Unit, onDismiss: () -> Unit) {
+fun PantallaSeleccion(onApplyFilter: (String?, Pair<Float, Float>?, Int?, Int?, Int?) -> Unit, onDismiss: () -> Unit) {
     val opciones = listOf("Barcelona", "Catalunya", "Tarragona", "Espanya", "Girona")
     val opcionesSeleccionadas = remember { mutableStateOf(emptyList<String>()) }
     val rangoPrecios = remember { mutableStateOf(Pair(0f, 5000000f)) }
+    val isDatePickerOpen = remember { mutableStateOf(false) }
+    val dia = remember { mutableStateOf<Int?>(null) }
+    val mes = remember { mutableStateOf<Int?>(null) }
+    val any = remember { mutableStateOf<Int?>(null) }
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -196,14 +230,32 @@ fun PantallaSeleccion(onApplyFilter: (String?, Pair<Float, Float>?) -> Unit, onD
         )
 
         Spacer(modifier = Modifier.height(16.dp))
-        DatePicker(onDateSelected = { year, month, day ->
-            println("Selected date: $year/$month/$day")
-        })
+        // Botón para abrir el DatePicker
+        Button(
+            modifier = Modifier.padding(8.dp),
+            onClick = {
+                isDatePickerOpen.value = true
+            }
+
+        ) {
+            Text(text = "Seleccionar data presentació")
+        }
+
+        // DatePickerDialog
+        if (isDatePickerOpen.value) {
+            DatePickerDialog(onDateSelected = { year, month, day -> dia.value = day; mes.value = month; any.value = year;
+                println("Selected date: $year/$month/$day")
+                isDatePickerOpen.value = false // Cerramos el diálogo al seleccionar la fecha
+            })
+        }
         FilterButtons(
             onApplyFilter = onApplyFilter,
             onDismiss = onDismiss,
             opcionesSeleccionadas = opcionesSeleccionadas.value,
-            rangoPrecio = rangoPrecios.value
+            rangoPrecio = rangoPrecios.value,
+            dia = dia.value,
+            mes = mes.value,
+            any = any.value
         )
     }
 }
