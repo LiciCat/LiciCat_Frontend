@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 
 
@@ -25,22 +26,23 @@ fun FilterDropdownMenu(
     opciones: List<String>,
     opcionesSeleccionadas: List<String>,
     onOptionClick: (String) -> Unit,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
+    titol: String
 ) {
     var expanded by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ) {
-        Text(
-            "Selecciona una ubicación:",
-            modifier = Modifier.clickable(onClick = { expanded = true })
-        )
+        Button(
+            onClick = { expanded = true },
+            modifier = Modifier.padding(8.dp).fillMaxWidth()
+        ){Text(titol)}
         Spacer(modifier = Modifier.width(16.dp))
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.width(200.dp)
+            modifier = Modifier.width(400.dp)
         ) {
             opciones.forEach { opcion ->
                 val isChecked = opcionesSeleccionadas.contains(opcion)
@@ -103,13 +105,14 @@ fun SliderPrecio(
 
 @Composable
 fun FilterButtons(
-    onApplyFilter: (String?, Pair<Float, Float>?, Int?, Int?, Int?) -> Unit,
+    onApplyFilter: (String?, Pair<Float, Float>?, Int?, Int?, Int?, String?) -> Unit,
     onDismiss: () -> Unit,
     opcionesSeleccionadas: List<String>,
     rangoPrecio: Pair<Float, Float>,
     dia: Int?,
     mes: Int?,
-    any: Int?
+    any: Int?,
+    opcionesSeleccionadasTipus: List<String>
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -118,18 +121,14 @@ fun FilterButtons(
         Button(
             modifier = Modifier.padding(8.dp),
             onClick = {
-                onApplyFilter(opcionesSeleccionadas.joinToString(", "), rangoPrecio, dia, mes, any )
+                onApplyFilter(opcionesSeleccionadas.joinToString(", "), rangoPrecio, dia, mes, any, opcionesSeleccionadasTipus.joinToString(", "))
                 onDismiss()
-            }
-
-        ) {
-            Text(text = "Aplicar filtre")
-        }
+            }) { Text(text = "Aplicar filtres") }
 
         Button(
             modifier = Modifier.padding(8.dp),
             onClick = {
-                onApplyFilter(null, null, null, null, null)
+                onApplyFilter(null, null, null, null, null, null)
                 onDismiss()
             }
 
@@ -145,7 +144,7 @@ fun DatePickerDialog(onDateSelected: (year: Int, month: Int, day: Int) -> Unit) 
     var selectedYear = 0
     var selectedMonth = 0
     var selectedDay = 0
-    var dialogOpen by remember { mutableStateOf(true) }
+    var dialogOpen = true
 
     // Esta es la función que se llama cuando se pulsa el botón de "Seleccionar"
     fun selectDate() {
@@ -164,7 +163,13 @@ fun DatePickerDialog(onDateSelected: (year: Int, month: Int, day: Int) -> Unit) 
                         .padding(8.dp),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    Button(onClick = { selectDate() }) {
+                    Button(onClick = {  dialogOpen = false
+                        onDateSelected(0,0,0)} ,
+                            modifier = Modifier.padding(8.dp)) {
+                        Text(text = "Cancel·lar")
+                    }
+                    Button(onClick = { selectDate() },
+                           modifier = Modifier.padding(8.dp)) {
                         Text(text = "Seleccionar")
                     }
                 }
@@ -197,11 +202,13 @@ fun DatePickerDialog(onDateSelected: (year: Int, month: Int, day: Int) -> Unit) 
 
 
 
-//LLoc_execucio, preu_min & preu_max, dia, mes, any
+//LLoc_execucio, preu_min & preu_max, dia, mes, any, Tipus_Contracte
 @Composable
-fun PantallaSeleccion(onApplyFilter: (String?, Pair<Float, Float>?, Int?, Int?, Int?) -> Unit, onDismiss: () -> Unit) {
+fun PantallaSeleccion(onApplyFilter: (String?, Pair<Float, Float>?, Int?, Int?, Int?, String?) -> Unit, onDismiss: () -> Unit) {
     val opciones = listOf("Barcelona", "Catalunya", "Tarragona", "Espanya", "Girona")
+    val opcionesTipus = listOf("Serveis", "Subministraments", "Obres", "Altra legislació sectorial", "Privat d'Administració Pública", "Concessió de serveis", "Administratiu especial", "Gestió de Serveis Públics", "Privat", "Concessió d'obra pública", "Col·laboració Públic-Privat", )
     val opcionesSeleccionadas = remember { mutableStateOf(emptyList<String>()) }
+    val opcionesSeleccionadasTipus = remember { mutableStateOf(emptyList<String>()) }
     val rangoPrecios = remember { mutableStateOf(Pair(0f, 5000000f)) }
     val isDatePickerOpen = remember { mutableStateOf(false) }
     val dia = remember { mutableStateOf<Int?>(null) }
@@ -209,10 +216,14 @@ fun PantallaSeleccion(onApplyFilter: (String?, Pair<Float, Float>?, Int?, Int?, 
     val any = remember { mutableStateOf<Int?>(null) }
     Column(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(16.dp))
+        Column(modifier = Modifier.fillMaxWidth().padding(16.dp)){
+            Text(text = "Filtres", fontSize = 36.sp, fontWeight = FontWeight.Bold)
+        }
+
         SliderPrecio(precioMinimo = 0f, precioMaximo = 5000000f , onRangeChanged = {
             rangoPrecios.value = it
         })
@@ -226,20 +237,31 @@ fun PantallaSeleccion(onApplyFilter: (String?, Pair<Float, Float>?, Int?, Int?, 
                     opcionesSeleccionadas.value = opcionesSeleccionadas.value + it
                 }
             },
-            onDismissRequest = { }
+            onDismissRequest = { },
+            titol = "Selecciona lloc d'execució"
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        FilterDropdownMenu(
+            opciones = opcionesTipus,
+            opcionesSeleccionadas = opcionesSeleccionadasTipus.value,
+            onOptionClick = {
+                if (opcionesSeleccionadasTipus.value.contains(it)) {
+                    opcionesSeleccionadasTipus.value = opcionesSeleccionadasTipus.value.filter { selected -> selected != it }
+                } else {
+                    opcionesSeleccionadasTipus.value = opcionesSeleccionadasTipus.value + it
+                }
+            },
+            onDismissRequest = { },
+            titol = "Selecciona tipus de contracte"
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
         // Botón para abrir el DatePicker
         Button(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(8.dp).fillMaxWidth(),
             onClick = {
                 isDatePickerOpen.value = true
-            }
-
-        ) {
-            Text(text = "Seleccionar data presentació")
-        }
+            }) { Text(text = "Seleccionar data presentació") }
 
         // DatePickerDialog
         if (isDatePickerOpen.value) {
@@ -247,6 +269,9 @@ fun PantallaSeleccion(onApplyFilter: (String?, Pair<Float, Float>?, Int?, Int?, 
                 isDatePickerOpen.value = false // Cerramos el diálogo al seleccionar la fecha
             })
         }
+
+
+
         FilterButtons(
             onApplyFilter = onApplyFilter,
             onDismiss = onDismiss,
@@ -254,7 +279,8 @@ fun PantallaSeleccion(onApplyFilter: (String?, Pair<Float, Float>?, Int?, Int?, 
             rangoPrecio = rangoPrecios.value,
             dia = dia.value,
             mes = mes.value,
-            any = any.value
+            any = any.value,
+            opcionesSeleccionadasTipus = opcionesSeleccionadasTipus.value
         )
     }
 }

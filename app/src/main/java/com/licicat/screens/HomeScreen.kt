@@ -45,6 +45,7 @@ fun HomeScreen(navController: NavController) {
     val isLoading = remember { mutableStateOf(true) }
     val expanded = remember { mutableStateOf(false) }
     var opcionesSeleccionadas by remember { mutableStateOf(emptyList<String>()) }
+    var opcionesSeleccionadasTipus by remember { mutableStateOf(emptyList<String>()) }
     var  rangoPrecios by remember { mutableStateOf(Pair(0f,Float.MAX_VALUE)) }
     var dia by remember { mutableStateOf(0) }
     var mes by remember { mutableStateOf(0) }
@@ -73,12 +74,13 @@ fun HomeScreen(navController: NavController) {
                 }
                 if (expanded.value) {
                     val onDismiss = { expanded.value = false }
-                    PantallaSeleccion(onApplyFilter = { opciones,rango, day, month, year->
+                    PantallaSeleccion(onApplyFilter = { opciones,rango, day, month, year, opcionesTipus->
                         opcionesSeleccionadas = if (opciones?.isNotBlank() == true) opciones.split(", ") else emptyList()
                         rangoPrecios = rango ?: Pair(0f, 5000000f)
                         dia = day ?: 0
                         mes = month ?: 0
                         any = year ?: 0
+                        opcionesSeleccionadasTipus = if (opcionesTipus?.isNotBlank() == true) opcionesTipus.split(", ") else emptyList()
                     }, onDismiss = onDismiss)
 
                 }
@@ -101,6 +103,12 @@ fun HomeScreen(navController: NavController) {
                         filteredList
                     } else {
                         filteredList.filter { it.termini_presentacio_ofertes.toString() == fechaFormateada }
+                    }
+                }.let { filteredList ->
+                    if (opcionesSeleccionadasTipus.isNotEmpty()) {
+                        filteredList.filter { it.tipus_contracte in opcionesSeleccionadasTipus }
+                    } else {
+                        filteredList
                     }
                 }
 
