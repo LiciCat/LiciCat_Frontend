@@ -38,6 +38,38 @@ fun formatDate(day: Int, month: Int, year: Int): String {
     return dateFormat.format(date)
 }
 
+fun filtrarLicitacions(
+    licitacions: List<Licitacio>,
+    opcionesSeleccionadas: List<String>,
+    rangoPrecios: Pair<Float, Float>,
+    fechaFormateada: String,
+    opcionesSeleccionadasTipus: List<String>
+): List<Licitacio> {
+    return if (opcionesSeleccionadas.isNotEmpty()) {
+        // Filtrar por ubicación
+        licitacions.filter { it.lloc_execucio in opcionesSeleccionadas }
+    } else {
+        // Mostrar todas las licitaciones
+        licitacions
+    }.filter {
+        val precio = it.pressupost_licitacio_asString?.replace(".", "")?.toFloatOrNull()
+        precio != null && precio >= rangoPrecios.first && precio <= rangoPrecios.second
+    }.let { filteredList ->
+        if (fechaFormateada == "31/12/0002") {
+            filteredList
+        } else {
+            filteredList.filter { it.termini_presentacio_ofertes.toString() == fechaFormateada }
+        }
+    }.let { filteredList ->
+        if (opcionesSeleccionadasTipus.isNotEmpty()) {
+            filteredList.filter { it.tipus_contracte in opcionesSeleccionadasTipus }
+        } else {
+            filteredList
+        }
+    }
+}
+
+
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -88,29 +120,8 @@ fun HomeScreen(navController: NavController) {
 
                 val fechaFormateada = formatDate(dia, mes, any)
 
-                println(fechaFormateada)
-                val licitacionsFiltradas = if (opcionesSeleccionadas.isNotEmpty()) {
-                    // Filtrar por ubicación
-                    licitacions.value.filter { it.lloc_execucio in opcionesSeleccionadas }
-                } else {
-                    // Mostrar todas las licitaciones
-                    licitacions.value
-                }.filter {
-                    val precio = it.pressupost_licitacio_asString?.replace(".", "")?.toFloatOrNull()
-                    precio != null && precio >= rangoPrecios.first && precio <= rangoPrecios.second
-                }.let { filteredList ->
-                    if (fechaFormateada == "31/12/0002") {
-                        filteredList
-                    } else {
-                        filteredList.filter { it.termini_presentacio_ofertes.toString() == fechaFormateada }
-                    }
-                }.let { filteredList ->
-                    if (opcionesSeleccionadasTipus.isNotEmpty()) {
-                        filteredList.filter { it.tipus_contracte in opcionesSeleccionadasTipus }
-                    } else {
-                        filteredList
-                    }
-                }
+                val licitacionsFiltradas = filtrarLicitacions(licitacions.value, opcionesSeleccionadas, rangoPrecios, fechaFormateada, opcionesSeleccionadasTipus)
+
 
                 LazyColumn {
                     items(items = licitacionsFiltradas) { licitacio ->
