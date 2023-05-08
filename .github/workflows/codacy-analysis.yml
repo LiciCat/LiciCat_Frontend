@@ -1,17 +1,18 @@
-name: Codacy Analysis
+name: Codacy Analysis CLI
 
 on:
   pull_request:
-    branches: [ '*' ]
+    branches: [ "main" ]
 
 jobs:
-  codacy-analysis:
-    name: Codacy Analysis
+  codacy-analysis-cli:
+    name: Codacy Analysis CLI
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Run Codacy analysis
-        uses: codacy/codacy-analysis-action@3.0.2
+        uses: actions/checkout@main
+
+      - name: Run Codacy Analysis CLI
+        uses: codacy/codacy-analysis-cli-action@master
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
