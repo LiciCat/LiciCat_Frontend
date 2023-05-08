@@ -2,8 +2,7 @@ name: Codacy Analysis
 
 on:
   pull_request:
-    branches:
-      - main
+    branches: [ '*' ]
 
 jobs:
   codacy-analysis:
