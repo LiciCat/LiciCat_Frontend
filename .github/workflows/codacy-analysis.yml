@@ -13,6 +13,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Run Codacy analysis
-        uses: codacy/codacy-analysis-action@4.0.4
+        uses: codacy/codacy-analysis-action@3.0.2
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
