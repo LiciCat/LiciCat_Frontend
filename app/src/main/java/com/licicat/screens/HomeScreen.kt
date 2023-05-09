@@ -14,7 +14,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import com.example.licicat.Licitacio
-import com.google.maps.android.compose.GoogleMap
 import com.licicat.LicitacionsRepository
 import com.licicat.components.BottomBarNavigation
 import com.licicat.components.CardLicitacio
@@ -91,6 +90,7 @@ fun filtrarLicitacions(
         }
     }
 }
+
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
