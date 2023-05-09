@@ -101,7 +101,7 @@ class LicitacionsRepository {
 
 
         //fecha = "2023-04-28T13:40:00.000"
-        val url = "https://analisi.transparenciacatalunya.cat/resource/a23c-d6vp.json?\$where=termini_presentacio_ofertes%3E%27$fecha%27&\$limit=20"
+        val url = "https://analisi.transparenciacatalunya.cat/resource/a23c-d6vp.json?\$where=termini_presentacio_ofertes%3E%27$fecha%27&\$limit=60"
 
         val request = Request.Builder()
             .url(url)

@@ -2,6 +2,8 @@ package com.licicat.screens
 
 import kotlin.math.abs
 import android.annotation.SuppressLint
+import android.content.Context
+import android.location.Geocoder
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.BoxScope
@@ -44,7 +46,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -55,11 +59,10 @@ import java.util.*
 
 
 // Función para calcular la similitud entre dos licitaciones
-fun calcularSimilitud(licitacion1: Licitacio, licitacion2: Licitacio): Double {
-    println("test_licitacion1:" + licitacion1.pressupost_licitacio)
-    println("test_licitacion2:" + licitacion2.pressupost_licitacio)
-    val similitudPrecio = calcularSimilitudPrecio(licitacion1.pressupost_licitacio, licitacion2.pressupost_licitacio)
+fun calcularSimilitud(licitacion1: Licitacio, licitacion2: Licitacio, context: Context): Double {
 
+    val similitudPrecio = calcularSimilitudPrecio(licitacion1.pressupost_licitacio, licitacion2.pressupost_licitacio)
+    val similitudUbicacio = calcularSimilitudUbi("Barcelona", "Tarragona", context)
 
     // Ponderar y combinar las similitudes según su importancia relativa
     val pesoPrecio = 1
@@ -88,6 +91,42 @@ fun calcularSimilitudPrecio(precio1: Int?, precio2: Int?): Double {
 
         return 1.0 - normalizacion //0 representa ninguna similitud y 1 representa una similitud perfecta
     }
+}
+
+fun getDistanceBetweenPoints(latitude1: Double, longitude1: Double, latitude2: Double, longitude2: Double): Double {
+    val theta = longitude1 - longitude2
+    val distance = 60 * 1.1515 * (180/Math.PI) * Math.acos(
+        Math.sin(latitude1 * (Math.PI/180)) * Math.sin(latitude2 * (Math.PI/180)) +
+                Math.cos(latitude1 * (Math.PI/180)) * Math.cos(latitude2 * (Math.PI/180)) * Math.cos(theta * (Math.PI/180))
+    )
+    return Math.round(distance * 1.609344 * 100) / 100.0 // Redondear a dos decimales
+}
+
+fun getCoordinates(ubi: String?, context: Context): Pair<Double, Double> {
+
+    val geocoder = Geocoder(context)
+    val result = ubi?.let { geocoder.getFromLocationName(it, 1) }
+    lateinit var latLng: LatLng
+    if (result != null && result.isNotEmpty()) {
+        val location = result[0]
+        latLng = LatLng(location.latitude, location.longitude)
+        println("Latitud: ${latLng.latitude} Longitud: ${latLng.longitude}")
+        return Pair(latLng.latitude, latLng.longitude)
+    }
+    return Pair(0.0, 0.0)
+}
+
+
+fun calcularSimilitudUbi(ubi1: String?, ubi2: String?, context: Context): Double {
+    if (ubi1 == null || ubi2 == null) {
+        println("ES null")
+        return 0.0
+    } else {
+        val ubi1 = getCoordinates(ubi1, context)
+        val ubi2 = getCoordinates(ubi2, context)
+        val distancia = getDistanceBetweenPoints(ubi1.first, ubi1.second, ubi2.first, ubi2.second)
+    }
+    return 0.0
 }
 
 
@@ -156,7 +195,7 @@ fun obtenerLicitaciones(numeros: List<Int>, onSuccess: (List<Licitacio>) -> Unit
 }
 
 
-fun calcularSimilitudPromedio(lista1: List<Licitacio>, lista2: List<Licitacio>): Double {
+fun calcularSimilitudPromedio(lista1: List<Licitacio>, lista2: List<Licitacio>, context: Context): Double {
     var totalSimilitud = 0.0
     val totalComparaciones = lista1.size * lista2.size
 
@@ -164,7 +203,7 @@ fun calcularSimilitudPromedio(lista1: List<Licitacio>, lista2: List<Licitacio>):
 
     for (licitacion1 in lista1) {
         for (licitacion2 in lista2) {
-            totalSimilitud += calcularSimilitud(licitacion1, licitacion2)
+            totalSimilitud += calcularSimilitud(licitacion1, licitacion2, context)
             println("test_bucle")
         }
     }
@@ -203,12 +242,12 @@ fun RecommendationScreen(navController: NavController, originalLicitacions: List
 
         if (presentacio.value) {
             println("Control" + licitacions_favs.value.size + "<- favs || all ->"+ licitacions_all.size)
-            val similitudPromedio = calcularSimilitudPromedio(licitacions_favs.value.toList(), licitacions_all)
+            val similitudPromedio = calcularSimilitudPromedio(licitacions_favs.value.toList(), licitacions_all, navController.context)
             var calc = 0.0
             println("Control" + similitudPromedio)
             println("prova favs" + licitacions_favs.value.get(0).pressupost_licitacio)
 
-            val licitacionesSimilares = licitacions_all.filter {  calc = calcularSimilitudPromedio(listOf(it), licitacions_favs.value.toList());
+            val licitacionesSimilares = licitacions_all.filter {  calc = calcularSimilitudPromedio(listOf(it), licitacions_favs.value.toList(), navController.context);
                 calc > similitudPromedio
             }.sortedByDescending { licitacion -> calc }
 

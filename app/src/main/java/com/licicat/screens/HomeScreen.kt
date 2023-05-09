@@ -82,6 +82,7 @@ fun filtrarLicitacions(
             filteredList
         } else {
             filteredList.filter { it.termini_presentacio_ofertes.toString() == fechaFormateada }
+            //Canviar el == per un == o <
         }
     }.let { filteredList ->
         if (opcionesSeleccionadasTipus.isNotEmpty()) {
