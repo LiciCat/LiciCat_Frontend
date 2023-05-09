@@ -102,6 +102,7 @@ fun HomeScreen(navController: NavController) {
     val isLoading = remember { mutableStateOf(true) }
 
     val expanded = remember { mutableStateOf(false) }
+    val expandedSimilar = remember { mutableStateOf(false) }
     var opcionesSeleccionadas by remember { mutableStateOf(emptyList<String>()) }
     var opcionesSeleccionadasTipus by remember { mutableStateOf(emptyList<String>()) }
     var  rangoPrecios by remember { mutableStateOf(Pair(0f,Float.MAX_VALUE)) }
@@ -136,6 +137,20 @@ fun HomeScreen(navController: NavController) {
                         modifier = Modifier.padding(16.dp)
                     )
                 }
+
+                if(!expandedSimilar.value) {
+                    FloatingActionButton(
+                        onClick = { expandedSimilar.value = true },
+                        content = { Icon(Icons.Filled.Search, contentDescription = "Filtro") },
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+
+                if(expandedSimilar.value){
+                    val onDismiss = { expanded.value = false }
+                    RecommendationScreen(navController = navController, originalLicitacions = originalLicitacions.value)
+                }
+
 
                 if(expanded.value){
                     val onDismiss = { expanded.value = false }
