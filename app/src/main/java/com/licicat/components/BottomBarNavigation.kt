@@ -12,8 +12,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.licicat.navigation.AppScreens
 
 
-
-
 @Composable
 fun BottomBarNavigation(navController: NavController) {
 
