@@ -42,15 +42,17 @@ fun HomeScreen(navController: NavController) {
         } else {
             LazyColumn {
                 items(items = licitacions.value) { licitacio ->
-                        CardLicitacio(
-                            icon = Icons.Filled.AccountCircle,
-                            title = licitacio.nom_organ,
-                            description = licitacio.objecte_contracte,
-                            date = licitacio.termini_presentacio_ofertes.toString(),
-                            price = licitacio.pressupost_licitacio_asString+"€",
-                            navController = navController, // Nuevo parámetro agregado
-                            location = licitacio.lloc_execucio // ubicación de la licitación
-                        )
+                    CardLicitacio(
+                        icon = Icons.Filled.AccountCircle,
+                        title = licitacio.nom_organ,
+                        description = licitacio.objecte_contracte,
+                        date = licitacio.termini_presentacio_ofertes.toString(),
+                        price = licitacio.pressupost_licitacio_asString+"€",
+                        navController = navController, // Nuevo parámetro agregado
+
+                        location = licitacio.lloc_execucio, // ubicación de la licitación
+
+                    )
                 }
             }
         }
@@ -66,13 +68,3 @@ fun HomeScreen(navController: NavController) {
         isLoading.value = false
     }
 }
-
-
-
-
-
-
-
-
-
-

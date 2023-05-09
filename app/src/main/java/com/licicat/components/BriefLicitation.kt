@@ -2,6 +2,7 @@ package com.licicat.components
 
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.*
 import androidx.compose.material.*
@@ -30,12 +31,16 @@ fun CardLicitacio(
     date: String?,
     price: String?,
     navController: NavController,
-    location: String?,
+    location: String?
+
 ) {
     Card(
         modifier = Modifier
             .padding(16.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable(onClick = {
+                navController.navigate("licitacio_screen")
+            }),
         elevation = 8.dp
     ) {
         var isFavorite by remember { mutableStateOf(false) }
@@ -134,7 +139,3 @@ fun CardLicitacio(
         }
     }
 }
-
-
-
-
