@@ -252,9 +252,8 @@ fun RecommendationScreen(navController: NavController, originalLicitacions: List
             val similitudPromedio = calcularSimilitudPromedio(licitacions_favs.value.toList(), licitacions_all, navController.context)
             var calc = 0.0
             println("Control" + similitudPromedio)
-            println("prova favs" + licitacions_favs.value.get(0).pressupost_licitacio)
 
-            val licitacionesSimilares = licitacions_all.filter {  calc = calcularSimilitudPromedio(listOf(it), licitacions_favs.value.toList(), navController.context);
+            val licitacionesSimilares = licitacions_all.filter {  calc = calcularSimilitudPromedio(licitacions_favs.value.toList(), listOf(it), navController.context);
                 calc > similitudPromedio
             }.sortedByDescending { licitacion -> calc }
 
