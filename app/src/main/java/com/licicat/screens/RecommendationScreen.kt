@@ -121,22 +121,24 @@ fun ajustarSimilitud(similitud: Double, umbral: Double): Double {
 }
 
 // Función para calcular la similitud entre dos licitaciones
-private fun calcularSimilitud(licitacion1: Licitacio, licitacion2: Licitacio, context: Context, corpus: List<String>): Double {
+private fun calcularSimilitud(licitacion1: Licitacio, licitacion2: Licitacio, context: Context, corpus: List<Pair<String,String>>): Double {
 
     val similitudPrecio = calcularSimilitudPrecio(licitacion1.pressupost_licitacio, licitacion2.pressupost_licitacio)
     val similitudUbicacio = calcularSimilitudUbi(licitacion1.lloc_execucio, licitacion2.lloc_execucio, context)
-    val similitudDescripcio = calcularTFIDF(licitacion1.objecte_contracte ?: "", licitacion2.objecte_contracte ?: "", corpus)
+    val similitudDescripcio = calcularTFIDF(licitacion1.objecte_contracte ?: "", licitacion2.objecte_contracte ?: "", corpus.map { it.first })
+    val similitudOrgan = calcularTFIDF(licitacion1.nom_organ ?: "", licitacion2.nom_organ ?: "", corpus.map { it.second })
 
     val umbral = 0.505 // Establecer el umbral deseado
-    val similitudAjustada = ajustarSimilitud(similitudDescripcio, umbral)
+    val similitudFitedDescripcio = ajustarSimilitud(similitudDescripcio, umbral)
 
     // Ponderar y combinar las similitudes según su importancia relativa
-    val pesoPrecio = 0.25
+    val pesoPrecio = 0.2
     val pesoUbicacio = 0.55
-    val pesoDescripcio = 0.20
+    val pesoDescripcio = 0.15
+    val pesoOrgan = 0.1
 
-    val similitudTotal = (similitudPrecio * pesoPrecio) + (similitudUbicacio * pesoUbicacio) + (similitudAjustada * pesoDescripcio)
-    println("Descripcio normalizada: " + similitudDescripcio)
+    val similitudTotal = (similitudPrecio * pesoPrecio) + (similitudUbicacio * pesoUbicacio) + (similitudFitedDescripcio * pesoDescripcio) + (similitudOrgan * pesoOrgan)
+    println("Nom organ normalizada: " + similitudOrgan)
     return similitudTotal
 }
 // Función para calcular la similitud de precio (ejemplo de diferencia porcentual)
@@ -269,7 +271,7 @@ private fun obtenerLicitaciones(numeros: List<Int>, onSuccess: (List<Licitacio>)
 }
 
 
-private fun calcularSimilitudPromedio(lista1: List<Licitacio>, lista2: List<Licitacio>, context: Context, corpus: List<String>): Double {
+private fun calcularSimilitudPromedio(lista1: List<Licitacio>, lista2: List<Licitacio>, context: Context, corpus: List<Pair<String,String>>): Double {
     var totalSimilitud = 0.0
     val totalComparaciones = lista1.size * lista2.size
 
@@ -314,14 +316,21 @@ fun RecommendationScreen(navController: NavController, originalLicitacions: List
 
 
         if (presentacio.value) {
-            val objecteContracteList: List<String> = licitacions_all.map { it.objecte_contracte ?: "" }
+
+
+            val objecteYOrganizacionList: List<Pair<String, String>> = licitacions_all.map { licitacion ->
+                val objecteContracte = licitacion.objecte_contracte ?: ""
+                val nombreOrganizacion = licitacion.nom_organ ?: ""
+                Pair(objecteContracte, nombreOrganizacion)
+            }
+
 
             println("Control" + licitacions_favs.value.size + "<- favs || all ->"+ licitacions_all.size)
-            val similitudPromedio = calcularSimilitudPromedio(licitacions_favs.value.toList(), licitacions_all, navController.context, objecteContracteList)
+            val similitudPromedio = calcularSimilitudPromedio(licitacions_favs.value.toList(), licitacions_all, navController.context, objecteYOrganizacionList)
             var calc = 0.0
             println("Control" + similitudPromedio)
 
-            val licitacionesSimilares = licitacions_all.filter {  calc = calcularSimilitudPromedio(licitacions_favs.value.toList(), listOf(it), navController.context, objecteContracteList);
+            val licitacionesSimilares = licitacions_all.filter {  calc = calcularSimilitudPromedio(licitacions_favs.value.toList(), listOf(it), navController.context, objecteYOrganizacionList);
                 calc > similitudPromedio
             }.sortedByDescending { licitacion -> calc }
 
