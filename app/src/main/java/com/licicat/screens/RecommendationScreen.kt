@@ -59,19 +59,21 @@ import java.util.*
 
 
 // Función para calcular la similitud entre dos licitaciones
-fun calcularSimilitud(licitacion1: Licitacio, licitacion2: Licitacio, context: Context): Double {
+private fun calcularSimilitud(licitacion1: Licitacio, licitacion2: Licitacio, context: Context): Double {
 
     val similitudPrecio = calcularSimilitudPrecio(licitacion1.pressupost_licitacio, licitacion2.pressupost_licitacio)
-    val similitudUbicacio = calcularSimilitudUbi("Barcelona", "Tarragona", context)
+    val similitudUbicacio = calcularSimilitudUbi(licitacion1.lloc_execucio, licitacion2.lloc_execucio, context)
 
     // Ponderar y combinar las similitudes según su importancia relativa
-    val pesoPrecio = 1
+    val pesoPrecio = 0.5
+    val pesoUbicacio = 0.5
 
-    val similitudTotal = (similitudPrecio * pesoPrecio)
+    val similitudTotal = (similitudPrecio * pesoPrecio) + (similitudUbicacio * pesoUbicacio)
+    println("Distancia normalizada: " + similitudUbicacio)
     return similitudTotal
 }
 // Función para calcular la similitud de precio (ejemplo de diferencia porcentual)
-fun calcularSimilitudPrecio(precio1: Int?, precio2: Int?): Double {
+private fun calcularSimilitudPrecio(precio1: Int?, precio2: Int?): Double {
     if (precio1 == null || precio2 == null) {
         println("ES null")
         return 0.0
@@ -79,7 +81,7 @@ fun calcularSimilitudPrecio(precio1: Int?, precio2: Int?): Double {
         if (precio2 == 0) {
             return 1.0 // Ambos precios son 0, por lo tanto, son idénticos
         } else {
-            val similitudMinima = 0.5 // Establece un valor mínimo de similitud deseado cuando precio1 es 0
+            val similitudMinima = 0.3 // Establece un valor mínimo de similitud deseado cuando precio1 es 0
             return similitudMinima
         }
     } else {
@@ -93,7 +95,7 @@ fun calcularSimilitudPrecio(precio1: Int?, precio2: Int?): Double {
     }
 }
 
-fun getDistanceBetweenPoints(latitude1: Double, longitude1: Double, latitude2: Double, longitude2: Double): Double {
+private fun getDistanceBetweenPoints(latitude1: Double, longitude1: Double, latitude2: Double, longitude2: Double): Double {
     val theta = longitude1 - longitude2
     val distance = 60 * 1.1515 * (180/Math.PI) * Math.acos(
         Math.sin(latitude1 * (Math.PI/180)) * Math.sin(latitude2 * (Math.PI/180)) +
@@ -102,7 +104,7 @@ fun getDistanceBetweenPoints(latitude1: Double, longitude1: Double, latitude2: D
     return Math.round(distance * 1.609344 * 100) / 100.0 // Redondear a dos decimales
 }
 
-fun getCoordinates(ubi: String?, context: Context): Pair<Double, Double> {
+private fun getCoordinates(ubi: String?, context: Context): Pair<Double, Double> {
 
     val geocoder = Geocoder(context)
     val result = ubi?.let { geocoder.getFromLocationName(it, 1) }
@@ -117,14 +119,19 @@ fun getCoordinates(ubi: String?, context: Context): Pair<Double, Double> {
 }
 
 
-fun calcularSimilitudUbi(ubi1: String?, ubi2: String?, context: Context): Double {
+private fun calcularSimilitudUbi(ubi1: String?, ubi2: String?, context: Context): Double {
     if (ubi1 == null || ubi2 == null) {
         println("ES null")
         return 0.0
     } else {
-        val ubi1 = getCoordinates(ubi1, context)
-        val ubi2 = getCoordinates(ubi2, context)
-        val distancia = getDistanceBetweenPoints(ubi1.first, ubi1.second, ubi2.first, ubi2.second)
+        val ubiP1 = getCoordinates(ubi1, context)
+        val ubiP2 = getCoordinates(ubi2, context)
+        val distancia = getDistanceBetweenPoints(ubiP1.first, ubiP1.second, ubiP2.first, ubiP2.second)
+        val maximaDistancia = 50.0 // Definir la máxima distancia considerada como "similitud" (en kilómetros)
+        val normalizada = 1.0 - (distancia / maximaDistancia)
+        if(normalizada < 0.0) return 0.0
+        else if(ubi1 == "Catalunya" || ubi2 == "Catalunya") return 0.0
+        else return normalizada
     }
     return 0.0
 }
@@ -132,7 +139,7 @@ fun calcularSimilitudUbi(ubi1: String?, ubi2: String?, context: Context): Double
 
 
 
-fun obtenerLicitacionesFavoritas(onSuccess: (List<Licitacio>) -> Unit) {
+private fun obtenerLicitacionesFavoritas(onSuccess: (List<Licitacio>) -> Unit) {
     val db = Firebase.firestore
     val current_user = FirebaseAuth.getInstance().currentUser
     val id_del_user = current_user?.uid
@@ -155,7 +162,7 @@ fun obtenerLicitacionesFavoritas(onSuccess: (List<Licitacio>) -> Unit) {
 
 
 
-fun obtenerLicitaciones(numeros: List<Int>, onSuccess: (List<Licitacio>) -> Unit) {
+private fun obtenerLicitaciones(numeros: List<Int>, onSuccess: (List<Licitacio>) -> Unit) {
     val db = Firebase.firestore
     val licitaciones = mutableListOf<Licitacio>()
     var documentosCompletados = 0
@@ -195,7 +202,7 @@ fun obtenerLicitaciones(numeros: List<Int>, onSuccess: (List<Licitacio>) -> Unit
 }
 
 
-fun calcularSimilitudPromedio(lista1: List<Licitacio>, lista2: List<Licitacio>, context: Context): Double {
+private fun calcularSimilitudPromedio(lista1: List<Licitacio>, lista2: List<Licitacio>, context: Context): Double {
     var totalSimilitud = 0.0
     val totalComparaciones = lista1.size * lista2.size
 
