@@ -6,70 +6,137 @@ import android.content.Context
 import android.location.Geocoder
 import android.util.Log
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.tooling.preview.Preview
+
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.MutableLiveData
+
 import androidx.navigation.NavController
 import com.example.licicat.Licitacio
-import com.google.maps.android.compose.GoogleMap
-import com.licicat.LicitacionsRepository
+
 import com.licicat.components.BottomBarNavigation
 import com.licicat.components.CardLicitacio
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.IconButton
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
-import java.text.SimpleDateFormat
 import java.util.*
 
+import kotlin.math.log
 
+// Función para calcular el TF-IDF entre dos documentos
+fun calcularTFIDF(doc1: String, doc2: String, corpus: List<String>): Double {
+    // Tokenización de los documentos en términos individuales (palabras)
+    val palabrasDoc1 = doc1.split(" ")
+    val palabrasDoc2 = doc2.split(" ")
+
+    // Construcción del vocabulario único a partir del corpus
+    val vocabulario = corpus.flatMap { it.split(" ") }.distinct()
+
+    // Cálculo del TF (Term Frequency) para cada documento
+    val tfDoc1 = calcularTF(palabrasDoc1)
+    val tfDoc2 = calcularTF(palabrasDoc2)
+
+    // Cálculo del IDF (Inverse Document Frequency)
+    val idf = calcularIDF(vocabulario, corpus)
+
+    // Cálculo del TF-IDF
+    val tfidfDoc1 = calcularTFIDF(tfDoc1, idf)
+    val tfidfDoc2 = calcularTFIDF(tfDoc2, idf)
+
+    // Cálculo de la similitud entre los documentos (por ejemplo, usando la similitud del coseno)
+    return calcularSimilitudCoseno(tfidfDoc1, tfidfDoc2)
+}
+
+// Función para calcular el TF (Term Frequency)
+fun calcularTF(palabras: List<String>): Map<String, Double> {
+    val frecuencia = mutableMapOf<String, Int>()
+    val tf = mutableMapOf<String, Double>()
+
+    for (palabra in palabras) {
+        frecuencia[palabra] = frecuencia.getOrDefault(palabra, 0) + 1
+    }
+
+    val totalPalabras = palabras.size.toDouble()
+
+    for ((palabra, count) in frecuencia) {
+        tf[palabra] = count / totalPalabras
+    }
+
+    return tf
+}
+
+// Función para calcular el IDF (Inverse Document Frequency)
+fun calcularIDF(vocabulario: List<String>, corpus: List<String>): Map<String, Double> {
+    val idf = mutableMapOf<String, Double>()
+
+    val numDocumentos = corpus.size.toDouble()
+
+    for (palabra in vocabulario) {
+        val numDocumentosContienenPalabra = corpus.count { it.contains(palabra) }
+        idf[palabra] = log(numDocumentos / (1 + numDocumentosContienenPalabra), 10.0)
+    }
+
+    return idf
+}
+
+// Función para calcular el TF-IDF
+fun calcularTFIDF(tf: Map<String, Double>, idf: Map<String, Double>): Map<String, Double> {
+    val tfidf = mutableMapOf<String, Double>()
+
+    for ((palabra, tfValue) in tf) {
+        tfidf[palabra] = tfValue * idf[palabra]!!
+    }
+
+    return tfidf
+}
+
+// Función para calcular la similitud del coseno entre dos documentos representados por vectores TF-IDF
+fun calcularSimilitudCoseno(doc1: Map<String, Double>, doc2: Map<String, Double>): Double {
+    val dotProduct = doc1.map { (palabra, tfidf) -> tfidf * (doc2[palabra] ?: 0.0) }.sum()
+    val normDoc1 = Math.sqrt(doc1.values.map { it * it }.sum())
+    val normDoc2 = Math.sqrt(doc2.values.map { it * it }.sum())
+
+    val similitud =  dotProduct / (normDoc1 * normDoc2)
+    return (similitud + 1) / 2
+}
+
+fun ajustarSimilitud(similitud: Double, umbral: Double): Double {
+    return if (similitud >= umbral) {
+        1.0
+    } else {
+        0.0
+    }
+}
 
 // Función para calcular la similitud entre dos licitaciones
-private fun calcularSimilitud(licitacion1: Licitacio, licitacion2: Licitacio, context: Context): Double {
+private fun calcularSimilitud(licitacion1: Licitacio, licitacion2: Licitacio, context: Context, corpus: List<String>): Double {
 
     val similitudPrecio = calcularSimilitudPrecio(licitacion1.pressupost_licitacio, licitacion2.pressupost_licitacio)
     val similitudUbicacio = calcularSimilitudUbi(licitacion1.lloc_execucio, licitacion2.lloc_execucio, context)
+    val similitudDescripcio = calcularTFIDF(licitacion1.objecte_contracte ?: "", licitacion2.objecte_contracte ?: "", corpus)
+
+    val umbral = 0.505 // Establecer el umbral deseado
+    val similitudAjustada = ajustarSimilitud(similitudDescripcio, umbral)
 
     // Ponderar y combinar las similitudes según su importancia relativa
-    val pesoPrecio = 0.5
-    val pesoUbicacio = 0.5
+    val pesoPrecio = 0.25
+    val pesoUbicacio = 0.55
+    val pesoDescripcio = 0.20
 
-    val similitudTotal = (similitudPrecio * pesoPrecio) + (similitudUbicacio * pesoUbicacio)
-    println("Distancia normalizada: " + similitudUbicacio)
+    val similitudTotal = (similitudPrecio * pesoPrecio) + (similitudUbicacio * pesoUbicacio) + (similitudAjustada * pesoDescripcio)
+    println("Descripcio normalizada: " + similitudDescripcio)
     return similitudTotal
 }
 // Función para calcular la similitud de precio (ejemplo de diferencia porcentual)
@@ -80,11 +147,11 @@ private fun calcularSimilitudPrecio(precio1: Int?, precio2: Int?): Double {
     } else if (precio1 == 0) {
         if (precio2 == 0) {
             return 1.0 // Ambos precios son 0, por lo tanto, son idénticos
-        } else {
-            val similitudMinima = 0.3 // Establece un valor mínimo de similitud deseado cuando precio1 es 0
-            return similitudMinima
         }
-    } else {
+        else return 0.3
+    } else if(precio2 == 0){ return 0.3}
+
+        else {
         val maxPrecio = maxOf(precio1, precio2).toDouble()
         val minPrecio = minOf(precio1, precio2).toDouble()
 
@@ -202,7 +269,7 @@ private fun obtenerLicitaciones(numeros: List<Int>, onSuccess: (List<Licitacio>)
 }
 
 
-private fun calcularSimilitudPromedio(lista1: List<Licitacio>, lista2: List<Licitacio>, context: Context): Double {
+private fun calcularSimilitudPromedio(lista1: List<Licitacio>, lista2: List<Licitacio>, context: Context, corpus: List<String>): Double {
     var totalSimilitud = 0.0
     val totalComparaciones = lista1.size * lista2.size
 
@@ -210,7 +277,7 @@ private fun calcularSimilitudPromedio(lista1: List<Licitacio>, lista2: List<Lici
 
     for (licitacion1 in lista1) {
         for (licitacion2 in lista2) {
-            totalSimilitud += calcularSimilitud(licitacion1, licitacion2, context)
+            totalSimilitud += calcularSimilitud(licitacion1, licitacion2, context, corpus)
             println("test_bucle")
         }
     }
@@ -238,7 +305,6 @@ fun RecommendationScreen(navController: NavController, originalLicitacions: List
                 presentacio.value = true
             }
             println("fin launched effect")
-
         }
 
 
@@ -248,12 +314,14 @@ fun RecommendationScreen(navController: NavController, originalLicitacions: List
 
 
         if (presentacio.value) {
+            val objecteContracteList: List<String> = licitacions_all.map { it.objecte_contracte ?: "" }
+
             println("Control" + licitacions_favs.value.size + "<- favs || all ->"+ licitacions_all.size)
-            val similitudPromedio = calcularSimilitudPromedio(licitacions_favs.value.toList(), licitacions_all, navController.context)
+            val similitudPromedio = calcularSimilitudPromedio(licitacions_favs.value.toList(), licitacions_all, navController.context, objecteContracteList)
             var calc = 0.0
             println("Control" + similitudPromedio)
 
-            val licitacionesSimilares = licitacions_all.filter {  calc = calcularSimilitudPromedio(licitacions_favs.value.toList(), listOf(it), navController.context);
+            val licitacionesSimilares = licitacions_all.filter {  calc = calcularSimilitudPromedio(licitacions_favs.value.toList(), listOf(it), navController.context, objecteContracteList);
                 calc > similitudPromedio
             }.sortedByDescending { licitacion -> calc }
 
