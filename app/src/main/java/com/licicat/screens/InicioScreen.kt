@@ -7,6 +7,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -16,26 +17,52 @@ import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.licicat.R
 import com.licicat.navigation.AppScreens
+import kotlinx.coroutines.delay
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+/*
 @Composable
 fun InicioScreen(navController: NavController) {
-    Scaffold {
-        Box(
-            Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
 
-            HeaderImageInicio(Modifier.align(Alignment.Center))
-            val auth = FirebaseAuth.getInstance()
-            if (auth.currentUser?.email.isNullOrEmpty()){
-                navController.navigate("login_screen")
-            }
-            else{
-                navController.navigate("home_screen")
-            }
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ){
+        HeaderImageInicio(Modifier)
+        if (FirebaseAuth.getInstance().currentUser?.email.isNullOrEmpty()){
+            navController.navigate(AppScreens.LoginScreen.route)
+        }
+        else{
+            navController.navigate(AppScreens.HomeScreen.route)
+        }
+    }
+}
+*/
 
+@Composable
+fun InicioScreen(navController: NavController) {
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    LaunchedEffect(key1 = currentUser) {
+        delay(1000) // Agregamos un pequeño retraso antes de navegar.
+        if (currentUser == null || currentUser.email.isNullOrEmpty()) {
+            navController.navigate(AppScreens.LoginScreen.route)
+        } else {
+            navController.navigate(AppScreens.HomeScreen.route)
+        }
+    }
+
+    Scaffold(
+
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ){
+            HeaderImageInicio(Modifier)
         }
     }
 }
