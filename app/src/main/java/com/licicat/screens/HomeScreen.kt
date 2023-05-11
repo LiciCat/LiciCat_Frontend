@@ -154,17 +154,10 @@ fun HomeScreen(navController: NavController) {
 
                 Switch(
                     checked = expandedSimilar.value,
-                    onCheckedChange = { expandedSimilar.value = it },
+                    onCheckedChange = { expandedSimilar.value = it
+                                        expanded.value = it},
                     modifier = Modifier.padding(16.dp)
                 )
-
-                /*if (!expandedSimilar.value) {
-                    FloatingActionButton(
-                        onClick = { expandedSimilar.value = true },
-                        content = { Icon(Icons.Filled.Search, contentDescription = "Filtro") },
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }*/
 
                 if (expandedSimilar.value) {
                     val onDismiss = { }

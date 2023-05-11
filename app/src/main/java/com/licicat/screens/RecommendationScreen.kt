@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
@@ -287,6 +288,9 @@ private fun calcularSimilitudPromedio(lista1: List<Licitacio>, lista2: List<Lici
     return totalSimilitud / totalComparaciones
 }
 
+private fun generateKey(licitacionsFavs: List<Licitacio>): Int {
+    return licitacionsFavs.hashCode()
+}
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -298,24 +302,29 @@ fun RecommendationScreen(navController: NavController, originalLicitacions: List
     ) {
         val licitacions_favs = remember { mutableStateOf(emptyList<Licitacio>()) }
         val licitacions_all =  originalLicitacions
-        val presentacio = remember { mutableStateOf(false) }
-
+        val isLoading = remember { mutableStateOf(true) }
+        val key = remember { generateKey(licitacions_favs.value) }
+        println("Hashkey: " +key)
 
         LaunchedEffect(Unit) {
             obtenerLicitacionesFavoritas { licitaciones ->
                 licitacions_favs.value = licitaciones
-                presentacio.value = true
+                isLoading.value = false
             }
             println("fin launched effect")
         }
 
-
-
-
-
-
-
-        if (presentacio.value) {
+        if (isLoading.value) {
+            // Muestra un indicador de carga mientras se obtienen los datos
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        else {
 
 
             val objecteYOrganizacionList: List<Pair<String, String>> = licitacions_all.map { licitacion ->
@@ -325,17 +334,14 @@ fun RecommendationScreen(navController: NavController, originalLicitacions: List
             }
 
 
-            println("Control" + licitacions_favs.value.size + "<- favs || all ->"+ licitacions_all.size)
-            val similitudPromedio = calcularSimilitudPromedio(licitacions_favs.value.toList(), licitacions_all, navController.context, objecteYOrganizacionList)
-            var calc = 0.0
-            println("Control" + similitudPromedio)
 
-            val licitacionesSimilares = licitacions_all.filter {  calc = calcularSimilitudPromedio(licitacions_favs.value.toList(), listOf(it), navController.context, objecteYOrganizacionList);
-                calc > similitudPromedio
-            }.sortedByDescending { licitacion -> calc }
+                val similitudPromedio = calcularSimilitudPromedio(licitacions_favs.value.toList(), licitacions_all, navController.context, objecteYOrganizacionList)
+                var calc = 0.0
+                val licitacionesSimilares = licitacions_all.filter {
+                    calc = calcularSimilitudPromedio(licitacions_favs.value.toList(), listOf(it), navController.context, objecteYOrganizacionList)
+                    calc > similitudPromedio
+                }.sortedByDescending { licitacion -> calc }
 
-
-            println("fin" + licitacionesSimilares.size)
 
             LazyColumn(modifier = Modifier
                 .padding(bottom = 56.dp)
