@@ -288,9 +288,7 @@ private fun calcularSimilitudPromedio(lista1: List<Licitacio>, lista2: List<Lici
     return totalSimilitud / totalComparaciones
 }
 
-private fun generateKey(licitacionsFavs: List<Licitacio>): Int {
-    return licitacionsFavs.hashCode()
-}
+
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -303,8 +301,7 @@ fun RecommendationScreen(navController: NavController, originalLicitacions: List
         val licitacions_favs = remember { mutableStateOf(emptyList<Licitacio>()) }
         val licitacions_all =  originalLicitacions
         val isLoading = remember { mutableStateOf(true) }
-        val key = remember { generateKey(licitacions_favs.value) }
-        println("Hashkey: " +key)
+
 
         LaunchedEffect(Unit) {
             obtenerLicitacionesFavoritas { licitaciones ->
