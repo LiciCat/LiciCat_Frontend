@@ -1,6 +1,9 @@
 package com.licicat.components
 
 
+import android.content.Context
+import android.location.Geocoder
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.*
@@ -20,6 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.licicat.navigation.AppScreens
+import java.io.IOException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -101,22 +105,29 @@ fun CardLicitacio(
                             .wrapContentWidth(align = Alignment.CenterHorizontally)
                     )
                 }
-                Box(
-                    modifier = Modifier
-                        .width(48.dp)
-                        .height(48.dp)
-                        .align(Alignment.CenterVertically)
-                ) {
-                    IconButton(
-                        onClick = {
-                            navController.navigate(AppScreens.withArgs(location,title))
-                        },
-                        modifier = Modifier.align(Alignment.Center)
+                if (location != null) {
+                    Box(
+                        modifier = Modifier
+                            .width(48.dp)
+                            .height(48.dp)
+                            .align(Alignment.CenterVertically)
                     ) {
-                        Icon(
-                            painter = painterResource(id = AppScreens.MapScreen.icon),
-                            contentDescription = AppScreens.MapScreen.title
-                        )
+                        IconButton(
+                            onClick = {
+                                if (findUbicacio(navController.context, location)) {
+                                    navController.navigate(AppScreens.withArgs(location, title))
+                                } else {
+                                    Toast.makeText(navController.context, "Licitacio no disponible en el mapa.",
+                                        Toast.LENGTH_SHORT).show()
+                                }
+                            },
+                            modifier = Modifier.align(Alignment.Center)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = AppScreens.MapScreen.icon),
+                                contentDescription = AppScreens.MapScreen.title
+                            )
+                        }
                     }
                 }
                 Box(
@@ -242,6 +253,23 @@ fun CardLicitacio(
         }
     }
 }
+
+
+fun findUbicacio(context: Context, location: String): Boolean {
+    try {
+        val geocoder = Geocoder(context)
+        val results = location?.let { geocoder.getFromLocationName(it, 1) }
+        if (results != null && results.isNotEmpty()) return true
+        return false
+    }
+    catch (e: IOException){
+        return false
+    }
+    catch (e: IllegalArgumentException) {
+        return false
+    }
+}
+
 
 
 

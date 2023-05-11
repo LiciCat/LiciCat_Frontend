@@ -33,20 +33,20 @@ fun OpenMap(adress: String?, title: String?) {
     if (results != null && results.isNotEmpty()) {
         val location = results[0]
         latLng = LatLng(location.latitude, location.longitude)
-    }
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(latLng, 13f)
-    }
-    GoogleMap(
-        modifier = Modifier.fillMaxSize(),
-        uiSettings = uiSettings,
-        cameraPositionState = cameraPositionState
-    ) {
-        // Agrega un marcador en la ubicación encontrada
-        Marker(
-            state = MarkerState(position = latLng),
-            title= title
-        )
+        val cameraPositionState = rememberCameraPositionState {
+            position = CameraPosition.fromLatLngZoom(latLng, 13f)
+        }
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            uiSettings = uiSettings,
+            cameraPositionState = cameraPositionState
+        ) {
+            // Agrega un marcador en la ubicación encontrada
+            Marker(
+                state = MarkerState(position = latLng),
+                title= title
+            )
+        }
     }
 }
 
