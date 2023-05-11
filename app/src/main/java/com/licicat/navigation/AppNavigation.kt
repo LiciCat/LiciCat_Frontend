@@ -35,8 +35,25 @@ fun AppNavigation() {
         composable(route = AppScreens.SignUpCompanyScreen.route) {
             SignUpScreenEmpresa(navController)
         }
+
         composable(
-            route = AppScreens.withArgs("{location}","{title}"),
+            route = AppScreens.withArgs("{location}","{title}", "{description}","{price}"),
+            arguments = listOf(
+                navArgument("location") { type = NavType.StringType },
+                navArgument("title") { type = NavType.StringType },
+                navArgument("description") { type = NavType.StringType },
+                navArgument("price") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val location = backStackEntry.arguments?.getString("location") ?: ""
+            val title = backStackEntry.arguments?.getString("title") ?: ""
+            val description = backStackEntry.arguments?.getString("description") ?: ""
+            val price = backStackEntry.arguments?.getString("price") ?: ""
+            LicitacioScreen(navController = navController, location = location, title = title, description = description, price = price)
+        }
+
+        composable(
+            route = AppScreens.Args("{location}","{title}"),
             arguments = listOf(
                 navArgument("location") { type = NavType.StringType },
                 navArgument("title") { type = NavType.StringType }
@@ -46,5 +63,7 @@ fun AppNavigation() {
             val title = backStackEntry.arguments?.getString("title") ?: ""
             MapScreen(navController = navController, adress = location, title = title)
         }
+
+
     }
 }

@@ -13,14 +13,25 @@ sealed class AppScreens(val route: String, val title: String, val icon: Int) {
     object LoginScreen: AppScreens("login_screen", "Login", R.drawable.baseline_person_24)
     object SignUpCompanyScreen: AppScreens("signup_screen", "SignUp", R.drawable.baseline_person_24)
     object MapScreen: AppScreens("map_screen", "See on map", R.drawable.baseline_fmd_good_24)
+    object LicitacioScreen: AppScreens("licitacio_screen", "Licitacio", R.drawable.baseline_fmd_good_24)
     companion object {
-        fun withArgs(location: String?, title:String?): String {
+        fun withArgs(location: String?, title:String?, description:String?, price:String?): String {
+            return buildString {
+                append(LicitacioScreen.route)
+                append("/$location")
+                append("/$title")
+                append("/$description")
+                append("/$price")
+            }
+        }
+        fun Args(location: String?, title:String?): String {
             return buildString {
                 append(MapScreen.route)
                 append("/$location")
                 append("/$title")
             }
         }
+
     }
 }
 
