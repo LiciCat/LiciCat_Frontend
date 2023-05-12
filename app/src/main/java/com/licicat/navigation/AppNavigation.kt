@@ -15,7 +15,7 @@ import com.licicat.screens.*
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController() //controla estado de navegacion actual entre pantallas (propagar entre pantallas)
-    NavHost(navController= navController, startDestination = AppScreens.LoginScreen.route) {
+    NavHost(navController= navController, startDestination =AppScreens.InicioScreen.route) {
         //tantos composables como diferentes pantallas accesibles
         composable(route = AppScreens.HomeScreen.route) {
             HomeScreen(navController)
@@ -34,6 +34,13 @@ fun AppNavigation() {
         }
         composable(route = AppScreens.SignUpCompanyScreen.route) {
             SignUpScreenEmpresa(navController)
+        }
+
+        composable(route = AppScreens.ConfigurationScreen.route) {
+            ConfigurationScreen(navController)
+        }
+        composable(route = AppScreens.InicioScreen.route) {
+            InicioScreen(navController)
         }
 
         composable(
