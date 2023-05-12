@@ -24,6 +24,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import android.util.Log
+import androidx.compose.foundation.clickable
 import kotlin.random.Random
 
 
@@ -36,11 +37,17 @@ fun CardLicitacio(
     price: String?,
     navController: NavController,
     location: String?,
+    denomination: String?,
+    date_inici: String?,
+    date_adjudicacio: String?,
+    tipus_contracte: String?
 ) {
     Card(
         modifier = Modifier
             .padding(16.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable (onClick = {
+                navController.navigate(AppScreens.withArgs(location,title,description,price))}),
         elevation = 8.dp
     ) {
         var isFavorite by remember { mutableStateOf(false) }
@@ -105,7 +112,7 @@ fun CardLicitacio(
                 ) {
                     IconButton(
                         onClick = {
-                            navController.navigate(AppScreens.withArgs(location,title))
+                            navController.navigate(AppScreens.Args(location,title))
                         },
                         modifier = Modifier.align(Alignment.Center)
                     ) {
@@ -173,6 +180,10 @@ fun CardLicitacio(
                                                 "price" to price,
                                                 "lic_id" to id_lic,
                                                 "location" to location,
+                                                "denomination" to denomination,
+                                                "date_inici" to date_inici,
+                                                "date_adjudicacio" to date_adjudicacio,
+                                                "tipus_contracte" to tipus_contracte,
                                                 "users_ids" to users
                                             )
                                             db.collection("licitacionsFavorits").add(data)
@@ -229,6 +240,13 @@ fun CardLicitacio(
                         style = MaterialTheme.typography.body2,
                         fontWeight = FontWeight.Bold
                     )
+                    if(location != null) {
+                    Text(
+                        text = location,
+                        style = MaterialTheme.typography.body2,
+                        fontWeight = FontWeight.Bold
+                    )
+                    }
                 }
             }
         }
