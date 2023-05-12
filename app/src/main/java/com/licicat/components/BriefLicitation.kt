@@ -240,6 +240,13 @@ fun CardLicitacio(
                         style = MaterialTheme.typography.body2,
                         fontWeight = FontWeight.Bold
                     )
+                    if(location != null) {
+                    Text(
+                        text = location,
+                        style = MaterialTheme.typography.body2,
+                        fontWeight = FontWeight.Bold
+                    )
+                    }
                 }
             }
         }
