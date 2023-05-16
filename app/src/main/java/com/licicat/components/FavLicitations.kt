@@ -105,7 +105,7 @@ fun FavLicitacio(
                 ) {
                     IconButton(
                         onClick = {
-                            navController.navigate(AppScreens.withArgs(location,title))
+                            navController.navigate(AppScreens.Args(location,title))
                         },
                         modifier = Modifier.align(Alignment.Center)
                     ) {

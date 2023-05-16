@@ -15,7 +15,7 @@ import com.licicat.screens.*
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController() //controla estado de navegacion actual entre pantallas (propagar entre pantallas)
-    NavHost(navController= navController, startDestination = AppScreens.LoginScreen.route) {
+    NavHost(navController= navController, startDestination =AppScreens.InicioScreen.route) {
         //tantos composables como diferentes pantallas accesibles
         composable(route = AppScreens.HomeScreen.route) {
             HomeScreen(navController)
@@ -35,8 +35,32 @@ fun AppNavigation() {
         composable(route = AppScreens.SignUpCompanyScreen.route) {
             SignUpScreenEmpresa(navController)
         }
+
+        composable(route = AppScreens.ConfigurationScreen.route) {
+            ConfigurationScreen(navController)
+        }
+        composable(route = AppScreens.InicioScreen.route) {
+            InicioScreen(navController)
+        }
+
         composable(
-            route = AppScreens.withArgs("{location}","{title}"),
+            route = AppScreens.withArgs("{location}","{title}", "{description}","{price}"),
+            arguments = listOf(
+                navArgument("location") { type = NavType.StringType },
+                navArgument("title") { type = NavType.StringType },
+                navArgument("description") { type = NavType.StringType },
+                navArgument("price") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val location = backStackEntry.arguments?.getString("location") ?: ""
+            val title = backStackEntry.arguments?.getString("title") ?: ""
+            val description = backStackEntry.arguments?.getString("description") ?: ""
+            val price = backStackEntry.arguments?.getString("price") ?: ""
+            LicitacioScreen(navController = navController, location = location, title = title, description = description, price = price)
+        }
+
+        composable(
+            route = AppScreens.Args("{location}","{title}"),
             arguments = listOf(
                 navArgument("location") { type = NavType.StringType },
                 navArgument("title") { type = NavType.StringType }
@@ -46,5 +70,7 @@ fun AppNavigation() {
             val title = backStackEntry.arguments?.getString("title") ?: ""
             MapScreen(navController = navController, adress = location, title = title)
         }
+
+
     }
 }

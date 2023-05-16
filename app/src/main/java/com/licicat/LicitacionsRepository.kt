@@ -31,9 +31,12 @@ class LicitacionsRepository {
         //Tipus contracte licitació
         val tc = json.optString("tipus_contracte", "no disponible")
 
-        //Pressupost licitació
+        //Pressupost licitació string
         val pl = json.optInt("pressupost_licitacio", 0)
         val formattedPl = String.format(Locale.getDefault(), "%,d", pl).replace(",", ".")
+
+        //Pressupost licitació en int
+        val plI = json.optInt("pressupost_licitacio", 0)
 
         //Ubicació licitació
         val lle = json.optString("lloc_execucio", "no disponible")
@@ -75,6 +78,7 @@ class LicitacionsRepository {
         licitacio.denominacio = denc;
         licitacio.objecte_contracte= desc;
         licitacio.pressupost_licitacio_asString = formattedPl;
+        licitacio.pressupost_licitacio = plI;
         licitacio.lloc_execucio = lle;
         licitacio.data_publicacio_anunci = data_inici;
         licitacio.termini_presentacio_ofertes = data_fi;
@@ -97,7 +101,7 @@ class LicitacionsRepository {
 
 
         //fecha = "2023-04-28T13:40:00.000"
-        val url = "https://analisi.transparenciacatalunya.cat/resource/a23c-d6vp.json?\$where=termini_presentacio_ofertes%3E%27$fecha%27&\$limit=20"
+        val url = "https://analisi.transparenciacatalunya.cat/resource/a23c-d6vp.json?\$where=termini_presentacio_ofertes%3E%27$fecha%27&\$limit=60"
 
         val request = Request.Builder()
             .url(url)
