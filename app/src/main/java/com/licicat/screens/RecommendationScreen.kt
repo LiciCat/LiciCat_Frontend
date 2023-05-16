@@ -138,7 +138,7 @@ private fun calcularSimilitud(licitacion1: Licitacio, licitacion2: Licitacio, co
     val pesoDescripcio = 0.15
     val pesoOrgan = 0.1
 
-    val similitudTotal = (similitudPrecio * pesoPrecio) + (similitudUbicacio * pesoUbicacio) + (similitudFitedDescripcio * pesoDescripcio) + (similitudOrgan * pesoOrgan)
+    val similitudTotal = (similitudPrecio * pesoPrecio) + (similitudUbicacio * pesoUbicacio) + (similitudOrgan * pesoOrgan)
     println("Nom organ normalizada: " + similitudOrgan)
     return similitudTotal
 }
