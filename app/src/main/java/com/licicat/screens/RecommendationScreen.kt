@@ -126,17 +126,17 @@ private fun calcularSimilitud(licitacion1: Licitacio, licitacion2: Licitacio, co
 
     val similitudPrecio = calcularSimilitudPrecio(licitacion1.pressupost_licitacio, licitacion2.pressupost_licitacio)
     val similitudUbicacio = calcularSimilitudUbi(licitacion1.lloc_execucio, licitacion2.lloc_execucio, context)
-    val similitudDescripcio = calcularTFIDF(licitacion1.objecte_contracte ?: "", licitacion2.objecte_contracte ?: "", corpus.map { it.first })
+    val similitudDescripcio = 0.0//calcularTFIDF(licitacion1.objecte_contracte ?: "", licitacion2.objecte_contracte ?: "", corpus.map { it.first })
     val similitudOrgan = calcularTFIDF(licitacion1.nom_organ ?: "", licitacion2.nom_organ ?: "", corpus.map { it.second })
 
     val umbral = 0.505 // Establecer el umbral deseado
-    val similitudFitedDescripcio = ajustarSimilitud(similitudDescripcio, umbral)
+    //val similitudFitedDescripcio = ajustarSimilitud(similitudDescripcio, umbral)
 
     // Ponderar y combinar las similitudes según su importancia relativa
     val pesoPrecio = 0.2
-    val pesoUbicacio = 0.55
-    val pesoDescripcio = 0.15
-    val pesoOrgan = 0.1
+    val pesoUbicacio = 0.6
+    val pesoDescripcio = 0.0
+    val pesoOrgan = 0.15
 
     val similitudTotal = (similitudPrecio * pesoPrecio) + (similitudUbicacio * pesoUbicacio) + (similitudFitedDescripcio * pesoDescripcio) + (similitudOrgan * pesoOrgan)
     println("Nom organ normalizada: " + similitudOrgan)
