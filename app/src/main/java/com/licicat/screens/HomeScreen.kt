@@ -1,6 +1,7 @@
 package com.licicat.screens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,6 +19,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.licicat.LicitacionsRepository
 import com.licicat.components.BottomBarNavigation
 import com.licicat.components.CardLicitacio
+import com.licicat.Usuari
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -43,12 +45,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.shape.RoundedCornerShape
 
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import com.licicat.model.usersEmpresa
+
 import java.text.SimpleDateFormat
 import java.util.*
 
 
 
 var licitacions: List<Licitacio>? = null
+var usuaris: List<Usuari>? = null
 
 fun formatDate(day: Int, month: Int, year: Int): String {
     val calendar = Calendar.getInstance().apply {
@@ -93,6 +103,43 @@ fun filtrarLicitacions(
     }
 }
 
+fun Cerca_Usuaris(
+    usuaris: List<Usuari>,
+    searchText: String
+): List<Usuari> {
+    return usuaris.filter {
+        it.empresa?.toLowerCase()?.contains(searchText.toLowerCase()) ?: false ||
+        it.email?.toLowerCase()?.contains(searchText.toLowerCase()) ?: false ||
+        it.nom_cognoms?.toLowerCase()?.contains(searchText.toLowerCase()) ?: false ||
+        it.descripcio?.toLowerCase()?.contains(searchText.toLowerCase()) ?: false
+    }
+}
+
+fun GetUsuaris(): List<Usuari> {
+    val listaActual = mutableListOf<Usuari>()
+    val db = Firebase.firestore
+    db.collection("usersEmpresa").get().addOnSuccessListener { Usuaris ->
+            for (u in Usuaris) {
+                Log.d("app", "${u.id} => ${u.data}")
+
+                    var usu = Usuari()
+                    usu.user_id = u.get("user_id") as String;
+                    usu.empresa = u.get("empresa") as String;
+                    usu.email = u.get("email") as String;
+                    usu.nif = u.get("nif") as Int;
+                    usu.telefon = u.get("telefon") as Int;
+                    usu.nom_cognoms = u.get("nom_cognoms") as String;
+                    usu.descripcio = u.get("descripcio") as String;
+                    listaActual.add(usu)
+            }
+
+    }
+    .addOnFailureListener { exception ->
+        Log.w("app", "Error getting documents: ", exception)
+    }
+    return listaActual
+}
+
 
 
 
@@ -103,6 +150,10 @@ fun HomeScreen(navController: NavController) {
     // Crea una còpia addicional de la llista de licitacions original
     val originalLicitacions = remember { mutableStateOf(emptyList<Licitacio>()) }
     var licitacions by remember { mutableStateOf(emptyList<Licitacio>()) }
+
+    val originalUsuaris = remember { mutableStateOf(emptyList<Usuari>()) }
+    var usuaris by remember { mutableStateOf(emptyList<Usuari>()) }
+
     val isLoading = remember { mutableStateOf(true) }
 
     val expanded = remember { mutableStateOf(false) }
@@ -191,6 +242,8 @@ fun HomeScreen(navController: NavController) {
                     fechaFormateada,
                     opcionesSeleccionadasTipus
                 )
+
+
                 var searchText by remember { mutableStateOf("") }
                 OutlinedTextField(
                     value = searchText,
@@ -256,6 +309,18 @@ fun HomeScreen(navController: NavController) {
 
 
                 LazyColumn {
+                    items(items = usuaris) { u ->
+                        CardUsusari(
+                            icon = Icons.Filled.AccountCircle,
+                            title = u.empresa,
+                            correu = u.email,
+                            telefon = u.telefon,
+                            descripcio = u.descripcio,
+                            nomResponsable = u.nom_cognoms
+                        )
+                    }
+
+
                     items(items = licitacions) { licitacio ->
                         CardLicitacio(
                             icon = Icons.Filled.AccountCircle,
@@ -285,9 +350,15 @@ fun HomeScreen(navController: NavController) {
         licitacionsData.value = repository.getLicitacions()
         originalLicitacions.value = licitacionsData.value ?: emptyList()
         licitacions = originalLicitacions.value
+
+
+        originalUsuaris.value = GetUsuaris()
+        usuaris = originalUsuaris.value
+
         isLoading.value = false
     }
 }
+
 
 
 
