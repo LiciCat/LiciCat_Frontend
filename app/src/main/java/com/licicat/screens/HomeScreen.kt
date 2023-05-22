@@ -51,6 +51,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.licicat.model.usersEmpresa
+import com.licicat.components.CardUsuari
 
 import java.text.SimpleDateFormat
 import java.util.*
@@ -122,15 +123,16 @@ fun GetUsuaris(): List<Usuari> {
             for (u in Usuaris) {
                 Log.d("app", "${u.id} => ${u.data}")
 
-                    var usu = Usuari()
-                    usu.user_id = u.get("user_id") as String;
-                    usu.empresa = u.get("empresa") as String;
-                    usu.email = u.get("email") as String;
-                    usu.nif = u.get("nif") as Int;
-                    usu.telefon = u.get("telefon") as Int;
-                    usu.nom_cognoms = u.get("nom_cognoms") as String;
-                    usu.descripcio = u.get("descripcio") as String;
-                    listaActual.add(usu)
+                var usu = Usuari()
+                usu.user_id = u.get("user_id") as? String ?: ""
+                usu.empresa = u.get("empresa") as? String ?: ""
+                usu.email = u.get("email") as? String ?: ""
+                usu.nif = (u.get("nif") as? Int) ?: 0
+                usu.telefon = (u.get("telefon") as? Int) ?: 0
+                usu.nom_cognoms = u.get("nom_cognoms") as? String ?: ""
+                usu.descripcio = u.get("descripcio") as? String ?: ""
+
+                listaActual.add(usu)
             }
 
     }
@@ -304,13 +306,14 @@ fun HomeScreen(navController: NavController) {
                     )
                 )
 
-                println(searchText)
 
+                    Log.d("Tag", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 
 
                 LazyColumn {
+
                     items(items = usuaris) { u ->
-                        CardUsusari(
+                        CardUsuari(
                             icon = Icons.Filled.AccountCircle,
                             title = u.empresa,
                             correu = u.email,

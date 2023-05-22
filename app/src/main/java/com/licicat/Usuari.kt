@@ -1,7 +1,5 @@
 package com.licicat
 
-import java.sql.Timestamp
-import java.util.*
 
 data class Usuari (
     var user_id : String? = null,
