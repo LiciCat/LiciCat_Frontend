@@ -35,6 +35,9 @@ fun AppNavigation() {
         composable(route = AppScreens.SignUpCompanyScreen.route) {
             SignUpScreenEmpresa(navController)
         }
+        composable(route = AppScreens.SignUpEntitatScreen.route) {
+            SignUpScreenEntitat(navController)
+        }
 
         composable(route = AppScreens.ConfigurationScreen.route) {
             ConfigurationScreen(navController)

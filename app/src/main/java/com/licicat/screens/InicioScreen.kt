@@ -20,26 +20,7 @@ import com.licicat.navigation.AppScreens
 import kotlinx.coroutines.delay
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-/*
-@Composable
-fun InicioScreen(navController: NavController) {
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ){
-        HeaderImageInicio(Modifier)
-        if (FirebaseAuth.getInstance().currentUser?.email.isNullOrEmpty()){
-            navController.navigate(AppScreens.LoginScreen.route)
-        }
-        else{
-            navController.navigate(AppScreens.HomeScreen.route)
-        }
-    }
-}
-*/
 
 @Composable
 fun InicioScreen(navController: NavController) {
