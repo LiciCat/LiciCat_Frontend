@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import com.example.licicat.Licitacio
+import com.google.maps.android.compose.GoogleMap
 import com.licicat.LicitacionsRepository
 import com.licicat.components.BottomBarNavigation
 import com.licicat.components.CardLicitacio
@@ -81,6 +82,7 @@ fun filtrarLicitacions(
             filteredList
         } else {
             filteredList.filter { it.termini_presentacio_ofertes.toString() == fechaFormateada }
+            //Canviar el == per un == o <
         }
     }.let { filteredList ->
         if (opcionesSeleccionadasTipus.isNotEmpty()) {
@@ -93,6 +95,8 @@ fun filtrarLicitacions(
 
 
 
+
+
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -102,9 +106,10 @@ fun HomeScreen(navController: NavController) {
     val isLoading = remember { mutableStateOf(true) }
 
     val expanded = remember { mutableStateOf(false) }
+    val expandedSimilar = remember { mutableStateOf(false) }
     var opcionesSeleccionadas by remember { mutableStateOf(emptyList<String>()) }
     var opcionesSeleccionadasTipus by remember { mutableStateOf(emptyList<String>()) }
-    var  rangoPrecios by remember { mutableStateOf(Pair(0f,Float.MAX_VALUE)) }
+    var rangoPrecios by remember { mutableStateOf(Pair(0f, Float.MAX_VALUE)) }
     var dia by remember { mutableStateOf(0) }
     var mes by remember { mutableStateOf(0) }
     var any by remember { mutableStateOf(0) }
@@ -117,42 +122,75 @@ fun HomeScreen(navController: NavController) {
     ) {
         if (isLoading.value) {
             // Muestra un indicador de carga mientras se obtienen los datos
-            Column(modifier = Modifier.fillMaxSize(),
+            Column(
+                modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally) {
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 CircularProgressIndicator()
             }
         } else {
 
-            Column(modifier = Modifier.fillMaxSize(),
+            Column(
+                modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally) {
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
 
-                if(!expanded.value) {
+                if (!expanded.value) {
                     FloatingActionButton(
                         onClick = { expanded.value = true },
-                        content = { Icon(Icons.Filled.AccountCircle, contentDescription = "Filtro") },
+                        content = {
+                            Icon(
+                                Icons.Filled.AccountCircle,
+                                contentDescription = "Filtro"
+                            )
+                        },
                         modifier = Modifier.padding(16.dp)
                     )
                 }
 
-                if(expanded.value){
+
+                Switch(
+                    checked = expandedSimilar.value,
+                    onCheckedChange = { expandedSimilar.value = it
+                                        expanded.value = it},
+                    modifier = Modifier.padding(16.dp)
+                )
+
+                if (expandedSimilar.value) {
+                    val onDismiss = { }
+                    RecommendationScreen(
+                        navController = navController,
+                        originalLicitacions = originalLicitacions.value
+                    )
+                } else {
+
+                if (expanded.value) {
                     val onDismiss = { expanded.value = false }
-                    PantallaSeleccion(onApplyFilter = { opciones,rango, day, month, year, opcionesTipus->
-                        opcionesSeleccionadas = if (opciones?.isNotBlank() == true) opciones.split(", ") else emptyList()
+                    PantallaSeleccion(onApplyFilter = { opciones, rango, day, month, year, opcionesTipus ->
+                        opcionesSeleccionadas =
+                            if (opciones?.isNotBlank() == true) opciones.split(", ") else emptyList()
                         rangoPrecios = rango ?: Pair(0f, 5000000f)
                         dia = day ?: 0
                         mes = month ?: 0
                         any = year ?: 0
-                        opcionesSeleccionadasTipus = if (opcionesTipus?.isNotBlank() == true) opcionesTipus.split(", ") else emptyList()
+                        opcionesSeleccionadasTipus =
+                            if (opcionesTipus?.isNotBlank() == true) opcionesTipus.split(", ") else emptyList()
                     }, onDismiss = onDismiss)
                 }
 
                 val fechaFormateada = formatDate(dia, mes, any)
                 println(fechaFormateada)
 
-                 licitacions = filtrarLicitacions(originalLicitacions.value, opcionesSeleccionadas, rangoPrecios, fechaFormateada, opcionesSeleccionadasTipus)
+                licitacions = filtrarLicitacions(
+                    originalLicitacions.value,
+                    opcionesSeleccionadas,
+                    rangoPrecios,
+                    fechaFormateada,
+                    opcionesSeleccionadasTipus
+                )
                 var searchText by remember { mutableStateOf("") }
                 OutlinedTextField(
                     value = searchText,
@@ -180,18 +218,29 @@ fun HomeScreen(navController: NavController) {
                     keyboardActions = KeyboardActions(
                         onSearch = {
                             // Filtra la llista originalLicitacions en funció del text de cerca
-                           licitacions = originalLicitacions.value.filter {
-                                it.nom_organ?.toLowerCase()?.contains(searchText.toLowerCase()) ?: false ||
-                                it.nom_ambit?.toLowerCase()?.contains(searchText.toLowerCase()) ?: false ||
-                                it.nom_departament_ens?.toLowerCase()?.contains(searchText.toLowerCase()) ?: false ||
-                                it.nom_unitat?.toLowerCase()?.contains(searchText.toLowerCase()) ?: false ||
-                                it.tipus_contracte?.toLowerCase()?.contains(searchText.toLowerCase()) ?: false ||
-                                it.subtipus_contracte?.toLowerCase()?.contains(searchText.toLowerCase()) ?: false ||
-                                it.denominacio?.toLowerCase()?.contains(searchText.toLowerCase()) ?: false ||
-                                it.objecte_contracte?.toLowerCase()?.contains(searchText.toLowerCase()) ?: false ||
-                                it.lloc_execucio?.toLowerCase()?.contains(searchText.toLowerCase()) ?: false ||
-                                it.descripcio_lot?.toLowerCase()?.contains(searchText.toLowerCase()) ?: false ||
-                                it.denominacio_adjudicatari?.toLowerCase()?.contains(searchText.toLowerCase()) ?: false
+                            licitacions = originalLicitacions.value.filter {
+                                it.nom_organ?.toLowerCase()
+                                    ?.contains(searchText.toLowerCase()) ?: false ||
+                                        it.nom_ambit?.toLowerCase()
+                                            ?.contains(searchText.toLowerCase()) ?: false ||
+                                        it.nom_departament_ens?.toLowerCase()
+                                            ?.contains(searchText.toLowerCase()) ?: false ||
+                                        it.nom_unitat?.toLowerCase()
+                                            ?.contains(searchText.toLowerCase()) ?: false ||
+                                        it.tipus_contracte?.toLowerCase()
+                                            ?.contains(searchText.toLowerCase()) ?: false ||
+                                        it.subtipus_contracte?.toLowerCase()
+                                            ?.contains(searchText.toLowerCase()) ?: false ||
+                                        it.denominacio?.toLowerCase()
+                                            ?.contains(searchText.toLowerCase()) ?: false ||
+                                        it.objecte_contracte?.toLowerCase()
+                                            ?.contains(searchText.toLowerCase()) ?: false ||
+                                        it.lloc_execucio?.toLowerCase()
+                                            ?.contains(searchText.toLowerCase()) ?: false ||
+                                        it.descripcio_lot?.toLowerCase()
+                                            ?.contains(searchText.toLowerCase()) ?: false ||
+                                        it.denominacio_adjudicatari?.toLowerCase()
+                                            ?.contains(searchText.toLowerCase()) ?: false
                             }
                         }
                     ),
@@ -226,6 +275,7 @@ fun HomeScreen(navController: NavController) {
             }
         }
     }
+}
 
     LaunchedEffect(true) {
         // Inicia una coroutine para obtener los datos desde la API
