@@ -3,19 +3,16 @@ package com.licicat.screens
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import com.example.licicat.Licitacio
-import com.google.maps.android.compose.GoogleMap
 import com.licicat.LicitacionsRepository
 import com.licicat.components.BottomBarNavigation
 import com.licicat.components.CardLicitacio
@@ -116,6 +113,36 @@ fun Cerca_Usuaris(
     }
 }
 
+fun Cerca_Licitacio(
+    licitacions: List<Licitacio>,
+    searchText: String
+): List<Licitacio> {
+    return licitacions.filter {
+                it.nom_organ?.toLowerCase()
+                    ?.contains(searchText.toLowerCase()) ?: false ||
+                it.nom_ambit?.toLowerCase()
+                    ?.contains(searchText.toLowerCase()) ?: false ||
+                it.nom_departament_ens?.toLowerCase()
+                    ?.contains(searchText.toLowerCase()) ?: false ||
+                it.nom_unitat?.toLowerCase()
+                    ?.contains(searchText.toLowerCase()) ?: false ||
+                it.tipus_contracte?.toLowerCase()
+                    ?.contains(searchText.toLowerCase()) ?: false ||
+                it.subtipus_contracte?.toLowerCase()
+                    ?.contains(searchText.toLowerCase()) ?: false ||
+                it.denominacio?.toLowerCase()
+                    ?.contains(searchText.toLowerCase()) ?: false ||
+                it.objecte_contracte?.toLowerCase()
+                    ?.contains(searchText.toLowerCase()) ?: false ||
+                it.lloc_execucio?.toLowerCase()
+                    ?.contains(searchText.toLowerCase()) ?: false ||
+                it.descripcio_lot?.toLowerCase()
+                    ?.contains(searchText.toLowerCase()) ?: false ||
+                it.denominacio_adjudicatari?.toLowerCase()
+                    ?.contains(searchText.toLowerCase()) ?: false
+    }
+}
+
 fun getUsuaris(callback: (List<Usuari>) -> Unit) {
     val listaActual: MutableList<Usuari> = mutableListOf()
     val db = Firebase.firestore
@@ -156,6 +183,7 @@ fun HomeScreen(navController: NavController) {
     val originalLicitacions = remember { mutableStateOf(emptyList<Licitacio>()) }
     var licitacions by remember { mutableStateOf(emptyList<Licitacio>()) }
 
+    val selectedTabIndex = remember { mutableStateOf(0) }
 
     val originalUsuaris = remember { mutableStateOf(emptyList<Usuari>()) }
     var usuaris by remember { mutableStateOf(emptyList<Usuari>()) }
@@ -277,29 +305,11 @@ fun HomeScreen(navController: NavController) {
                     keyboardActions = KeyboardActions(
                         onSearch = {
                             // Filtra la llista originalLicitacions en funció del text de cerca
-                            licitacions = originalLicitacions.value.filter {
-                                it.nom_organ?.toLowerCase()
-                                    ?.contains(searchText.toLowerCase()) ?: false ||
-                                        it.nom_ambit?.toLowerCase()
-                                            ?.contains(searchText.toLowerCase()) ?: false ||
-                                        it.nom_departament_ens?.toLowerCase()
-                                            ?.contains(searchText.toLowerCase()) ?: false ||
-                                        it.nom_unitat?.toLowerCase()
-                                            ?.contains(searchText.toLowerCase()) ?: false ||
-                                        it.tipus_contracte?.toLowerCase()
-                                            ?.contains(searchText.toLowerCase()) ?: false ||
-                                        it.subtipus_contracte?.toLowerCase()
-                                            ?.contains(searchText.toLowerCase()) ?: false ||
-                                        it.denominacio?.toLowerCase()
-                                            ?.contains(searchText.toLowerCase()) ?: false ||
-                                        it.objecte_contracte?.toLowerCase()
-                                            ?.contains(searchText.toLowerCase()) ?: false ||
-                                        it.lloc_execucio?.toLowerCase()
-                                            ?.contains(searchText.toLowerCase()) ?: false ||
-                                        it.descripcio_lot?.toLowerCase()
-                                            ?.contains(searchText.toLowerCase()) ?: false ||
-                                        it.denominacio_adjudicatari?.toLowerCase()
-                                            ?.contains(searchText.toLowerCase()) ?: false
+                            if (selectedTabIndex.value == 1) {
+                                licitacions = Cerca_Licitacio(originalLicitacions.value, searchText)
+                            }
+                            if (selectedTabIndex.value == 0){
+                                    usuaris = Cerca_Usuaris(originalUsuaris.value, searchText)
                             }
                         }
                     ),
@@ -310,36 +320,47 @@ fun HomeScreen(navController: NavController) {
                     )
                 )
 
-
-
-
+                TabRow(selectedTabIndex.value) {
+                    Tab(
+                        selected = selectedTabIndex.value == 0,
+                        onClick = { selectedTabIndex.value = 0 }
+                    ) {
+                        Text("Usuaris")
+                    }
+                    Tab(
+                        selected = selectedTabIndex.value == 1,
+                        onClick = { selectedTabIndex.value = 1 }
+                    ) {
+                        Text("Licitacions")
+                    }
+                }
 
                 LazyColumn {
+                    when (selectedTabIndex.value) {
+                        0 -> items(items = usuaris) { u ->
+                            CardUsuari(
+                                icon = Icons.Filled.AccountCircle,
+                                title = u.empresa,
+                                correu = u.email,
+                                telefon = u.telefon
+                            )
+                        }
 
-                    items(items = usuaris) { u ->
-                        CardUsuari(
-                            icon = Icons.Filled.AccountCircle,
-                            title = u.empresa,
-                            correu = u.email,
-                            telefon = u.telefon
-                        )
-                    }
-
-
-                    items(items = licitacions) { licitacio ->
-                        CardLicitacio(
-                            icon = Icons.Filled.AccountCircle,
-                            title = licitacio.nom_organ,
-                            description = licitacio.objecte_contracte,
-                            date = licitacio.termini_presentacio_ofertes.toString(),
-                            price = licitacio.pressupost_licitacio_asString,
-                            navController = navController, // Nuevo parámetro agregado
-                            location = licitacio.lloc_execucio, // ubicación de la licitación
-                            denomination = licitacio.denominacio,
-                            date_inici = licitacio.data_publicacio_anunci,
-                            date_adjudicacio = licitacio.data_publicacio_adjudicacio,
-                            tipus_contracte = licitacio.tipus_contracte
-                        )
+                        1 -> items(items = licitacions) { licitacio ->
+                            CardLicitacio(
+                                icon = Icons.Filled.AccountCircle,
+                                title = licitacio.nom_organ,
+                                description = licitacio.objecte_contracte,
+                                date = licitacio.termini_presentacio_ofertes.toString(),
+                                price = licitacio.pressupost_licitacio_asString,
+                                navController = navController, // Nuevo parámetro agregado
+                                location = licitacio.lloc_execucio, // ubicación de la licitación
+                                denomination = licitacio.denominacio,
+                                date_inici = licitacio.data_publicacio_anunci,
+                                date_adjudicacio = licitacio.data_publicacio_adjudicacio,
+                                tipus_contracte = licitacio.tipus_contracte
+                            )
+                        }
                     }
                 }
             }
