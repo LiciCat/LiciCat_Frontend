@@ -14,6 +14,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.licicat.model.usersEmpresa
+import com.licicat.model.usersEntitat
 import kotlinx.coroutines.launch
 
 class LoginScreenViewModel: ViewModel() {
@@ -85,6 +86,33 @@ class LoginScreenViewModel: ViewModel() {
         }
     }
 
+    fun createUserWithEmailAndPasswordEntitat(email: String, password: String,  nom: String, entitat: String, nif: String, telefon: String, context: Context, home: () -> Unit){
+        if(_loading.value == false){
+            _loading.value = true
+            auth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task->
+                    try{
+                        if (task.isSuccessful){
+                            crateUserEntitat(email, nom, entitat, nif, telefon)
+                            home()
+                        }
+                        else{
+                            Log.d("Licicat", "Error: ${task.result.toString()}")
+                            Toast.makeText(context, "Registre incorrecte.",
+                                Toast.LENGTH_SHORT).show()
+                        }
+                        _loading.value = false
+                    }
+                    catch (e: Exception) {
+                        Log.d("Licicat", "Excepcion-log: ${e.message}")
+                        Toast.makeText(context, "Registre incorrecte.",
+                            Toast.LENGTH_SHORT).show()
+                    }
+
+                }
+        }
+    }
+
     private fun crateUser(
         email: String,
         nom: String,
@@ -107,6 +135,35 @@ class LoginScreenViewModel: ViewModel() {
 
         FirebaseFirestore.getInstance().collection("usersEmpresa")
             .add(userEmpresa)
+            .addOnSuccessListener {
+                Log.d("LiciCat", "Creat ${it.id}")
+            }.addOnFailureListener{
+                Log.d("LiciCat", "Error ${it}")
+            }
+    }
+
+    private fun crateUserEntitat(
+        email: String,
+        nom: String,
+        entitat: String,
+        nif: String,
+        telefon: String
+    ) {
+        val userId = auth.currentUser?.uid
+        val usersEntitat = usersEntitat(
+            userId = userId.toString(),
+            Entitat = entitat,
+            Nom = nom,
+            email = email,
+            avatarUrl = "",
+            NIF =  nif,
+            Telefon = telefon,
+            id = null,
+            seguidors =  emptyList<Int>()
+        ).toMap()
+
+        FirebaseFirestore.getInstance().collection("usersEntitat")
+            .add(usersEntitat)
             .addOnSuccessListener {
                 Log.d("LiciCat", "Creat ${it.id}")
             }.addOnFailureListener{
