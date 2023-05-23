@@ -116,31 +116,34 @@ fun Cerca_Usuaris(
     }
 }
 
-fun GetUsuaris(): List<Usuari> {
-    val listaActual = mutableListOf<Usuari>()
+fun getUsuaris(callback: (List<Usuari>) -> Unit) {
+    val listaActual: MutableList<Usuari> = mutableListOf()
     val db = Firebase.firestore
-    db.collection("usersEmpresa").get().addOnSuccessListener { Usuaris ->
-            for (u in Usuaris) {
-                Log.d("app", "${u.id} => ${u.data}")
-
-                var usu = Usuari()
+    db.collection("usersEmpresa").get()
+        .addOnSuccessListener { usuaris ->
+            for (u in usuaris) {
+                val usu = Usuari()
                 usu.user_id = u.get("user_id") as? String ?: ""
                 usu.empresa = u.get("empresa") as? String ?: ""
                 usu.email = u.get("email") as? String ?: ""
-                usu.nif = (u.get("nif") as? Int) ?: 0
-                usu.telefon = (u.get("telefon") as? Int) ?: 0
+                usu.nif = (u.get("nif") as? String) ?: ""
+                usu.telefon = (u.get("telefon") as? String) ?: ""
                 usu.nom_cognoms = u.get("nom_cognoms") as? String ?: ""
                 usu.descripcio = u.get("descripcio") as? String ?: ""
+
+
 
                 listaActual.add(usu)
             }
 
-    }
-    .addOnFailureListener { exception ->
-        Log.w("app", "Error getting documents: ", exception)
-    }
-    return listaActual
+            callback(listaActual)
+        }
+        .addOnFailureListener { exception ->
+            Log.w("app", "Error getting documents: ", exception)
+            callback(emptyList())
+        }
 }
+
 
 
 
@@ -152,6 +155,7 @@ fun HomeScreen(navController: NavController) {
     // Crea una còpia addicional de la llista de licitacions original
     val originalLicitacions = remember { mutableStateOf(emptyList<Licitacio>()) }
     var licitacions by remember { mutableStateOf(emptyList<Licitacio>()) }
+
 
     val originalUsuaris = remember { mutableStateOf(emptyList<Usuari>()) }
     var usuaris by remember { mutableStateOf(emptyList<Usuari>()) }
@@ -307,7 +311,7 @@ fun HomeScreen(navController: NavController) {
                 )
 
 
-                    Log.d("Tag", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+
 
 
                 LazyColumn {
@@ -317,9 +321,7 @@ fun HomeScreen(navController: NavController) {
                             icon = Icons.Filled.AccountCircle,
                             title = u.empresa,
                             correu = u.email,
-                            telefon = u.telefon,
-                            descripcio = u.descripcio,
-                            nomResponsable = u.nom_cognoms
+                            telefon = u.telefon
                         )
                     }
 
@@ -355,8 +357,12 @@ fun HomeScreen(navController: NavController) {
         licitacions = originalLicitacions.value
 
 
-        originalUsuaris.value = GetUsuaris()
-        usuaris = originalUsuaris.value
+        getUsuaris { listaActual ->
+            originalUsuaris.value = listaActual
+            usuaris = originalUsuaris.value
+
+        }
+
 
         isLoading.value = false
     }

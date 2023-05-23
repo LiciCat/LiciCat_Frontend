@@ -35,24 +35,22 @@ fun CardUsuari(
     icon: ImageVector,
     title: String?,
     correu: String?,
-    telefon: Int?,
-    descripcio: String?,
-    nomResponsable: String?
+    telefon: String?
 ) {
     Card(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxWidth()
             .clickable(onClick = { /* Navegació al perfil de l'usuari */ })
-            .padding(vertical = 8.dp, horizontal = 16.dp), // Espaiat intern del contingut de la Card
+            .padding(vertical = 2.dp, horizontal = 16.dp), // Espaiat intern del contingut de la Card
         elevation = 8.dp
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 imageVector = icon,
-                contentDescription = null, // Elimina la descripció del contingut
-                tint = Color.Black, // Tonalitat de l'ícone
-                modifier = Modifier.padding(end = 16.dp)
+                contentDescription = null,
+                tint = Color.Black,
+                modifier = Modifier.size(50.dp) // Modifica el valor de la mida aquí
             )
             Column {
                 Text(
@@ -81,12 +79,14 @@ fun CardUsuari(
                         tint = Color.Black.copy(alpha = 0.6f),
                         modifier = Modifier.size(16.dp)
                     )
-                    Text(
-                        text = telefon?.toString().orEmpty(), // Utilitza el telèfon o una cadena buida si és nul
-                        style = MaterialTheme.typography.body2,
-                        color = Color.Black.copy(alpha = 0.6f),
-                        modifier = Modifier.padding(start = 4.dp)
-                    )
+                    telefon?.let { telefonValue ->
+                        Text(
+                            text = telefonValue.toString(),
+                            style = MaterialTheme.typography.body2,
+                            color = Color.Black.copy(alpha = 0.6f),
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
                 }
             }
         }
