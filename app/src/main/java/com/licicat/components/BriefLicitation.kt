@@ -1,6 +1,10 @@
 package com.licicat.components
 
 
+import android.content.Context
+import android.location.Geocoder
+import android.widget.Toast
+import java.io.IOException
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.*
@@ -28,6 +32,21 @@ import androidx.compose.foundation.clickable
 import kotlin.random.Random
 
 
+fun findUbicacio(context: Context, location: String): Boolean {
+    try {
+        val geocoder = Geocoder(context)
+        val results = location?.let { geocoder.getFromLocationName(it, 1) }
+        if (results != null && results.isNotEmpty()) return true
+        return false
+    }
+    catch (e: IOException){
+        return false
+    }
+    catch (e: IllegalArgumentException) {
+        return false
+    }
+}
+
 @Composable
 fun CardLicitacio(
     icon: ImageVector,
@@ -46,8 +65,9 @@ fun CardLicitacio(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxWidth()
-            .clickable (onClick = {
-                navController.navigate(AppScreens.withArgs(location,title,description,price))}),
+            .clickable(onClick = {
+                navController.navigate(AppScreens.withArgs(location, title, description, price))
+            }),
         elevation = 8.dp
     ) {
         var isFavorite by remember { mutableStateOf(false) }
@@ -104,148 +124,186 @@ fun CardLicitacio(
                             .wrapContentWidth(align = Alignment.CenterHorizontally)
                     )
                 }
-                Box(
-                    modifier = Modifier
-                        .width(48.dp)
-                        .height(48.dp)
-                        .align(Alignment.CenterVertically)
-                ) {
-                    IconButton(
-                        onClick = {
-                            navController.navigate(AppScreens.Args(location,title))
-                        },
-                        modifier = Modifier.align(Alignment.Center)
+                if (location != null) {
+                    Box(
+                        modifier = Modifier
+                            .width(48.dp)
+                            .height(48.dp)
+                            .align(Alignment.CenterVertically)
                     ) {
-                        Icon(
-                            painter = painterResource(id = AppScreens.MapScreen.icon),
-                            contentDescription = AppScreens.MapScreen.title
-                        )
+                        IconButton(
+                            onClick = {
+                                if (findUbicacio(navController.context, location)) {
+                                    navController.navigate(AppScreens.Args(location, title))
+                                } else {
+                                    Toast.makeText(
+                                        navController.context,
+                                        "Licitacio no disponible en el mapa.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            },
+                            modifier = Modifier.align(Alignment.Center)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = AppScreens.MapScreen.icon),
+                                contentDescription = AppScreens.MapScreen.title
+                            )
+                        }
                     }
-                }
-                Box(
-                    modifier = Modifier
-                        .width(48.dp)
-                        .height(48.dp)
-                        .align(Alignment.CenterVertically)
-                ) {
-                    IconButton(
-                        onClick = {
-                            if (isFavorite) {
-                                db.collection("licitacionsFavorits")
-                                    .whereEqualTo("title", title)
-                                    .whereEqualTo("description", description)
-                                    .whereEqualTo("date", date)
-                                    .whereEqualTo("price", price)
-                                    .whereArrayContains("users_ids", current_user?.uid.toString())
-                                    .get()
-                                    .addOnSuccessListener { documents ->
-                                        for (document in documents) {
-                                            val usersIds = document.get("users_ids") as MutableList<String>
-                                            usersIds.remove(current_user?.uid.toString())
-                                            document.reference.update("users_ids", usersIds)
-                                        }
-                                    }
-                                db.collection("usersEmpresa")
-                                    .whereEqualTo("user_id", current_user?.uid)
-                                    .get()
-                                    .addOnSuccessListener { documents ->
-                                        for (document in documents) {
-                                            val favsIds = document.get("favorits") as MutableList<Int>
-                                            val newfavsIds = favsIds.filter { it != id_lic.toInt() }
-                                            document.reference.update("favorits", newfavsIds )
-                                        }
-                                    }
-                            }
-                            else {
-                                db.collection("licitacionsFavorits")
-                                    .whereEqualTo("title", title)
-                                    .whereEqualTo("description", description)
-                                    .whereEqualTo("date", date)
-                                    .whereEqualTo("price", price)
-                                    .get()
-                                    .addOnSuccessListener { documents ->
-                                        if (!documents.isEmpty) {
+                    Box(
+                        modifier = Modifier
+                            .width(48.dp)
+                            .height(48.dp)
+                            .align(Alignment.CenterVertically)
+                    ) {
+                        IconButton(
+                            onClick = {
+                                navController.navigate(AppScreens.Args(location, title))
+                            },
+                            modifier = Modifier.align(Alignment.Center)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = AppScreens.MapScreen.icon),
+                                contentDescription = AppScreens.MapScreen.title
+                            )
+                        }
+                    }
+                    Box(
+                        modifier = Modifier
+                            .width(48.dp)
+                            .height(48.dp)
+                            .align(Alignment.CenterVertically)
+                    ) {
+                        IconButton(
+                            onClick = {
+                                if (isFavorite) {
+                                    db.collection("licitacionsFavorits")
+                                        .whereEqualTo("title", title)
+                                        .whereEqualTo("description", description)
+                                        .whereEqualTo("date", date)
+                                        .whereEqualTo("price", price)
+                                        .whereArrayContains(
+                                            "users_ids",
+                                            current_user?.uid.toString()
+                                        )
+                                        .get()
+                                        .addOnSuccessListener { documents ->
                                             for (document in documents) {
-                                                val usersIds = document.get("users_ids") as MutableList<String>
-                                                usersIds.add(current_user?.uid.toString())
+                                                val usersIds =
+                                                    document.get("users_ids") as MutableList<String>
+                                                usersIds.remove(current_user?.uid.toString())
                                                 document.reference.update("users_ids", usersIds)
                                             }
-                                        } else {
-                                            val users = listOf(current_user?.uid.toString())
-                                            id_lic = Random.nextLong(1, 2147483647).toInt()
-                                            val data = hashMapOf(
-                                                "title" to title,
-                                                "description" to description,
-                                                "date" to date,
-                                                "price" to price,
-                                                "lic_id" to id_lic,
-                                                "location" to location,
-                                                "denomination" to denomination,
-                                                "date_inici" to date_inici,
-                                                "date_adjudicacio" to date_adjudicacio,
-                                                "tipus_contracte" to tipus_contracte,
-                                                "users_ids" to users
-                                            )
-                                            db.collection("licitacionsFavorits").add(data)
+                                        }
+                                    db.collection("usersEmpresa")
+                                        .whereEqualTo("user_id", current_user?.uid)
+                                        .get()
+                                        .addOnSuccessListener { documents ->
+                                            for (document in documents) {
+                                                val favsIds =
+                                                    document.get("favorits") as MutableList<Int>
+                                                val newfavsIds =
+                                                    favsIds.filter { it != id_lic.toInt() }
+                                                document.reference.update("favorits", newfavsIds)
+                                            }
+                                        }
+                                } else {
+                                    db.collection("licitacionsFavorits")
+                                        .whereEqualTo("title", title)
+                                        .whereEqualTo("description", description)
+                                        .whereEqualTo("date", date)
+                                        .whereEqualTo("price", price)
+                                        .get()
+                                        .addOnSuccessListener { documents ->
+                                            if (!documents.isEmpty) {
+                                                for (document in documents) {
+                                                    val usersIds =
+                                                        document.get("users_ids") as MutableList<String>
+                                                    usersIds.add(current_user?.uid.toString())
+                                                    document.reference.update("users_ids", usersIds)
+                                                }
+                                            } else {
+                                                val users = listOf(current_user?.uid.toString())
+                                                id_lic = Random.nextLong(1, 2147483647).toInt()
+                                                val data = hashMapOf(
+                                                    "title" to title,
+                                                    "description" to description,
+                                                    "date" to date,
+                                                    "price" to price,
+                                                    "lic_id" to id_lic,
+                                                    "location" to location,
+                                                    "denomination" to denomination,
+                                                    "date_inici" to date_inici,
+                                                    "date_adjudicacio" to date_adjudicacio,
+                                                    "tipus_contracte" to tipus_contracte,
+                                                    "users_ids" to users
+                                                )
+                                                db.collection("licitacionsFavorits").add(data)
+                                            }
+
+                                            db.collection("usersEmpresa")
+                                                .whereEqualTo("user_id", current_user?.uid)
+                                                .get()
+                                                .addOnSuccessListener { documents ->
+                                                    for (document in documents) {
+
+                                                        println("id_lic es igual a $id_lic")
+
+                                                        val favsIds =
+                                                            document.get("favorits") as MutableList<Int>
+                                                        favsIds.add(id_lic)
+                                                        document.reference.update(
+                                                            "favorits",
+                                                            favsIds
+                                                        )
+                                                    }
+                                                }
                                         }
 
-                                        db.collection("usersEmpresa")
-                                            .whereEqualTo("user_id", current_user?.uid)
-                                            .get()
-                                            .addOnSuccessListener { documents ->
-                                                for (document in documents) {
-
-                                                    println("id_lic es igual a $id_lic")
-
-                                                    val favsIds = document.get("favorits") as MutableList<Int>
-                                                    favsIds.add(id_lic)
-                                                    document.reference.update("favorits", favsIds)
-                                                }
-                                            }
-                                    }
-
-                            }
-                            isFavorite = !isFavorite
-                        },
-                        modifier = Modifier.align(Alignment.Center)
-                    ) {
-                        Icon(
-                            imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                            contentDescription = "Botón de favorito"
-                        )
+                                }
+                                isFavorite = !isFavorite
+                            },
+                            modifier = Modifier.align(Alignment.Center)
+                        ) {
+                            Icon(
+                                imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                contentDescription = "Botón de favorito"
+                            )
+                        }
                     }
                 }
-            }
-            if (description != null) {
-                Text(
-                    text = description,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(top = 12.dp)
-                )
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                if (date != null) {
+                if (description != null) {
                     Text(
-                        text = date,
-                        style = MaterialTheme.typography.body2
+                        text = description,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(top = 12.dp)
                     )
                 }
-                if (price != null) {
-                    Text(
-                        text = price,
-                        style = MaterialTheme.typography.body2,
-                        fontWeight = FontWeight.Bold
-                    )
-                    if(location != null) {
-                    Text(
-                        text = location,
-                        style = MaterialTheme.typography.body2,
-                        fontWeight = FontWeight.Bold
-                    )
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    if (date != null) {
+                        Text(
+                            text = date,
+                            style = MaterialTheme.typography.body2
+                        )
+                    }
+                    if (price != null) {
+                        Text(
+                            text = price,
+                            style = MaterialTheme.typography.body2,
+                            fontWeight = FontWeight.Bold
+                        )
+                        if (location != null) {
+                            Text(
+                                text = location,
+                                style = MaterialTheme.typography.body2,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
                 }
             }
