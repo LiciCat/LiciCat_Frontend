@@ -99,7 +99,7 @@ fun UserForm(
             CreaCompteEmpresa(modifier = Modifier.weight(1f), navController)
             ForgotPassword(modifier = Modifier.align(Alignment.CenterVertically) )
         }
-        CreaCompteEntitatPublica(Modifier.align(Alignment.Start))
+        CreaCompteEntitatPublica(Modifier.align(Alignment.Start), navController)
         Spacer(modifier = Modifier.padding(20.dp))
         LoginButton(
             inputValido = valido
@@ -224,10 +224,10 @@ fun CreaCompteEmpresa(modifier: Modifier, navController: NavController) {
 }
 
 @Composable
-fun CreaCompteEntitatPublica(modifier: Modifier) {
+fun CreaCompteEntitatPublica(modifier: Modifier, navController: NavController) {
     Text(
         text = "Crear compte d'entitat pública",
-        modifier = modifier.clickable { },
+        modifier = modifier.clickable {navController.navigate(route = AppScreens.SignUpEntitatScreen.route) },
         fontSize = 12.sp,
         fontWeight = FontWeight.Bold,
         color = Color(0xFFFF454A)
