@@ -1,38 +1,26 @@
 package com.licicat.screens
 
-import kotlin.math.abs
-import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Geocoder
 import android.util.Log
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.runtime.*
-
-import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.*
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 
 import androidx.navigation.NavController
 import com.example.licicat.Licitacio
 
-import com.licicat.components.BottomBarNavigation
-import com.licicat.components.CardLicitacio
-
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
-import java.util.*
+import com.google.android.gms.tasks.Tasks
+import com.google.android.gms.tasks.Task
+import com.google.firebase.firestore.QuerySnapshot
 
 import kotlin.math.log
 
@@ -125,7 +113,7 @@ fun ajustarSimilitud(similitud: Double, umbral: Double): Double {
 private fun calcularSimilitud(licitacion1: Licitacio, licitacion2: Licitacio, context: Context, corpus: List<Pair<String,String>>): Double {
 
     val similitudPrecio = calcularSimilitudPrecio(licitacion1.pressupost_licitacio, licitacion2.pressupost_licitacio)
-    val similitudUbicacio = calcularSimilitudUbi(licitacion1.lloc_execucio, licitacion2.lloc_execucio, context)
+    val similitudUbicacio = 0.0//calcularSimilitudUbi(licitacion1.lloc_execucio, licitacion2.lloc_execucio, context)
     val similitudDescripcio = 0.0//calcularTFIDF(licitacion1.objecte_contracte ?: "", licitacion2.objecte_contracte ?: "", corpus.map { it.first })
     val similitudOrgan = calcularTFIDF(licitacion1.nom_organ ?: "", licitacion2.nom_organ ?: "", corpus.map { it.second })
 
@@ -154,7 +142,7 @@ private fun calcularSimilitudPrecio(precio1: Int?, precio2: Int?): Double {
         else return 0.3
     } else if(precio2 == 0){ return 0.3}
 
-        else {
+    else {
         val maxPrecio = maxOf(precio1, precio2).toDouble()
         val minPrecio = minOf(precio1, precio2).toDouble()
 
@@ -209,67 +197,7 @@ private fun calcularSimilitudUbi(ubi1: String?, ubi2: String?, context: Context)
 
 
 
-private fun obtenerLicitacionesFavoritas(onSuccess: (List<Licitacio>) -> Unit) {
-    val db = Firebase.firestore
-    val current_user = FirebaseAuth.getInstance().currentUser
-    val id_del_user = current_user?.uid
-    val numeros = mutableListOf<Int>()
 
-    db.collection("usersEmpresa")
-        .whereEqualTo("user_id", id_del_user)
-        .get()
-        .addOnSuccessListener { documents ->
-            for (document in documents) {
-                val numerosDocument = document.get("favorits") as List<Long>
-                numeros.addAll(numerosDocument.map { it.toInt() })
-            }
-            obtenerLicitaciones(numeros, onSuccess)
-        }
-        .addOnFailureListener { exception ->
-            Log.w("app", "Error getting documents: ", exception)
-        }
-}
-
-
-
-private fun obtenerLicitaciones(numeros: List<Int>, onSuccess: (List<Licitacio>) -> Unit) {
-    val db = Firebase.firestore
-    val licitaciones = mutableListOf<Licitacio>()
-    var documentosCompletados = 0
-
-    for (numero in numeros) {
-        db.collection("licitacionsFavorits")
-            .whereEqualTo("lic_id", numero)
-            .get()
-            .addOnSuccessListener { documents ->
-                for (document in documents) {
-                    val licitacio = Licitacio(
-                        nom_organ = document.get("title") as String,
-                        objecte_contracte = document.get("description") as String,
-                        termini_presentacio_ofertes = document.get("date") as String,
-                        pressupost_licitacio_asString = document.get("price") as String,
-                        pressupost_licitacio = (document.get("price") as String).replace(".", "").toInt(),
-                        lloc_execucio = document.get("location") as String,
-                        denominacio = document.get("denomination") as String,
-                        data_publicacio_anunci = document.get("date_inici") as String,
-                        data_publicacio_adjudicacio = document.get("date_adjudicacio") as String,
-                        tipus_contracte = document.get("tipus_contracte") as String
-
-
-
-                    )
-                    licitaciones.add(licitacio)
-                }
-                documentosCompletados++
-                if (documentosCompletados == numeros.size) {
-                    onSuccess(licitaciones)
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.w("app", "Error getting documents: ", exception)
-            }
-    }
-}
 
 
 private fun calcularSimilitudPromedio(lista1: List<Licitacio>, lista2: List<Licitacio>, context: Context, corpus: List<Pair<String,String>>): Double {
@@ -290,76 +218,108 @@ private fun calcularSimilitudPromedio(lista1: List<Licitacio>, lista2: List<Lici
 
 
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-@Composable
-fun RecommendationScreen(navController: NavController, originalLicitacions: List<Licitacio>) {
-    Scaffold(
-        bottomBar = {
-            BottomBarNavigation(navController)
-        }
-    ) {
-        val licitacions_favs = remember { mutableStateOf(emptyList<Licitacio>()) }
-        val licitacions_all =  originalLicitacions
-        val isLoading = remember { mutableStateOf(true) }
+fun RecommendationScreen(navController: NavController, originalLicitacions: List<Licitacio>, callback: (List<Licitacio>) -> Unit) {
+    val licitacions_favs = mutableListOf<Licitacio>()
+    val licitacions_all = originalLicitacions
+    val isLoading = mutableStateOf(true)
+    var l : List<Licitacio> = emptyList()
 
 
-        LaunchedEffect(Unit) {
-            obtenerLicitacionesFavoritas { licitaciones ->
-                licitacions_favs.value = licitaciones
-                isLoading.value = false
-            }
-            println("fin launched effect")
-        }
+    val db = Firebase.firestore
+    val current_user = FirebaseAuth.getInstance().currentUser
+    val id_del_user = current_user?.uid
+    val numeros = mutableListOf<Int>()
+    val licitaciones = mutableListOf<Licitacio>()
 
-        if (isLoading.value) {
-            // Muestra un indicador de carga mientras se obtienen los datos
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                CircularProgressIndicator()
-            }
-        }
-        else {
-
-
-            val objecteYOrganizacionList: List<Pair<String, String>> = licitacions_all.map { licitacion ->
-                val objecteContracte = licitacion.objecte_contracte ?: ""
-                val nombreOrganizacion = licitacion.nom_organ ?: ""
-                Pair(objecteContracte, nombreOrganizacion)
+    db.collection("usersEmpresa")
+        .whereEqualTo("user_id", id_del_user)
+        .get()
+        .addOnSuccessListener { documents ->
+            for (document in documents) {
+                val numerosDocument = document.get("favorits") as List<Long>
+                numeros.addAll(numerosDocument.map { it.toInt() })
             }
 
+            val tasks = mutableListOf<Task<QuerySnapshot>>()
 
+            for (numero in numeros) {
+                val task = db.collection("licitacionsFavorits")
+                    .whereEqualTo("lic_id", numero)
+                    .get()
+                tasks.add(task)
+            }
 
-                val similitudPromedio = calcularSimilitudPromedio(licitacions_favs.value.toList(), licitacions_all, navController.context, objecteYOrganizacionList)
-                var calc = 0.0
-                val licitacionesSimilares = licitacions_all.filter {
-                    calc = calcularSimilitudPromedio(licitacions_favs.value.toList(), listOf(it), navController.context, objecteYOrganizacionList)
-                    calc > similitudPromedio
-                }.sortedByDescending { licitacion -> calc }
+            Tasks.whenAllComplete(tasks)
+                .addOnSuccessListener { snapshots ->
+                    for (snapshot in snapshots) {
+                        val documents = snapshot.result as QuerySnapshot
+                        for (document in documents) {
+                            val licitacio = Licitacio(
+                                nom_organ = document.get("title") as String,
+                                objecte_contracte = document.get("description") as String,
+                                termini_presentacio_ofertes = document.get("date") as String,
+                                pressupost_licitacio_asString = document.get("price") as String,
+                                pressupost_licitacio = (document.get("price") as String).replace(".", "").toInt(),
+                                lloc_execucio = document.get("location") as String,
+                                denominacio = document.get("denomination") as String,
+                                data_publicacio_anunci = document.get("date_inici") as String,
+                                data_publicacio_adjudicacio = document.get("date_adjudicacio") as String,
+                                tipus_contracte = document.get("tipus_contracte") as String
+                            )
+                            licitaciones.add(licitacio)
+                            println("Bucle intern:")
+                            println(licitaciones.size)
+                            println(licitacio.nom_organ)
+                        }
+                    }
+                    println("Mida de licitaciones: ")
+                    println(licitaciones.size)
+                    isLoading.value = false
+                    if (!isLoading.value) {
+                        val objecteYOrganizacionList: List<Pair<String, String>> = licitacions_all.map { licitacion ->
+                            val objecteContracte = licitacion.objecte_contracte ?: ""
+                            val nombreOrganizacion = licitacion.nom_organ ?: ""
+                            Pair(objecteContracte, nombreOrganizacion)
+                        }
 
+                        val similitudPromedio = calcularSimilitudPromedio(
+                            licitaciones.toList(),
+                            licitacions_all,
+                            navController.context,
+                            objecteYOrganizacionList
+                        )
 
-            LazyColumn(modifier = Modifier
-                .padding(bottom = 56.dp)
-                .fillMaxWidth()) {
+                        var calc = 0.0
 
-                items(items = licitacionesSimilares) { licitacio ->
-                    CardLicitacio(
-                        icon = Icons.Filled.AccountCircle,
-                        title = licitacio.nom_organ,
-                        description = licitacio.objecte_contracte,
-                        date = licitacio.termini_presentacio_ofertes.toString(),
-                        price = licitacio.pressupost_licitacio_asString,
-                        navController = navController,
-                        location = licitacio.lloc_execucio,
-                        denomination = licitacio.denominacio,
-                        date_inici = licitacio.data_publicacio_anunci,
-                        date_adjudicacio = licitacio.data_publicacio_adjudicacio,
-                        tipus_contracte = licitacio.tipus_contracte
-                    )
+                        val licitacionesSimilares = licitacions_all.filter {
+                            calc = calcularSimilitudPromedio(
+                                licitaciones.toList(),
+                                listOf(it),
+                                navController.context,
+                                objecteYOrganizacionList
+                            )
+                            calc > similitudPromedio
+                        }.sortedByDescending { licitacion -> calc }
+
+                        println("Mida de la llista de licitacions similars:")
+                        println(licitacionesSimilares.size)
+                        l = licitacionesSimilares
+                        callback(l)
+                    }
+
+                    //return emptyList()
                 }
-            }
+                .addOnFailureListener { exception ->
+                    Log.w("app", "Error getting documents: ", exception)
+                }
         }
-    }
+        .addOnFailureListener { exception ->
+            Log.w("app", "Error getting documents: ", exception)
+        }
+    println("mida l:")
+    println(l.size)
 }
+
+
+
+
