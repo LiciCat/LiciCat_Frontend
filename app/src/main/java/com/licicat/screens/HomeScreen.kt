@@ -55,8 +55,6 @@ import java.util.*
 
 
 
-var licitacions: List<Licitacio>? = null
-var usuaris: List<Usuari>? = null
 
 fun formatDate(day: Int, month: Int, year: Int): String {
     val calendar = Calendar.getInstance().apply {
@@ -183,6 +181,9 @@ fun HomeScreen(navController: NavController) {
     val originalLicitacions = remember { mutableStateOf(emptyList<Licitacio>()) }
     var licitacions by remember { mutableStateOf(emptyList<Licitacio>()) }
 
+    var originalLicitacionsSimilars = remember { mutableStateOf(emptyList<Licitacio>()) }
+    var similars by remember { mutableStateOf(emptyList<Licitacio>()) }
+
     val selectedTabIndex = remember { mutableStateOf(0) }
 
     val originalUsuaris = remember { mutableStateOf(emptyList<Usuari>()) }
@@ -214,7 +215,8 @@ fun HomeScreen(navController: NavController) {
             ) {
                 CircularProgressIndicator()
             }
-        } else {
+        }
+        else {
 
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -235,22 +237,6 @@ fun HomeScreen(navController: NavController) {
                         modifier = Modifier.padding(16.dp)
                     )
                 }
-
-
-                Switch(
-                    checked = expandedSimilar.value,
-                    onCheckedChange = { expandedSimilar.value = it
-                                        expanded.value = it},
-                    modifier = Modifier.padding(16.dp)
-                )
-
-                if (expandedSimilar.value) {
-                    val onDismiss = { }
-                    RecommendationScreen(
-                        navController = navController,
-                        originalLicitacions = originalLicitacions.value
-                    )
-                } else {
 
                 if (expanded.value) {
                     val onDismiss = { expanded.value = false }
@@ -305,6 +291,9 @@ fun HomeScreen(navController: NavController) {
                     keyboardActions = KeyboardActions(
                         onSearch = {
                             // Filtra la llista originalLicitacions en funció del text de cerca
+                            if (selectedTabIndex.value == 2) {
+                                similars = Cerca_Licitacio(originalLicitacionsSimilars.value, searchText)
+                            }
                             if (selectedTabIndex.value == 1) {
                                 licitacions = Cerca_Licitacio(originalLicitacions.value, searchText)
                             }
@@ -332,6 +321,14 @@ fun HomeScreen(navController: NavController) {
                         onClick = { selectedTabIndex.value = 1 }
                     ) {
                         Text("Licitacions")
+                    }
+                    Tab(
+                        selected = selectedTabIndex.value == 2,
+                        onClick = {
+                            selectedTabIndex.value = 2
+                        }
+                    ) {
+                        Text("Licitacions Similars")
                     }
                 }
 
@@ -361,12 +358,27 @@ fun HomeScreen(navController: NavController) {
                                 tipus_contracte = licitacio.tipus_contracte
                             )
                         }
+
+                        2 -> items(items = similars) { licitacio ->
+                            CardLicitacio(
+                                icon = Icons.Filled.AccountCircle,
+                                title = licitacio.nom_organ,
+                                description = licitacio.objecte_contracte,
+                                date = licitacio.termini_presentacio_ofertes.toString(),
+                                price = licitacio.pressupost_licitacio_asString,
+                                navController = navController,
+                                location = licitacio.lloc_execucio,
+                                denomination = licitacio.denominacio,
+                                date_inici = licitacio.data_publicacio_anunci,
+                                date_adjudicacio = licitacio.data_publicacio_adjudicacio,
+                                tipus_contracte = licitacio.tipus_contracte
+                            )
+                        }
                     }
                 }
             }
         }
     }
-}
 
     LaunchedEffect(true) {
         // Inicia una coroutine para obtener los datos desde la API
@@ -385,6 +397,18 @@ fun HomeScreen(navController: NavController) {
         }
 
 
+        RecommendationScreen(navController, originalLicitacions.value) { result ->
+            // Aquí puedes usar el resultado devuelto, por ejemplo, asignarlo a una variable
+            originalLicitacionsSimilars.value = result
+            similars = originalLicitacionsSimilars.value
+            println("aaaaaaaaaaaaaaaaa")
+            println(similars.size)
+
+        }
+
+
+
+        
         isLoading.value = false
     }
 }
