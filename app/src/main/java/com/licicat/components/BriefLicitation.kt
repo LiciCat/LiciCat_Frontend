@@ -159,24 +159,6 @@ fun CardLicitacio(
                     ) {
                         IconButton(
                             onClick = {
-                                navController.navigate(AppScreens.Args(location, title))
-                            },
-                            modifier = Modifier.align(Alignment.Center)
-                        ) {
-                            Icon(
-                                painter = painterResource(id = AppScreens.MapScreen.icon),
-                                contentDescription = AppScreens.MapScreen.title
-                            )
-                        }
-                    }
-                    Box(
-                        modifier = Modifier
-                            .width(48.dp)
-                            .height(48.dp)
-                            .align(Alignment.CenterVertically)
-                    ) {
-                        IconButton(
-                            onClick = {
                                 if (isFavorite) {
                                     db.collection("licitacionsFavorits")
                                         .whereEqualTo("title", title)
