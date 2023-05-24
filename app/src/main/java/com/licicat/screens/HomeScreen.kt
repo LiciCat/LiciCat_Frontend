@@ -2,6 +2,7 @@ package com.licicat.screens
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,9 +18,11 @@ import com.licicat.LicitacionsRepository
 import com.licicat.components.BottomBarNavigation
 import com.licicat.components.CardLicitacio
 import com.licicat.Usuari
+import androidx.compose.material.ExtendedFloatingActionButton
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.IconButton
@@ -41,6 +44,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.ui.draw.clip
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -49,6 +55,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.licicat.model.usersEmpresa
 import com.licicat.components.CardUsuari
+import com.licicat.ui.theme.redLicicat
 
 import java.text.SimpleDateFormat
 import java.util.*
@@ -225,18 +232,7 @@ fun HomeScreen(navController: NavController) {
             ) {
 
 
-                if (!expanded.value) {
-                    FloatingActionButton(
-                        onClick = { expanded.value = true },
-                        content = {
-                            Icon(
-                                Icons.Filled.AccountCircle,
-                                contentDescription = "Filtro"
-                            )
-                        },
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
+
 
                 if (expanded.value) {
                     val onDismiss = { expanded.value = false }
@@ -264,52 +260,9 @@ fun HomeScreen(navController: NavController) {
                 )
 
 
-                var searchText by remember { mutableStateOf("") }
-                OutlinedTextField(
-                    value = searchText,
-                    onValueChange = { searchText = it },
-                    placeholder = { Text("Cerca") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Icona de cerca"
-                        )
-                    },
-                    textStyle = TextStyle(
-                        fontFamily = FontFamily.Default,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 16.sp,
-                        color = Color.Black
-                    ),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Search
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onSearch = {
-                            // Filtra la llista originalLicitacions en funció del text de cerca
-                            if (selectedTabIndex.value == 2) {
-                                similars = Cerca_Licitacio(originalLicitacionsSimilars.value, searchText)
-                            }
-                            if (selectedTabIndex.value == 1) {
-                                licitacions = Cerca_Licitacio(originalLicitacions.value, searchText)
-                            }
-                            if (selectedTabIndex.value == 0){
-                                    usuaris = Cerca_Usuaris(originalUsuaris.value, searchText)
-                            }
-                        }
-                    ),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = Color.White,
-                        cursorColor = Color.Black
-                    )
-                )
-
-                TabRow(selectedTabIndex.value) {
+                TabRow(
+                    selectedTabIndex.value,
+                ) {
                     Tab(
                         selected = selectedTabIndex.value == 0,
                         onClick = { selectedTabIndex.value = 0 }
@@ -331,6 +284,82 @@ fun HomeScreen(navController: NavController) {
                         Text("Licitacions Similars")
                     }
                 }
+
+
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    var searchText by remember { mutableStateOf("") }
+
+                    OutlinedTextField(
+                        value = searchText,
+                        onValueChange = { searchText = it },
+                        placeholder = { Text("Cerca") },
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(16.dp),
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "Icona de cerca"
+                            )
+                        },
+                        textStyle = TextStyle(
+                            fontFamily = FontFamily.Default,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 16.sp,
+                            color = Color.Black
+                        ),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Search
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onSearch = {
+                                // Filtra la llista originalLicitacions en funció del text de cerca
+                                if (selectedTabIndex.value == 2) {
+                                    similars = Cerca_Licitacio(originalLicitacionsSimilars.value, searchText)
+                                }
+                                if (selectedTabIndex.value == 1) {
+                                    licitacions = Cerca_Licitacio(originalLicitacions.value, searchText)
+                                }
+                                if (selectedTabIndex.value == 0) {
+                                    usuaris = Cerca_Usuaris(originalUsuaris.value, searchText)
+                                }
+                            }
+                        ),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = TextFieldDefaults.textFieldColors(
+                            backgroundColor = Color.White,
+                            cursorColor = Color.Black
+                        )
+                    )
+
+                    if (!expanded.value) {
+                        ExtendedFloatingActionButton(
+                            onClick = { expanded.value = true },
+                            icon = {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Icon(
+                                        Icons.Filled.FilterList,
+                                        tint = Color.White,
+                                        contentDescription = "Filtro",
+                                        modifier = Modifier.size(24.dp) // Ajusta la mida de l'icono
+                                    )
+                                }
+                            },
+                            modifier = Modifier.padding(16.dp),
+                            backgroundColor = redLicicat,
+                            text = { Text("") },
+                            shape = CircleShape
+                        )
+                    }
+                }
+
+
 
                 LazyColumn {
                     when (selectedTabIndex.value) {
@@ -408,7 +437,7 @@ fun HomeScreen(navController: NavController) {
 
 
 
-        
+
         isLoading.value = false
     }
 }
