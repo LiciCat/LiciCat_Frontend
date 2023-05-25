@@ -26,6 +26,10 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.Date
 import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.style.TextAlign
+
+
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -40,30 +44,33 @@ fun WhatsScreen(navController: NavController, chat_id: String, id_docEmpresa: St
 
     val chatRef = db.collection("chats").document(chat_id)
 
-
-
     LaunchedEffect(Unit) {
         if (!messagesObtained) {
             chatRef.collection("messages").orderBy("dob", Query.Direction.DESCENDING)
-                .get()
-                .addOnSuccessListener { messages ->
-                    val newMessages = mutableListOf<Message>()
-                    for (message in messages) {
-                        val dob = message.get("dob") as? Timestamp
-                        var date = Date();
-                        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-                        val dobString = dob?.let { timestamp ->
-                            date = Date(timestamp.seconds * 1000)
-                            dateFormat.format(date)
-                        } ?: ""
-                        val from = message.get("from") as? String ?: ""
-                        val messageText = message.get("message") as? String ?: ""
-
-                        val missatge = Message(messageText, from, date)
-                        newMessages.add(missatge)
+                .addSnapshotListener { snapshot, exception ->
+                    if (exception != null) {
+                        // Manejar el error en caso de que ocurra
+                        return@addSnapshotListener
                     }
-                    missatges = newMessages
-                    messagesObtained = true
+                    if (snapshot != null && !snapshot.isEmpty) {
+                        val newMessages = mutableListOf<Message>()
+                        for (message in snapshot.documents) {
+                            val dob = message.get("dob") as? Timestamp
+                            var date = Date();
+                            val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                            val dobString = dob?.let { timestamp ->
+                                date = Date(timestamp.seconds * 1000)
+                                dateFormat.format(date)
+                            } ?: ""
+                            val from = message.get("from") as? String ?: ""
+                            val messageText = message.get("message") as? String ?: ""
+
+                            val missatge = Message(messageText, from, date)
+                            newMessages.add(missatge)
+                        }
+                        missatges = newMessages
+                        messagesObtained = true
+                    }
                 }
         }
     }
@@ -93,10 +100,30 @@ fun WhatsScreen(navController: NavController, chat_id: String, id_docEmpresa: St
                 modifier = Modifier.weight(1f),
                 reverseLayout = true,
                 contentPadding = PaddingValues(horizontal = 16.dp)
-            ) {items(missatges) { missatge ->
-                // Aquí puedes definir el diseño y la representación de cada mensaje en pantalla
-                Text(text = missatge.message)
-                Text(text = missatge.from)
+            ) {
+                val current_user = FirebaseAuth.getInstance().currentUser
+                val user = current_user?.uid.toString()
+                items(missatges) { missatge ->
+                    val isCurrentUser = user == missatge.from
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = if (isCurrentUser) Arrangement.End else Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        val textAlign = if (isCurrentUser) TextAlign.End else TextAlign.Start
+
+                        Column {
+                            Text(
+                                text = missatge.message,
+                                textAlign = textAlign
+                            )
+                            Text(
+                                text = missatge.from,
+                                textAlign = textAlign
+                            )
+                        }
+                    }
                 }
             }
 
@@ -144,13 +171,15 @@ object AppDescription2 {
 }
 
 fun sendMessage(message_chat: String) {
-    val db = Firebase.firestore
-    val current_user = FirebaseAuth.getInstance().currentUser
-    val user = current_user?.uid.toString()
-    val message = Message(
-        message = message_chat,
-        from = user
-    )
-    db.collection("chats").document(AppDescription2.chat_id).collection("messages").document().set(message)
-
+    if (message_chat != "") {
+        val db = Firebase.firestore
+        val current_user = FirebaseAuth.getInstance().currentUser
+        val user = current_user?.uid.toString()
+        val message = Message(
+            message = message_chat,
+            from = user
+        )
+        db.collection("chats").document(AppDescription2.chat_id).collection("messages").document()
+            .set(message)
+    }
 }
