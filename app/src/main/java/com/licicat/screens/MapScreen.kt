@@ -59,7 +59,7 @@ fun MapScreen(navController: NavController, adress: String?, title: String?) {
 fun OpenMap(licitacio_location: LatLng, parking_locations: MutableList<LatLng>, title: String?) {
     val uiSettings by remember { mutableStateOf(MapUiSettings(zoomControlsEnabled = true, zoomGesturesEnabled = true)) }
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(licitacio_location, 13f)
+        position = CameraPosition.fromLatLngZoom(licitacio_location, 15f)
     }
 
     GoogleMap(
