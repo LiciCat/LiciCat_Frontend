@@ -47,6 +47,22 @@ fun AppNavigation() {
         }
 
         composable(
+            route = AppScreens.withArgs2("{chat_id}","{id_docEmpresa}","{id_docEntitat}", "{info}"),
+            arguments = listOf(
+                navArgument("chat_id") { type = NavType.StringType },
+                navArgument("id_docEmpresa") { type = NavType.StringType },
+                navArgument("id_docEntitat") { type = NavType.StringType },
+                navArgument("info") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val chat_id = backStackEntry.arguments?.getString("chat_id") ?: ""
+            val id_docEmpresa = backStackEntry.arguments?.getString("id_docEmpresa") ?: ""
+            val id_docEntitat = backStackEntry.arguments?.getString("id_docEntitat") ?: ""
+            val info = backStackEntry.arguments?.getString("info") ?: ""
+            WhatsScreen(navController = navController, chat_id = chat_id, id_docEmpresa = id_docEmpresa, id_docEntitat = id_docEntitat, info = info)
+        }
+
+        composable(
             route = AppScreens.withArgs("{location}","{title}", "{description}","{price}"),
             arguments = listOf(
                 navArgument("location") { type = NavType.StringType },
@@ -73,7 +89,5 @@ fun AppNavigation() {
             val title = backStackEntry.arguments?.getString("title") ?: ""
             MapScreen(navController = navController, adress = location, title = title)
         }
-
-
     }
 }

@@ -17,6 +17,7 @@ sealed class AppScreens(val route: String, val title: String, val icon: Int) {
     object ConfigurationScreen: AppScreens("configuration_screen", "Configuration", R.drawable.baseline_person_24)
     object InicioScreen: AppScreens("inicio_screen", "Inicio", R.drawable.baseline_person_24)
     object LicitacioScreen: AppScreens("licitacio_screen", "Licitacio", R.drawable.baseline_fmd_good_24)
+    object WhatsScreen: AppScreens("whats_screen", "Whats", R.drawable.baseline_fmd_good_24)
     companion object {
         fun withArgs(location: String?, title:String?, description:String?, price:String?): String {
             return buildString {
@@ -32,6 +33,16 @@ sealed class AppScreens(val route: String, val title: String, val icon: Int) {
                 append(MapScreen.route)
                 append("/$location")
                 append("/$title")
+            }
+        }
+
+        fun withArgs2(chat_id: String?, id_docEmpresa: String?, id_docEntitat:String?, info:String?): String {
+            return buildString {
+                append(LicitacioScreen.route)
+                append("/$chat_id")
+                append("/$id_docEmpresa")
+                append("/$id_docEntitat")
+                append("/$info")
             }
         }
 

@@ -2,6 +2,7 @@ package com.licicat.screens
 
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,15 +23,22 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.licicat.components.BottomBarNavigation
-
+import com.licicat.model.Chat
+import com.licicat.navigation.AppScreens
+import java.util.*
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-
-
 fun LicitacioScreen(navController: NavController, location:String?, title:String?, description:String?, price:String?) {
+
+    description?.let {
+        AppDescription.description = it
+    }
 
     Scaffold(
         bottomBar = {
@@ -97,8 +105,14 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                     modifier = Modifier.fillMaxWidth().padding(70.dp)
                 ) {
                     Button(
-                        onClick = { navController.navigate("chat_screen")
-                        },
+                        onClick = {
+                            Log.d("App","Entro a clicar")
+                            crea_chat(navController){
+                                Log.d("App","Entro a navegar")
+                                navController.navigate(route = AppScreens.ChatScreen.route)
+                                Log.d("App","Salgo de navegar")
+                            }
+                        }
                     ) {
                         Text(text = "Obrir Chat")
                     }
@@ -113,6 +127,60 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
     }
 }
 
+object AppDescription {
+    var description: String = ""
+}
+
+fun crea_chat(navController: NavController,onComplete: () -> Unit) {
+    val db = Firebase.firestore
+    val current_user = FirebaseAuth.getInstance().currentUser
+    val nomEntitat = "Generalitat de Catalunya"
+    val info = AppDescription.description
+        db.collection("usersEmpresa")
+            .whereEqualTo("user_id", current_user?.uid)
+            .get()
+            .addOnSuccessListener { empresaDocuments ->
+                for (empresaDocument in empresaDocuments) {
+                    val id_doc_user = empresaDocument.id
+
+                    db.collection("usersEntitat")
+                        .whereEqualTo("entitat", nomEntitat)
+                        .get()
+                        .addOnSuccessListener { entitatDocuments ->
+                            for (entitatDocument in entitatDocuments) {
+                                val id_doc_entitat = entitatDocument.id
+
+                                // Verificar si ya existe un chat entre los mismos usuarios
+                                db.collection("chats")
+                                    .whereEqualTo("id_docEmpresa", id_doc_user)
+                                    .whereEqualTo("id_docEntitat", id_doc_entitat)
+                                    .whereEqualTo("info", info)
+                                    .get()
+                                    .addOnSuccessListener { chatDocuments ->
+                                        if (chatDocuments.isEmpty) {
+                                            val chatId = UUID.randomUUID().toString()
+                                            val chat = Chat(
+                                                id = chatId,
+                                                name = "Xat amb $nomEntitat",
+                                                info = info,
+                                                id_docEmpresa = id_doc_user,
+                                                id_docEntitat = id_doc_entitat
+                                            )
+
+                                            db.collection("chats").document(chatId).set(chat)
+                                            db.collection("usersEmpresa").document(id_doc_user)
+                                                .collection("chats").document(chatId).set(chat)
+                                            db.collection("usersEntitat").document(id_doc_entitat)
+                                                .collection("chats").document(chatId).set(chat)
+                                            onComplete()
+                                        } else onComplete()
+
+                                    }
+                            }
+                        }
+                }
+            }
+}
 
 @Composable
 fun PerfilCard(navController: NavController ,text: String) {
@@ -222,101 +290,3 @@ fun RoundedButton(text: String) {
         Text(text = text)
     }
 }
-
-
-
-/*
-fun DetalleLicitacionScreen(navController: NavController, licitacio: Licitacio) {
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = licitacio.nom_organ) },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = null)
-                    }
-                }
-            )
-        },
-        content = {
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                // Descripción
-                Card(
-                    elevation = 8.dp,
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(
-                            text = "Descripción",
-                            style = MaterialTheme.typography.h6
-                        )
-                        Text(
-                            text = licitacio.objecte_contracte,
-                            style = MaterialTheme.typography.body1
-                        )
-                    }
-                }
-
-                // Fecha y precio
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    Card(
-                        elevation = 8.dp,
-                        shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Text(
-                                text = "Fecha",
-                                style = MaterialTheme.typography.h6
-                            )
-                            Text(
-                                text = licitacio.termini_presentacio_ofertes.toString(),
-                                style = MaterialTheme.typography.body1
-                            )
-                        }
-                    }
-
-                    Card(
-                        elevation = 8.dp,
-                        shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Text(
-                                text = "Precio",
-                                style = MaterialTheme.typography.h6
-                            )
-                            Text(
-                                text = licitacio.pressupost_licitacio_asString+"€",
-                                style = MaterialTheme.typography.body1
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    )
-}
- */
-
-
-
