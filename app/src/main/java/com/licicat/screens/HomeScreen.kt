@@ -53,14 +53,15 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.licicat.AppType
+import com.licicat.UserType
+import com.licicat.components.BottomBarNavigationEntitat
 import com.licicat.model.usersEmpresa
 import com.licicat.components.CardUsuari
 import com.licicat.ui.theme.redLicicat
 
 import java.text.SimpleDateFormat
 import java.util.*
-
-
 
 
 fun formatDate(day: Int, month: Int, year: Int): String {
@@ -181,7 +182,7 @@ fun getUsuaris(callback: (List<Usuari>) -> Unit) {
 
 
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "UnrememberedMutableState")
 @Composable
 fun HomeScreen(navController: NavController) {
     // Crea una còpia addicional de la llista de licitacions original
@@ -208,9 +209,13 @@ fun HomeScreen(navController: NavController) {
     var any by remember { mutableStateOf(0) }
 
 
+    var type by remember { mutableStateOf("") }
+
     Scaffold(
         bottomBar = {
-            BottomBarNavigation(navController)
+            if (AppType.getUserType() == UserType.EMPRESA) BottomBarNavigation(navController)
+            //else if (AppType.getUserType() == UserType.UNKNOWN) BottomBarNavigation(navController)
+            else if (AppType.getUserType() == UserType.ENTITAT) BottomBarNavigationEntitat(navController)
         }
     ) {
         if (isLoading.value) {
@@ -230,8 +235,6 @@ fun HomeScreen(navController: NavController) {
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
-
 
 
                 if (expanded.value) {
@@ -411,6 +414,23 @@ fun HomeScreen(navController: NavController) {
 
     LaunchedEffect(true) {
         // Inicia una coroutine para obtener los datos desde la API
+
+        val db = Firebase.firestore
+        val current_user = FirebaseAuth.getInstance().currentUser
+        val id_del_user = current_user?.uid
+        println(id_del_user)
+        db.collection("usersEmpresa")
+            .whereEqualTo("user_id", id_del_user)
+            .get()
+            .addOnSuccessListener {
+                //type = "empresa"
+                type = "entitat"
+            }
+            .addOnFailureListener {
+                type = "entitat"
+            }
+
+
         val repository = LicitacionsRepository()
         val licitacionsData = MutableLiveData<List<Licitacio>>()
         licitacionsData.value = emptyList()
@@ -422,7 +442,6 @@ fun HomeScreen(navController: NavController) {
         getUsuaris { listaActual ->
             originalUsuaris.value = listaActual
             usuaris = originalUsuaris.value
-
         }
 
 
@@ -430,9 +449,6 @@ fun HomeScreen(navController: NavController) {
             // Aquí puedes usar el resultado devuelto, por ejemplo, asignarlo a una variable
             originalLicitacionsSimilars.value = result
             similars = originalLicitacionsSimilars.value
-            println("aaaaaaaaaaaaaaaaa")
-            println(similars.size)
-
         }
 
 
