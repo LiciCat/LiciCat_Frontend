@@ -31,10 +31,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
+import com.licicat.AppType
 import com.licicat.R
-
-
-
+import com.licicat.UserType
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -56,7 +55,13 @@ fun LoginScreen(
            ){
                email, password ->
                viewModel.signInWithEmailAndPassword(email, password, context){
-                   navController.navigate(route = AppScreens.HomeScreen.route)
+                   /*val userType = AppType.getUserType()
+                   if ((userType == UserType.EMPRESA) /*|| (userType == UserType.UNKNOWN)*/) {
+                       navController.navigate(route = AppScreens.HomeScreen.route)
+                   } else if (userType == UserType.ENTITAT) {
+                       navController.navigate(route = AppScreens.ChatScreen.route)
+                   }*/
+                   navController.navigate(route = AppScreens.InicioScreen.route)
                }
            }
        }

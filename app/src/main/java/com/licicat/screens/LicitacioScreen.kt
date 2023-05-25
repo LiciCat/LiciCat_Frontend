@@ -22,8 +22,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.licicat.AppType
+import com.licicat.UserType
 import com.licicat.components.BottomBarNavigation
-
+import com.licicat.components.BottomBarNavigationEntitat
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -34,7 +36,9 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
 
     Scaffold(
         bottomBar = {
-            BottomBarNavigation(navController)
+            if (AppType.getUserType() == UserType.EMPRESA) BottomBarNavigation(navController)
+            //else if (AppType.getUserType() == UserType.UNKNOWN) BottomBarNavigation(navController)
+            else if (AppType.getUserType() == UserType.ENTITAT) BottomBarNavigationEntitat(navController)
         }
     ) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {

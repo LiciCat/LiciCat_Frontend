@@ -12,7 +12,10 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.licicat.AppType
+import com.licicat.UserType
 import com.licicat.model.usersEmpresa
 import com.licicat.model.usersEntitat
 import kotlinx.coroutines.launch
@@ -35,6 +38,20 @@ class LoginScreenViewModel: ViewModel() {
                    try {
                        if (task.isSuccessful){
                            Log.d("Licicat", "Logeado")
+                           /*
+                           val db = Firebase.firestore
+                           val current_user = FirebaseAuth.getInstance().currentUser
+                           val id_del_user = current_user?.uid
+                           db.collection("usersEmpresa")
+                               .whereEqualTo("user_id", id_del_user)
+                               .get()
+                               .addOnSuccessListener {
+                                   AppType.setUserType(UserType.EMPRESA)
+                               }
+                               .addOnFailureListener {
+                                   AppType.setUserType(UserType.ENTITAT)
+                               }
+                               */
                            home()
                        }
                        else{
