@@ -1,7 +1,14 @@
 package com.licicat.screens
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.net.Uri
+import android.provider.MediaStore
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -36,11 +43,45 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import com.licicat.navigation.AppScreens
-
+import androidx.compose.material.icons.*
+import androidx.compose.ui.platform.LocalContext
+import com.google.firebase.storage.ktx.storage
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.rememberImagePainter
+import coil.transform.CircleCropTransformation
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun WhatsScreen(navController: NavController, chat_id: String, id_Empresa: String, id_docEntitat: String, info: String) {
+    val selectedImageUri = remember { mutableStateOf<Uri?>(null) }
+    val context = LocalContext.current
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+    ) { uri: Uri? ->
+        val storage = Firebase.storage
+        val imageRef = storage.reference.child("images/${System.currentTimeMillis()}.jpg") // Ruta del archivo en Firebase Storage
+        val selectedImageUri: Uri? = uri
+        val uploadTask = imageRef.putFile(selectedImageUri!!)
+        uploadTask.continueWithTask { task ->
+            if (!task.isSuccessful) {
+                throw task.exception!!
+            }
+            // Continuar con la tarea para obtener la URL de descarga
+            imageRef.downloadUrl
+        }.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val downloadUri = task.result
+                // Guardar la URL de descarga en Firestore
+                guardarUrlDeDescargaEnFirestore(downloadUri.toString())
+            } else {
+                // Manejar el error en la carga de la imagen
+            }
+        }
+    }
+
+
     var missatges by remember { mutableStateOf(emptyList<Message>()) }
     var messagesObtained by remember { mutableStateOf(false) }
 
@@ -52,11 +93,6 @@ fun WhatsScreen(navController: NavController, chat_id: String, id_Empresa: Strin
     val user = current_user?.uid.toString()
     val chatRef = db.collection("chats").document(chat_id)
     var name by remember { mutableStateOf("") }
-    Log.d("App","Mi user:" + user)
-    Log.d("App","Mi chat_id:" + chat_id)
-    Log.d("App","Mi id_Empresa:" + id_Empresa)
-    Log.d("App","Mi id_docEntitat:" + id_docEntitat)
-    Log.d("App","Mi info:" + info)
     if (user == id_Empresa) {
     LaunchedEffect(Unit) {
         chatRef.get()
@@ -182,11 +218,16 @@ fun WhatsScreen(navController: NavController, chat_id: String, id_Empresa: Strin
                                 .clip(RoundedCornerShape(8.dp))
                         ) {
                             Column {
-                                Text(
-                                    text = missatge.message,
-                                    textAlign = textAlign,
-                                    fontSize = 18.sp // Tamaño del mensaje (puedes ajustar el valor según tus preferencias)
-                                )
+                                if (missatge.message.startsWith("https:")) {
+                                    ImageWithCoil(missatge.message)
+                                }
+                                else {
+                                    Text(
+                                        text = missatge.message,
+                                        textAlign = textAlign,
+                                        fontSize = 18.sp // Tamaño del mensaje (puedes ajustar el valor según tus preferencias)
+                                    )
+                                }
                                 Text(
                                     text = dateString,
                                     color = Color.Gray,
@@ -221,7 +262,7 @@ fun WhatsScreen(navController: NavController, chat_id: String, id_Empresa: Strin
                         value = textFieldValue.value,
                         onValueChange = { onTextFieldValueChanged(it) },
                         modifier = Modifier
-                            .weight(1f)
+                            .weight(4f)
                             .padding(end = 8.dp),
                         placeholder = {
                             Text(text = "Escribe un mensaje...")
@@ -229,14 +270,62 @@ fun WhatsScreen(navController: NavController, chat_id: String, id_Empresa: Strin
                     )
                     Button(
                         onClick = { sendMessage(textFieldValue.value); textFieldValue.value = "" },
-                        modifier = Modifier.padding(start = 8.dp)
+                        modifier = Modifier.padding(start = 4.dp).weight(1f)
                     ) {
-                        Text(text = "Enviar")
+                        Text(text = "➤")
+                    }
+                    CameraButton(
+                        onClick = { galleryLauncher.launch("image/*") },
+                        modifier = Modifier
+                            .padding(start = 1.dp)
+                            .weight(1f)
+                    ) {
+                        Text(text = "\uD83D\uDCF7")
                     }
                 }
             }
         }
     }
+}
+
+@Composable
+fun ImageWithCoil(url: String) {
+    Image(
+        painter = rememberImagePainter(
+            data = url,
+            builder = {
+                transformations(CircleCropTransformation()) // Opcional: aplicar una transformación (por ejemplo, recorte circular)
+            }
+        ),
+        contentDescription = "Foto",
+        modifier = Modifier.size(200.dp), // Ajusta el tamaño de la imagen según tus preferencias
+        contentScale = ContentScale.Crop, // Opcional: ajustar la escala de la imagen
+        colorFilter = ColorFilter.tint(Color.Gray) // Opcional: aplicar un filtro de color
+    )
+}
+
+@Composable
+fun CameraButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Button(onClick = onClick, modifier = modifier) {
+        content()
+    }
+}
+
+fun guardarUrlDeDescargaEnFirestore(downloadUrl: String) {
+    val db = Firebase.firestore
+    val current_user = FirebaseAuth.getInstance().currentUser
+    val user = current_user?.uid.toString()
+
+    val message = Message(
+        message = downloadUrl, // Aquí guardas la URL de descarga de la imagen
+        from = user
+    )
+    db.collection("chats").document(AppDescription2.chat_id).collection("messages").document()
+        .set(message)
 }
 
 object AppDescription2 {
@@ -256,3 +345,4 @@ fun sendMessage(message_chat: String) {
             .set(message)
     }
 }
+
