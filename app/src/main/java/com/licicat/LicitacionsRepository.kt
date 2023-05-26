@@ -44,6 +44,9 @@ class LicitacionsRepository {
         //Descripció del contracte
         val desc = json.optString("objecte_contracte", "no disponible")
 
+        //Enllaç de la licitació
+        val enllac_publicacio = json.optString("enllac_publicacio", "no disponible")
+
         //Transformacions dates
         val formatoOrigen = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
         val formatoDestino = SimpleDateFormat("dd/MM/yyyy")
@@ -84,6 +87,7 @@ class LicitacionsRepository {
         licitacio.termini_presentacio_ofertes = data_fi;
         licitacio.data_publicacio_adjudicacio = data_adjudicacio;
         licitacio.tipus_contracte = tc;
+        licitacio.enllac_publicacio = enllac_publicacio;
         return licitacio
     }
 

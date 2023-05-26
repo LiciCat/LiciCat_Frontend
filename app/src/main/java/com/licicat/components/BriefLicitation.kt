@@ -59,16 +59,18 @@ fun CardLicitacio(
     denomination: String?,
     date_inici: String?,
     date_adjudicacio: String?,
-    tipus_contracte: String?
+    tipus_contracte: String?,
+    enllac_publicacio: String?,
 ) {
     Card(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxWidth()
             .clickable (onClick = {
-                navController.navigate(AppScreens.withArgs(location,title,description,price))}),
+                navController.navigate(AppScreens.withArgs(location,title,description,price, denomination, enllac_publicacio))}),
         elevation = 8.dp
     ) {
+        Log.d("app", "enllac_publicacio:"+ enllac_publicacio)
         var isFavorite by remember { mutableStateOf(false) }
         var id_lic by remember { mutableStateOf(Random.nextLong(1, 2147483647).toInt()) }
         val db = Firebase.firestore
@@ -213,7 +215,8 @@ fun CardLicitacio(
                                                 "date_inici" to date_inici,
                                                 "date_adjudicacio" to date_adjudicacio,
                                                 "tipus_contracte" to tipus_contracte,
-                                                "users_ids" to users
+                                                "users_ids" to users,
+                                                "enllac_publicacio" to enllac_publicacio,
                                             )
                                             db.collection("licitacionsFavorits").add(data)
                                         }
