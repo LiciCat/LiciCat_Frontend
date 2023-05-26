@@ -8,7 +8,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.navigation.NavController
-import com.licicat.components.BottomBarNavigation
 import com.licicat.navigation.AppScreens
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -20,7 +19,6 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.lifecycle.MutableLiveData
 import com.example.licicat.Licitacio
 import com.google.firebase.firestore.DocumentReference
-import com.licicat.components.CardLicitacio
 import com.licicat.model.usersEmpresa
 
 import androidx.compose.foundation.layout.*
@@ -33,10 +31,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.licicat.AppType
 import com.licicat.LicitacionsRepository
-import com.licicat.components.BottomBarNavigation
-import com.licicat.components.FavLicitacio
-
+import com.licicat.UserType
+import com.licicat.components.*
 
 
 val licitacions_favs: MutableLiveData<List<Licitacio>> = MutableLiveData(emptyList())
@@ -47,7 +45,9 @@ var presentacio =  mutableStateOf(false)
 fun FavouritesScreen(navController: NavController) {
     Scaffold(
         bottomBar = {
-            BottomBarNavigation(navController)
+            if (AppType.getUserType() == UserType.EMPRESA) BottomBarNavigation(navController)
+            //else if (AppType.getUserType() == UserType.UNKNOWN) BottomBarNavigation(navController)
+            else if (AppType.getUserType() == UserType.ENTITAT) BottomBarNavigationEntitat(navController)
         }
     ) {
 

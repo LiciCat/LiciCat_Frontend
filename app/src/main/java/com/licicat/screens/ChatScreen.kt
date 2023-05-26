@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
+
 import com.example.licicat.Licitacio
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
@@ -32,6 +33,12 @@ import com.licicat.components.BottomBarNavigation
 import com.licicat.components.CardChat
 import com.licicat.components.CardLicitacio
 import com.licicat.model.Chat
+
+import com.licicat.AppType
+import com.licicat.UserType
+import com.licicat.components.BottomBarNavigation
+import com.licicat.components.BottomBarNavigationEntitat
+
 import com.licicat.navigation.AppScreens
 
 
@@ -99,7 +106,9 @@ fun ChatScreen(navController: NavController) {
         }
     Scaffold(
         bottomBar = {
-            BottomBarNavigation(navController)
+            if (AppType.getUserType() == UserType.EMPRESA) BottomBarNavigation(navController)
+            //else if (AppType.getUserType() == UserType.UNKNOWN) BottomBarNavigation(navController)
+            else if (AppType.getUserType() == UserType.ENTITAT) BottomBarNavigationEntitat(navController)
         }
     ) {
         Column(

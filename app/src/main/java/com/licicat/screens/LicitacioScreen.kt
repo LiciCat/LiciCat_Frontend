@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -41,6 +42,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import kotlinx.coroutines.delay
+
+import com.licicat.AppType
+import com.licicat.UserType
+import com.licicat.components.BottomBarNavigation
+import com.licicat.components.BottomBarNavigationEntitat
+
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -68,7 +75,9 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
         }
     Scaffold(
         bottomBar = {
-            BottomBarNavigation(navController)
+            if (AppType.getUserType() == UserType.EMPRESA) BottomBarNavigation(navController)
+            //else if (AppType.getUserType() == UserType.UNKNOWN) BottomBarNavigation(navController)
+            else if (AppType.getUserType() == UserType.ENTITAT) BottomBarNavigationEntitat(navController)
         }
     ) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {

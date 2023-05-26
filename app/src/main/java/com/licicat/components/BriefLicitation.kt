@@ -1,6 +1,10 @@
 package com.licicat.components
 
 
+import android.content.Context
+import android.location.Geocoder
+import android.widget.Toast
+import java.io.IOException
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.*
@@ -27,6 +31,21 @@ import android.util.Log
 import androidx.compose.foundation.clickable
 import kotlin.random.Random
 
+
+fun findUbicacio(context: Context, location: String): Boolean {
+    try {
+        val geocoder = Geocoder(context)
+        val results = location?.let { geocoder.getFromLocationName(it, 1) }
+        if (results != null && results.isNotEmpty()) return true
+        return false
+    }
+    catch (e: IOException){
+        return false
+    }
+    catch (e: IllegalArgumentException) {
+        return false
+    }
+}
 
 @Composable
 fun CardLicitacio(
@@ -104,22 +123,32 @@ fun CardLicitacio(
                             .wrapContentWidth(align = Alignment.CenterHorizontally)
                     )
                 }
-                Box(
-                    modifier = Modifier
-                        .width(48.dp)
-                        .height(48.dp)
-                        .align(Alignment.CenterVertically)
-                ) {
-                    IconButton(
-                        onClick = {
-                            navController.navigate(AppScreens.Args(location,title))
-                        },
-                        modifier = Modifier.align(Alignment.Center)
+                if (location != null) {
+                    Box(
+                        modifier = Modifier
+                            .width(48.dp)
+                            .height(48.dp)
+                            .align(Alignment.CenterVertically)
                     ) {
-                        Icon(
-                            painter = painterResource(id = AppScreens.MapScreen.icon),
-                            contentDescription = AppScreens.MapScreen.title
-                        )
+                        IconButton(
+                            onClick = {
+                                if (findUbicacio(navController.context, location)) {
+                                    navController.navigate(AppScreens.Args(location, title))
+                                } else {
+                                    Toast.makeText(
+                                        navController.context,
+                                        "Licitacio no disponible en el mapa.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            },
+                            modifier = Modifier.align(Alignment.Center)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = AppScreens.MapScreen.icon),
+                                contentDescription = AppScreens.MapScreen.title
+                            )
+                        }
                     }
                 }
                 Box(
@@ -241,18 +270,17 @@ fun CardLicitacio(
                         fontWeight = FontWeight.Bold
                     )
                     if(location != null) {
-                    Text(
-                        text = location,
-                        style = MaterialTheme.typography.body2,
-                        fontWeight = FontWeight.Bold
-                    )
+                        Text(
+                            text = location,
+                            style = MaterialTheme.typography.body2,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
             }
         }
     }
 }
-
 
 
 
