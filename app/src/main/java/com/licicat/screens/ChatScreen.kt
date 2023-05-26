@@ -1,6 +1,7 @@
 package com.licicat.screens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -34,13 +35,68 @@ import com.licicat.model.Chat
 import com.licicat.navigation.AppScreens
 
 
+
+
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun ChatScreen(navController: NavController) {
 
+    var textFieldValue by remember { mutableStateOf("") }
     var chats by remember { mutableStateOf(emptyList<Chat>()) }
 
+    val db = Firebase.firestore
+    val current_user = FirebaseAuth.getInstance().currentUser
+    val chatList = mutableListOf<Chat>()
 
+        db.collection("usersEmpresa")
+            .whereEqualTo("user_id", current_user?.uid)
+            .get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    val userId = document.id
+                    db.collection("usersEmpresa").document(userId).collection("chats")
+                        .get()
+                        .addOnSuccessListener { chatDocuments ->
+                            for (chatDocument in chatDocuments) {
+                                val chatData = chatDocument.data
+                                val chat = Chat(
+                                    id = chatData["id"] as? String ?: "",
+                                    name = chatData["name"] as? String ?: "",
+                                    info = chatData["info"] as? String ?: "",
+                                    id_Empresa = chatData["id_Empresa"] as? String ?: "",
+                                    id_docEntitat = chatData["id_docEntitat"] as? String ?: ""
+                                )
+                                chatList.add(chat)
+                            }
+                            if (chatList.isNotEmpty()) chats = chatList
+                        }
+                }
+            }
+        db.collection("usersEntitat")
+            .whereEqualTo("user_id", current_user?.uid)
+            .get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    val userId = document.id
+                    db.collection("usersEntitat").document(userId).collection("chats")
+                        .get()
+                        .addOnSuccessListener { chatDocuments ->
+                            for (chatDocument in chatDocuments) {
+                                val chatData = chatDocument.data
+                                val chat = Chat(
+                                    id = chatData["id"] as? String ?: "",
+                                    name = chatData["name"] as? String ?: "",
+                                    info = chatData["info"] as? String ?: "",
+                                    id_Empresa = chatData["id_Empresa"] as? String ?: "",
+                                    id_docEntitat = chatData["id_docEntitat"] as? String ?: ""
+                                )
+                                chatList.add(chat)
+                            }
+                            if (chatList.isNotEmpty()) chats = chatList
+
+                }
+            }
+        }
     Scaffold(
         bottomBar = {
             BottomBarNavigation(navController)
@@ -67,8 +123,13 @@ fun ChatScreen(navController: NavController) {
                 )
 
                 TextField(
-                    value = "",
-                    onValueChange = {},
+                    value = textFieldValue,
+                    onValueChange = { newValue ->
+                        textFieldValue = newValue
+                        chats_buscados(textFieldValue) { updatedChats ->
+                            chats = updatedChats
+                        }
+                    },
                     placeholder = {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -111,15 +172,18 @@ fun ChatScreen(navController: NavController) {
             }
         }
     }
+}
 
-    LaunchedEffect(true) {
-        val db = Firebase.firestore
-        val current_user = FirebaseAuth.getInstance().currentUser
+fun chats_buscados(buscador: String, onSuccess: (List<Chat>) -> Unit) {
+    val db = Firebase.firestore
+    val current_user = FirebaseAuth.getInstance().currentUser
+    val chatList = mutableListOf<Chat>()
+
+    if (buscador.isEmpty()) {
         db.collection("usersEmpresa")
             .whereEqualTo("user_id", current_user?.uid)
             .get()
             .addOnSuccessListener { documents ->
-                val chatList = mutableListOf<Chat>()
                 for (document in documents) {
                     val userId = document.id
                     db.collection("usersEmpresa").document(userId).collection("chats")
@@ -136,7 +200,7 @@ fun ChatScreen(navController: NavController) {
                                 )
                                 chatList.add(chat)
                             }
-                            if (!chatList.isEmpty()) chats = chatList
+                                onSuccess(chatList)
                         }
                 }
             }
@@ -144,7 +208,6 @@ fun ChatScreen(navController: NavController) {
             .whereEqualTo("user_id", current_user?.uid)
             .get()
             .addOnSuccessListener { documents ->
-                val chatList = mutableListOf<Chat>()
                 for (document in documents) {
                     val userId = document.id
                     db.collection("usersEntitat").document(userId).collection("chats")
@@ -161,7 +224,90 @@ fun ChatScreen(navController: NavController) {
                                 )
                                 chatList.add(chat)
                             }
-                            if (!chatList.isEmpty()) chats = chatList
+                                onSuccess(chatList)
+                        }
+                }
+            }
+    } else {
+        db.collection("usersEmpresa")
+            .whereEqualTo("user_id", current_user?.uid)
+            .get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    val userId = document.id
+                    db.collection("usersEmpresa").document(userId).collection("chats")
+                        .get()
+                        .addOnSuccessListener { chatDocuments ->
+                            for (chatDocument in chatDocuments) {
+                                val chatData = chatDocument.data
+                                val name = chatData["name"] as? String ?: ""
+
+                                // Verificar si el nombre contiene las letras del buscador (ignorando mayúsculas y minúsculas)
+                                if (name.contains(buscador, ignoreCase = true)) {
+                                    val chat = Chat(
+                                        id = chatData["id"] as? String ?: "",
+                                        name = name,
+                                        info = chatData["info"] as? String ?: "",
+                                        id_Empresa = chatData["id_Empresa"] as? String ?: "",
+                                        id_docEntitat = chatData["id_docEntitat"] as? String ?: ""
+                                    )
+                                    chatList.add(chat)
+                                }
+                            }
+                            onSuccess(chatList)
+                        }
+                }
+            }
+        db.collection("usersEntitat")
+            .whereEqualTo("user_id", current_user?.uid)
+            .get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    val userId = document.id
+                    db.collection("usersEntitat").document(userId).collection("chats")
+                        .get()
+                        .addOnSuccessListener { chatDocuments ->
+                            for (chatDocument in chatDocuments) {
+                                val id_Empresa = chatDocument["id_Empresa"] as? String ?: ""
+
+                                db.collection("usersEmpresa")
+                                    .whereEqualTo("user_id", id_Empresa)
+                                    .get()
+                                    .addOnSuccessListener { empresaDocuments ->
+                                        for (empresaDocument in empresaDocuments) {
+                                            val DocUserID = empresaDocument.id
+                                            val name_empresa = empresaDocument.get("empresa") as String
+                                            if (name_empresa.contains(
+                                                    buscador,
+                                                    ignoreCase = true
+                                                )
+                                            ) {
+                                                db.collection("usersEmpresa").document(DocUserID)
+                                                    .collection("chats")
+                                                    .get()
+                                                    .addOnSuccessListener { Docs ->
+                                                        for (Doc in Docs) {
+                                                            val chat = Chat(
+                                                                id = Doc["id"] as? String
+                                                                    ?: "",
+                                                                name = Doc["name"] as? String
+                                                                    ?: "",
+                                                                info = Doc["info"] as? String
+                                                                    ?: "",
+                                                                id_Empresa = Doc["id_Empresa"] as? String
+                                                                    ?: "",
+                                                                id_docEntitat = Doc["id_docEntitat"] as? String
+                                                                    ?: ""
+                                                            )
+                                                            chatList.add(chat)
+                                                        }
+                                                        onSuccess(chatList)
+                                                    }
+                                            }
+                                            else onSuccess(chatList)
+                                        }
+                                    }
+                            }
                         }
                 }
             }

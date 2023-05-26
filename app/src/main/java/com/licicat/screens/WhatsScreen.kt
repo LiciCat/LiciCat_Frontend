@@ -113,7 +113,7 @@ fun WhatsScreen(navController: NavController, chat_id: String, id_Empresa: Strin
                     name = empresaDocument.get("empresa") as String
                 }
             }
-    }
+        }
     }
 
 
