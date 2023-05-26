@@ -20,16 +20,27 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.licicat.R
 import com.licicat.components.BottomBarNavigation
 import com.licicat.model.Chat
 import com.licicat.navigation.AppScreens
 import java.util.*
+
+import androidx.compose.material.Snackbar
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import kotlinx.coroutines.delay
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -40,6 +51,21 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
         AppDescription.description = it
     }
 
+    title?.let {
+        AppDescription_title.title = it
+    }
+
+
+    val db = Firebase.firestore
+    var existeix_entitat by remember { mutableStateOf(false) }
+    db.collection("usersEntitat")
+        .whereEqualTo("entitat", title)
+        .get()
+        .addOnSuccessListener { entitatDocuments ->
+            for (entitatDocument in entitatDocuments) {
+                existeix_entitat = true;
+            }
+        }
     Scaffold(
         bottomBar = {
             BottomBarNavigation(navController)
@@ -99,23 +125,43 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                     }
                 }
             }
+            item    {
+                Column(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .wrapContentHeight(align = Alignment.Bottom)
+                        .fillMaxWidth()
+                        .wrapContentWidth(align = Alignment.CenterHorizontally),
+                    verticalArrangement = Arrangement.Bottom,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (!existeix_entitat) {
+                        Text(
+                            text = "No es pot crear xat. No està loguejada l'empresa",
+                            style = TextStyle(fontWeight = FontWeight.Bold)
+                        )
+                    }
+                }
+            }
             item {
                 Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth().padding(70.dp)
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 70.dp)
                 ) {
                     Button(
                         onClick = {
-                            Log.d("App","Entro a clicar")
-                            crea_chat(navController){
-                                Log.d("App","Entro a navegar")
-                                navController.navigate(route = AppScreens.ChatScreen.route)
-                                Log.d("App","Salgo de navegar")
+                            if (existeix_entitat == true) {
+                                crea_chat(navController) {
+                                    navController.navigate(route = AppScreens.ChatScreen.route)
+                                }
+                            }
+                            else {
                             }
                         }
                     ) {
                         Text(text = "Obrir Chat")
                     }
+                    Spacer(modifier = Modifier.width(16.dp))
                     Button(
                         onClick = { /* Acción del segundo botón */ },
                     ) {
@@ -123,6 +169,7 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                     }
                 }
             }
+
         }
     }
 }
@@ -131,55 +178,58 @@ object AppDescription {
     var description: String = ""
 }
 
+object AppDescription_title {
+    var title: String = ""
+}
+
 fun crea_chat(navController: NavController,onComplete: () -> Unit) {
     val db = Firebase.firestore
     val current_user = FirebaseAuth.getInstance().currentUser
-    val nomEntitat = "Generalitat de Catalunya"
+    val nomEntitat = AppDescription_title.title
     val info = AppDescription.description
-        db.collection("usersEmpresa")
-            .whereEqualTo("user_id", current_user?.uid)
-            .get()
-            .addOnSuccessListener { empresaDocuments ->
-                for (empresaDocument in empresaDocuments) {
-                    val id_doc_user = empresaDocument.id
+    db.collection("usersEmpresa")
+        .whereEqualTo("user_id", current_user?.uid)
+        .get()
+        .addOnSuccessListener { empresaDocuments ->
+            for (empresaDocument in empresaDocuments) {
+                val id_doc_user = empresaDocument.id
 
-                    db.collection("usersEntitat")
-                        .whereEqualTo("entitat", nomEntitat)
-                        .get()
-                        .addOnSuccessListener { entitatDocuments ->
-                            for (entitatDocument in entitatDocuments) {
-                                val id_doc_entitat = entitatDocument.id
+                db.collection("usersEntitat")
+                    .whereEqualTo("entitat", nomEntitat)
+                    .get()
+                    .addOnSuccessListener { entitatDocuments ->
+                        for (entitatDocument in entitatDocuments) {
+                            val id_doc_entitat = entitatDocument.id
 
-                                // Verificar si ya existe un chat entre los mismos usuarios
-                                db.collection("chats")
-                                    .whereEqualTo("id_docEmpresa", id_doc_user)
-                                    .whereEqualTo("id_docEntitat", id_doc_entitat)
-                                    .whereEqualTo("info", info)
-                                    .get()
-                                    .addOnSuccessListener { chatDocuments ->
-                                        if (chatDocuments.isEmpty) {
-                                            val chatId = UUID.randomUUID().toString()
-                                            val chat = Chat(
-                                                id = chatId,
-                                                name = "Xat amb $nomEntitat",
-                                                info = info,
-                                                id_docEmpresa = id_doc_user,
-                                                id_docEntitat = id_doc_entitat
-                                            )
+                            // Verificar si ya existe un chat entre los mismos usuarios
+                            db.collection("chats")
+                                .whereEqualTo("id_Empresa", current_user?.uid)
+                                .whereEqualTo("id_docEntitat", id_doc_entitat)
+                                .whereEqualTo("info", info)
+                                .get()
+                                .addOnSuccessListener { chatDocuments ->
+                                    if (chatDocuments.isEmpty) {
+                                        val chatId = UUID.randomUUID().toString()
+                                        val chat = Chat(
+                                            id = chatId,
+                                            name = "$nomEntitat",
+                                            info = info,
+                                            id_Empresa = current_user?.uid.toString(),
+                                            id_docEntitat = id_doc_entitat
+                                        )
 
-                                            db.collection("chats").document(chatId).set(chat)
-                                            db.collection("usersEmpresa").document(id_doc_user)
-                                                .collection("chats").document(chatId).set(chat)
-                                            db.collection("usersEntitat").document(id_doc_entitat)
-                                                .collection("chats").document(chatId).set(chat)
-                                            onComplete()
-                                        } else onComplete()
-
-                                    }
-                            }
+                                        db.collection("chats").document(chatId).set(chat)
+                                        db.collection("usersEmpresa").document(id_doc_user)
+                                            .collection("chats").document(chatId).set(chat)
+                                        db.collection("usersEntitat").document(id_doc_entitat)
+                                            .collection("chats").document(chatId).set(chat)
+                                        onComplete()
+                                    } else onComplete()
+                                }
                         }
-                }
+                    }
             }
+        }
 }
 
 @Composable

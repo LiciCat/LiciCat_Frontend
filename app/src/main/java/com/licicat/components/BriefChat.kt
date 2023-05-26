@@ -21,20 +21,20 @@ import androidx.navigation.NavController
 import com.licicat.navigation.AppScreens
 
 @Composable
-fun CardChat(chat_id: String, name: String, info: String, id_docEmpresa: String, id_docEntitat: String, navController: NavController) {
+fun CardChat(chat_id: String, name: String, info: String, id_Empresa: String, id_docEntitat: String, navController: NavController) {
     Card(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxWidth()
             .clickable (onClick = {
                 navController.navigate(
-                    AppScreens.withArgs2(chat_id,id_docEmpresa,id_docEmpresa,info))}
+                    AppScreens.withArgs2(chat_id,id_Empresa,id_docEntitat,info))}
             ),
         elevation = 8.dp
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = name,
+                text = "Xat amb "+ name,
                 style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp),
                 modifier = Modifier.padding(bottom = 8.dp)
             )

@@ -102,7 +102,7 @@ fun ChatScreen(navController: NavController) {
                             chat_id = chat.id,
                             name = chat.name,
                             info = chat.info,
-                            id_docEmpresa = chat.id_docEmpresa,
+                            id_Empresa = chat.id_Empresa,
                             id_docEntitat = chat.id_docEntitat,
                             navController = navController
                         )
@@ -131,12 +131,37 @@ fun ChatScreen(navController: NavController) {
                                     id = chatData["id"] as? String ?: "",
                                     name = chatData["name"] as? String ?: "",
                                     info = chatData["info"] as? String ?: "",
-                                    id_docEmpresa = chatData["id_docEmpresa"] as? String ?: "",
+                                    id_Empresa = chatData["id_Empresa"] as? String ?: "",
                                     id_docEntitat = chatData["id_docEntitat"] as? String ?: ""
                                 )
                                 chatList.add(chat)
                             }
-                            chats = chatList
+                            if (!chatList.isEmpty()) chats = chatList
+                        }
+                }
+            }
+        db.collection("usersEntitat")
+            .whereEqualTo("user_id", current_user?.uid)
+            .get()
+            .addOnSuccessListener { documents ->
+                val chatList = mutableListOf<Chat>()
+                for (document in documents) {
+                    val userId = document.id
+                    db.collection("usersEntitat").document(userId).collection("chats")
+                        .get()
+                        .addOnSuccessListener { chatDocuments ->
+                            for (chatDocument in chatDocuments) {
+                                val chatData = chatDocument.data
+                                val chat = Chat(
+                                    id = chatData["id"] as? String ?: "",
+                                    name = chatData["name"] as? String ?: "",
+                                    info = chatData["info"] as? String ?: "",
+                                    id_Empresa = chatData["id_Empresa"] as? String ?: "",
+                                    id_docEntitat = chatData["id_docEntitat"] as? String ?: ""
+                                )
+                                chatList.add(chat)
+                            }
+                            if (!chatList.isEmpty()) chats = chatList
                         }
                 }
             }

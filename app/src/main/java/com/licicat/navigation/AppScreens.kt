@@ -36,11 +36,11 @@ sealed class AppScreens(val route: String, val title: String, val icon: Int) {
             }
         }
 
-        fun withArgs2(chat_id: String?, id_docEmpresa: String?, id_docEntitat:String?, info:String?): String {
+        fun withArgs2(chat_id: String?, id_Empresa: String?, id_docEntitat:String?, info:String?): String {
             return buildString {
-                append(LicitacioScreen.route)
+                append(WhatsScreen.route)
                 append("/$chat_id")
-                append("/$id_docEmpresa")
+                append("/$id_Empresa")
                 append("/$id_docEntitat")
                 append("/$info")
             }
