@@ -294,13 +294,12 @@ fun ImageWithCoil(url: String) {
         painter = rememberImagePainter(
             data = url,
             builder = {
-                transformations(CircleCropTransformation()) // Opcional: aplicar una transformación (por ejemplo, recorte circular)
+
             }
         ),
         contentDescription = "Foto",
         modifier = Modifier.size(200.dp), // Ajusta el tamaño de la imagen según tus preferencias
         contentScale = ContentScale.Crop, // Opcional: ajustar la escala de la imagen
-        colorFilter = ColorFilter.tint(Color.Gray) // Opcional: aplicar un filtro de color
     )
 }
 
