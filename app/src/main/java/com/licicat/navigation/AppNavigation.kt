@@ -89,5 +89,14 @@ fun AppNavigation() {
             val title = backStackEntry.arguments?.getString("title") ?: ""
             MapScreen(navController = navController, adress = location, title = title)
         }
+        composable(
+            route = AppScreens.Args2("{title}"),
+            arguments = listOf(
+                navArgument("title") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val title = backStackEntry.arguments?.getString("title") ?: ""
+            ProfileEntitatScreen(navController = navController, entitat = title)
+        }
     }
 }

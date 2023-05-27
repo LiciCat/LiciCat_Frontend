@@ -87,8 +87,18 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     if (title != null) {
-                        PerfilCard(navController = navController, text = title)
+                        PerfilCard(navController = navController, text = title, existeix = existeix_entitat)
                     }
+
+                }
+            }
+            if (!existeix_entitat) {
+                item{
+                    Text(
+                        text = "Entitat no registrada",
+                        style = TextStyle(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
                 }
             }
             item {
@@ -146,7 +156,7 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                 ) {
                     if (!existeix_entitat) {
                         Text(
-                            text = "No es pot crear xat. No està loguejada l'empresa",
+                            text = "No es pot crear xat. No està registrada l'entitat",
                             style = TextStyle(fontWeight = FontWeight.Bold)
                         )
                     }
@@ -242,14 +252,16 @@ fun crea_chat(navController: NavController,onComplete: () -> Unit) {
 }
 
 @Composable
-fun PerfilCard(navController: NavController ,text: String) {
+fun PerfilCard(navController: NavController ,text: String, existeix: Boolean) {
     Card(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
-            .clickable {
-                navController.navigate("profile_screen")
+            .clickable(enabled = existeix) {
+                if (existeix) {
+                    navController.navigate(AppScreens.Args2(text))
+                }
             }
     ) {
         Row(
@@ -349,3 +361,6 @@ fun RoundedButton(text: String) {
         Text(text = text)
     }
 }
+
+
+
