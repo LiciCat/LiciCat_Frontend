@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -187,6 +188,23 @@ fun ProfileEntitatScreen(navController: NavController, entitat:String?) {
                     fontWeight = FontWeight.Bold
 
                 )
+                Button(
+                    onClick = { /* Accio de seguir  */ },
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .height(36.dp)
+                        .width(120.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color(0xFFFF454A),
+                        disabledBackgroundColor = Color(0xFFF78058),
+                        contentColor = Color.White,
+                        disabledContentColor = Color.White
+
+                    )
+                ) {
+                    Text(text = "Seguir")
+                }
                 Divider(modifier = Modifier.padding(vertical = 8.dp))
             }
             if (licitacions.isNotEmpty()) {
