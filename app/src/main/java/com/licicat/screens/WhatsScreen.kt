@@ -51,6 +51,9 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
+import com.licicat.AppType
+import com.licicat.UserType
+import com.licicat.components.BottomBarNavigationEntitat
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -151,7 +154,9 @@ fun WhatsScreen(navController: NavController, chat_id: String, id_Empresa: Strin
 
     Scaffold(
         bottomBar = {
-            BottomBarNavigation(navController)
+            if (AppType.getUserType() == UserType.EMPRESA) BottomBarNavigation(navController)
+            //else if (AppType.getUserType() == UserType.UNKNOWN) BottomBarNavigation(navController)
+            else if (AppType.getUserType() == UserType.ENTITAT) BottomBarNavigationEntitat(navController)
         }
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
