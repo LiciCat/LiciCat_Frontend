@@ -147,7 +147,8 @@ class LoginScreenViewModel: ViewModel() {
             NIF =  nif,
             Telefon = telefon,
             id = null,
-            favorits =  emptyList<Int>()
+            favorits =  emptyList<Int>(),
+            descripcio = "Descripció empresa"
         ).toMap()
 
         FirebaseFirestore.getInstance().collection("usersEmpresa")
@@ -176,7 +177,10 @@ class LoginScreenViewModel: ViewModel() {
             NIF =  nif,
             Telefon = telefon,
             id = null,
-            seguidors =  emptyList<Int>()
+            seguidors =  emptyList<Int>(),
+            descripcio = "Descripció administració pública",
+            valoracio = 0F,
+            numSeguidors = 0
         ).toMap()
 
         FirebaseFirestore.getInstance().collection("usersEntitat")
