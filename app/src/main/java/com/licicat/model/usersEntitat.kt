@@ -9,7 +9,10 @@ data class usersEntitat(
     val avatarUrl: String,
     val NIF: String,
     val Telefon: String,
-    val seguidors: List<Int>
+    val seguidors: List<Int>,
+    val descripcio: String,
+    val valoracio: Float,
+    val numSeguidors: Int
 ){
     fun toMap(): MutableMap<String, Any>{
         return mutableMapOf(
@@ -20,7 +23,10 @@ data class usersEntitat(
             "nif" to this.NIF,
             "telefon" to this.Telefon,
             "avatar_url" to this.avatarUrl,
-            "seguidors" to this.seguidors
+            "seguidors" to this.seguidors,
+            "descripcio" to this.descripcio,
+            "valoracio" to this.valoracio,
+            "numSeguidors" to this.numSeguidors
         )
     }
 }
