@@ -51,6 +51,8 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.RemoteMessage
 import com.licicat.AppType
 import com.licicat.UserType
 import com.licicat.components.BottomBarNavigationEntitat
@@ -274,7 +276,7 @@ fun WhatsScreen(navController: NavController, chat_id: String, id_Empresa: Strin
                         }
                     )
                     Button(
-                        onClick = { sendMessage(textFieldValue.value); textFieldValue.value = "" },
+                        onClick = { sendMessage(textFieldValue.value); textFieldValue.value = ""; },
                         modifier = Modifier.padding(start = 4.dp).weight(1f)
                     ) {
                         Text(text = "➤")
