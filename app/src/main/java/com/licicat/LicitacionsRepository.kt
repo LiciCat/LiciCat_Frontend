@@ -134,22 +134,20 @@ class LicitacionsRepository {
 
     suspend fun getLicitacions(): List<Licitacio> {
 
-
-        println("---DATA DONE---")
-
-        println("---FINAL API---")
-
-
-
-
-
-
         val jsonArray = JSONTokener(request_api()).nextValue() as JSONArray
 
-        val licitacions = List(jsonArray.length()) { i ->
-            creallista(jsonArray.getJSONObject(i))
+        val licitacions = mutableListOf<Licitacio>()
+        val uniqueCombos = HashSet<String>()
+
+        for (i in 0 until jsonArray.length()) {
+            val licitacio = creallista(jsonArray.getJSONObject(i))
+            val combo = "${licitacio.nom_organ}-${licitacio.denominacio}"
+            if (combo !in uniqueCombos) {
+                uniqueCombos.add(combo)
+                licitacions.add(licitacio)
+            }
         }
-        println("llista feta")
+
         for (elem in licitacions) {
             println("Licitacio-------------")
             println(elem.nom_organ)
