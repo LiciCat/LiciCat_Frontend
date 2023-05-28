@@ -10,6 +10,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
@@ -297,17 +298,33 @@ fun WhatsScreen(navController: NavController, chat_id: String, id_Empresa: Strin
 
 @Composable
 fun ImageWithCoil(url: String) {
-    Image(
-        painter = rememberImagePainter(
-            data = url,
-            builder = {
+    var isExpanded by remember { mutableStateOf(false) }
 
-            }
-        ),
-        contentDescription = "Foto",
-        modifier = Modifier.size(200.dp), // Ajusta el tamaño de la imagen según tus preferencias
-        contentScale = ContentScale.Crop, // Opcional: ajustar la escala de la imagen
-    )
+    val toggleExpansion: () -> Unit = {
+        isExpanded = !isExpanded
+    }
+
+    val modifier = if (isExpanded) {
+        Modifier.fillMaxSize()
+    } else {
+        Modifier.size(200.dp)
+    }
+
+    Box(
+        modifier = Modifier.clickable(onClick = toggleExpansion)
+    ) {
+        Image(
+            painter = rememberImagePainter(
+                data = url,
+                builder = {
+
+                }
+            ),
+            contentDescription = "Foto",
+            contentScale = ContentScale.Crop,
+            modifier = modifier
+        )
+    }
 }
 
 @Composable
