@@ -2,6 +2,7 @@ package com.licicat.screens
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,6 +35,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import com.licicat.AppType
 import com.licicat.R
 import com.licicat.UserType
+import com.google.firebase.auth.FirebaseAuth;
+
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -102,7 +105,7 @@ fun UserForm(
         Spacer(modifier = Modifier.padding(8.dp))
         Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             CreaCompteEmpresa(modifier = Modifier.weight(1f), navController)
-            ForgotPassword(modifier = Modifier.align(Alignment.CenterVertically) )
+            ForgotPassword(LocalContext.current, email.value,modifier = Modifier.align(Alignment.CenterVertically) )
         }
         CreaCompteEntitatPublica(Modifier.align(Alignment.Start), navController)
         Spacer(modifier = Modifier.padding(20.dp))
@@ -207,14 +210,37 @@ fun LoginButton(
 }
 
 @Composable
-fun ForgotPassword(modifier: Modifier) {
+fun ForgotPassword(context: Context , mail: String, modifier: Modifier) {
     Text(
         text = "Has oblidat la contrasenya?",
-        modifier = modifier.clickable {},
+        modifier = modifier.clickable {reset_password(context, mail)},
         fontSize = 12.sp,
         fontWeight = FontWeight.Bold,
         color = Color(0xFFFF454A)
     )
+}
+
+fun reset_password(context: Context, mail: String){
+    var auth: FirebaseAuth
+    auth = FirebaseAuth.getInstance();
+    if (mail.isNullOrEmpty()) showToast(context ,"Introduixi un mail per poder enviar el correu de reinici de contrasenya.")
+    else {
+        auth.sendPasswordResetEmail(mail)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    showToast(context, "S'ha enviat el reinici de contrasenya al correu.")
+                } else {
+                    showToast(
+                        context,
+                        "Introdueixi un correu loguejat per poder enviar el reinici de contrasenya."
+                    )
+                }
+            }
+    }
+}
+
+fun showToast(context: Context,message: String) {
+    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
 }
 
 @Composable
