@@ -45,6 +45,9 @@ fun AppNavigation() {
         composable(route = AppScreens.InicioScreen.route) {
             InicioScreen(navController)
         }
+        composable(route = AppScreens.EditPerfilScreen.route) {
+            EditPerfilScreen(navController)
+        }
 
         composable(
             route = AppScreens.withArgs2("{chat_id}","{id_Empresa}","{id_docEntitat}", "{info}"),
