@@ -3,6 +3,7 @@ package com.licicat.components
 
 import android.content.Context
 import android.location.Geocoder
+import android.net.Uri
 import android.widget.Toast
 import java.io.IOException
 import androidx.compose.foundation.background
@@ -67,7 +68,8 @@ fun CardLicitacio(
             .padding(16.dp)
             .fillMaxWidth()
             .clickable (onClick = {
-                navController.navigate(AppScreens.withArgs(location,title,description,price, denomination, enllac_publicacio))}),
+                val encodedEnlace = Uri.encode(enllac_publicacio);
+                navController.navigate(AppScreens.withArgs(location,title,description,price, denomination,encodedEnlace))}),
         elevation = 8.dp
     ) {
         Log.d("app", "enllac_publicacio:"+ enllac_publicacio)
