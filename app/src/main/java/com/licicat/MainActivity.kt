@@ -15,6 +15,7 @@ import okhttp3.Request
 import org.json.JSONObject
 import java.io.IOException
 import com.example.licicat.Licitacio
+import com.google.firebase.messaging.FirebaseMessaging
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,11 +24,25 @@ class MainActivity : ComponentActivity() {
             LiciCatTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
+                    notificacio()
                     AppNavigation()
                 }
             }
         }
     }
 
+}
+
+private fun notificacio() {
+    FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+        if (task.isSuccessful) {
+            val token = task.result
+            token?.let {
+                println("Este es mi token del dispositivo: $it")
+            }
+        } else {
+            println("Error al obtener el token del dispositivo: ${task.exception}")
+        }
+    }
 }
 

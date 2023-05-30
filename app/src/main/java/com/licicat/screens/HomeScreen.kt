@@ -53,6 +53,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 import com.licicat.AppType
 import com.licicat.UserType
 import com.licicat.components.BottomBarNavigationEntitat
@@ -210,6 +211,13 @@ fun HomeScreen(navController: NavController) {
 
 
     var type by remember { mutableStateOf("") }
+
+    FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+        if (task.isSuccessful) {
+            val token = task.result
+            guardarTokenEnFirestore(token)
+        }
+    }
 
     Scaffold(
         bottomBar = {
@@ -458,6 +466,47 @@ fun HomeScreen(navController: NavController) {
 
         isLoading.value = false
     }
+}
+
+fun guardarTokenEnFirestore(token: String?) {
+    val db = Firebase.firestore
+    val notificacionesCollection = db.collection("notificacions")
+    val current_user = FirebaseAuth.getInstance().currentUser
+    val uid = current_user?.uid
+    val data = hashMapOf("token" to token,"uid" to uid)
+
+    val query = notificacionesCollection.whereEqualTo("token", token)
+    query.get()
+        .addOnSuccessListener { querySnapshot ->
+            if (querySnapshot.isEmpty) {
+                // No existe un documento con el token, crea uno nuevo
+                val data = hashMapOf(
+                    "token" to token,
+                    "uid" to uid
+                )
+
+                notificacionesCollection.add(data)
+                    .addOnSuccessListener { documentReference ->
+                        Log.d("Firestore", "Notificación agregada con ID: ${documentReference.id}")
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("Firestore", "Error al agregar la notificación", e)
+                    }
+            } else {
+                // Existe un documento con el token, actualiza el UID
+                val documentSnapshot = querySnapshot.documents[0]
+                documentSnapshot.reference.update("uid", uid)
+                    .addOnSuccessListener {
+                        Log.d("Firestore", "UID actualizado para el token $token")
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("Firestore", "Error al actualizar el UID", e)
+                    }
+            }
+        }
+        .addOnFailureListener { e ->
+            Log.e("Firestore", "Error al consultar el token", e)
+        }
 }
 
 
