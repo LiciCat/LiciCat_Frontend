@@ -29,6 +29,9 @@ import com.licicat.LicitacionsRepository
 import com.licicat.components.BottomBarNavigation
 import com.licicat.components.CardLicitacio
 import androidx.compose.material.icons.*
+import com.licicat.AppType
+import com.licicat.UserType
+import com.licicat.components.BottomBarNavigationEntitat
 import kotlinx.coroutines.delay
 
 var presentacioEntitat =  mutableStateOf(false)
@@ -51,7 +54,9 @@ fun ProfileEntitatScreen(navController: NavController, entitat:String?) {
             )
         },
         bottomBar = {
-            BottomBarNavigation(navController)
+            if (AppType.getUserType() == UserType.EMPRESA) BottomBarNavigation(navController)
+            //else if (AppType.getUserType() == UserType.UNKNOWN) BottomBarNavigation(navController)
+            else if (AppType.getUserType() == UserType.ENTITAT) BottomBarNavigationEntitat(navController)
         }
     ) {
         val db = Firebase.firestore
