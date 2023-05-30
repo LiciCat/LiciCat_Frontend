@@ -92,7 +92,8 @@ fun FavouritesScreen(navController: NavController) {
                     denomination = licitacio.denominacio,
                     date_inici = licitacio.data_publicacio_anunci,
                     date_adjudicacio = licitacio.data_publicacio_adjudicacio,
-                    tipus_contracte = licitacio.tipus_contracte
+                    tipus_contracte = licitacio.tipus_contracte,
+                    enllac_publicacio = licitacio.enllac_publicacio,
                 )
             }
         }

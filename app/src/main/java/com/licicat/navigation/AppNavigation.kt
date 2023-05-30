@@ -63,20 +63,31 @@ fun AppNavigation() {
         }
 
         composable(
-            route = AppScreens.withArgs("{location}","{title}", "{description}","{price}"),
+            route = AppScreens.withArgs("{location}","{title}", "{description}","{price}","{denomination}", "{enllac_publicacio}"),
             arguments = listOf(
                 navArgument("location") { type = NavType.StringType },
                 navArgument("title") { type = NavType.StringType },
                 navArgument("description") { type = NavType.StringType },
-                navArgument("price") { type = NavType.StringType }
+                navArgument("price") { type = NavType.StringType },
+                navArgument("denomination") { type = NavType.StringType },
+                navArgument("enllac_publicacio") { type = NavType.StringType }
             )
         ) { backStackEntry ->
             val location = backStackEntry.arguments?.getString("location") ?: ""
             val title = backStackEntry.arguments?.getString("title") ?: ""
             val description = backStackEntry.arguments?.getString("description") ?: ""
             val price = backStackEntry.arguments?.getString("price") ?: ""
-            LicitacioScreen(navController = navController, location = location, title = title, description = description, price = price)
-        }
+            val denomination = backStackEntry.arguments?.getString("denomination") ?: ""
+            val enllac_publicacio = backStackEntry.arguments?.getString("enllac_publicacio") ?: ""
+            LicitacioScreen(
+                navController = navController,
+                location = location,
+                title = title,
+                description = description,
+                price = price,
+                denomination = denomination,
+                enllac_publicacio = enllac_publicacio
+            )        }
 
         composable(
             route = AppScreens.Args("{location}","{title}"),

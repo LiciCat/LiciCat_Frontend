@@ -2,6 +2,8 @@ package com.licicat.screens
 
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -52,18 +54,15 @@ import com.licicat.components.BottomBarNavigationEntitat
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun LicitacioScreen(navController: NavController, location:String?, title:String?, description:String?, price:String?) {
-
-    description?.let {
+fun LicitacioScreen(navController: NavController, location:String?, title:String?, description:String?, price:String?, denomination:String?, enllac_publicacio:String?) {
+      description?.let {
         AppDescription.description = it
     }
 
     title?.let {
         AppDescription_title.title = it
-    }
-
-
-    val db = Firebase.firestore
+    }  
+  val db = Firebase.firestore
     var existeix_entitat by remember { mutableStateOf(false) }
     db.collection("usersEntitat")
         .whereEqualTo("entitat", title)
@@ -106,10 +105,10 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    if (description != null) {
+                    if (denomination != null) {
                         DescripcionCard(
                             title = "Descripció:",
-                            description = description
+                            description = denomination
                         )
                     }
                 }
@@ -119,10 +118,12 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    DescripcionCard(
-                        title = "Objecte del Contracte:",
-                        description = "L'objecte del contracte són els serveis de suport a la gestió..."
-                    )
+                    if (description != null) {
+                        DescripcionCard(
+                            title = "Objecte del Contracte:",
+                            description = description
+                        )
+                    }
                 }
             }
             item {
@@ -180,16 +181,22 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                     ) {
                         Text(text = "Obrir Chat")
                     }
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Button(
-                        onClick = { /* Acción del segundo botón */ },
-                    ) {
-                        Text(text = "Optar")
-                    }
+                    MyButton(enllac_publicacio)   
                 }
             }
 
         }
+    }
+}
+
+
+@Composable
+fun MyButton(enllac_publicacio: String?) {
+    val context = LocalContext.current
+    val intent = remember { Intent(Intent.ACTION_VIEW, Uri.parse(enllac_publicacio)) }
+
+    Button(onClick = { context.startActivity(intent) }) {
+        Text(text = "Optar")
     }
 }
 
