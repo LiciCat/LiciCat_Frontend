@@ -16,7 +16,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
@@ -26,7 +25,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -35,7 +33,6 @@ import com.licicat.components.BottomBarNavigation
 import com.licicat.model.Chat
 import com.licicat.navigation.AppScreens
 import java.util.*
-
 import androidx.compose.material.Snackbar
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -43,13 +40,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import kotlinx.coroutines.delay
-
 import com.licicat.AppType
 import com.licicat.UserType
-import com.licicat.components.BottomBarNavigation
 import com.licicat.components.BottomBarNavigationEntitat
-
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.Share
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -168,20 +166,11 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier.fillMaxWidth().padding(bottom = 70.dp)
                 ) {
-                    Button(
-                        onClick = {
-                            if (existeix_entitat == true) {
-                                crea_chat(navController) {
-                                    navController.navigate(route = AppScreens.ChatScreen.route)
-                                }
-                            }
-                            else {
-                            }
-                        }
-                    ) {
-                        Text(text = "Obrir Chat")
-                    }
-                    MyButton(enllac_publicacio)   
+                    ObrirChatButton(navController = navController, existeix_entitat = existeix_entitat)
+                    Spacer(modifier = Modifier.width(16.dp)) // Espacio horizontal entre botones
+                    MyButton(enllac_publicacio)
+                    Spacer(modifier = Modifier.width(16.dp)) // Espacio horizontal entre botones
+                    MyShareButton(enllac_publicacio)
                 }
             }
 
@@ -195,8 +184,46 @@ fun MyButton(enllac_publicacio: String?) {
     val context = LocalContext.current
     val intent = remember { Intent(Intent.ACTION_VIEW, Uri.parse(enllac_publicacio)) }
 
-    Button(onClick = { context.startActivity(intent) }) {
+    Button(onClick = { context.startActivity(intent) },
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = Color.DarkGray,
+            contentColor = Color.White)
+    ) {
         Text(text = "Optar")
+    }
+}
+
+@Composable
+fun ObrirChatButton(navController: NavController, existeix_entitat: Boolean) {
+    val context = LocalContext.current
+
+    IconButton(onClick = {
+        if (existeix_entitat) {
+            crea_chat(navController) {
+                navController.navigate(route = AppScreens.ChatScreen.route)
+            }
+        }
+    }) {
+        Icon(
+            imageVector = Icons.Default.Chat,
+            contentDescription = "Abrir Chat",
+            tint = Color.DarkGray
+        )
+    }
+}
+
+@Composable
+fun MyShareButton(enlacePublicacion: String?) {
+    val context = LocalContext.current
+    val intent = remember {
+        Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, enlacePublicacion)
+        }
+    }
+
+    IconButton(onClick = { context.startActivity(Intent.createChooser(intent, "Compartir enlace")) }) {
+        Icon(imageVector = Icons.Filled.Share, contentDescription = "Compartir", tint = Color.DarkGray)
     }
 }
 
