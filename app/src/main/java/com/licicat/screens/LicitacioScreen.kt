@@ -181,11 +181,14 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                         Text(text = "Obrir Chat")
                     }
                     Spacer(modifier = Modifier.width(16.dp))
-                    Button(
-                        onClick = { /* Acción del segundo botón */ },
-                    ) {
-                        Text(text = "Optar")
+                    if (AppType.getUserType() == UserType.EMPRESA){
+                        Button(
+                            onClick = { /* Acción del segundo botón */ },
+                        ) {
+                            Text(text = "Optar")
+                        }
                     }
+
                 }
             }
 
