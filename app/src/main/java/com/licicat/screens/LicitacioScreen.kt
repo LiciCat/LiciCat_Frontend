@@ -1,7 +1,13 @@
 package com.licicat.screens
 
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -41,12 +47,30 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import kotlinx.coroutines.delay
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.content.ContextCompat.getSystemService
+import com.google.firebase.messaging.FirebaseMessaging
+
+import com.google.firebase.messaging.RemoteMessage.Notification.*
 
 import com.licicat.AppType
 import com.licicat.UserType
 import com.licicat.components.BottomBarNavigation
 import com.licicat.components.BottomBarNavigationEntitat
+
+import com.google.android.gms.tasks.OnCompleteListener
+
+import com.google.firebase.messaging.RemoteMessage
+import com.google.firebase.messaging.ktx.remoteMessage
+import com.google.firebase.messaging.ktx.messaging
+
+
+
+
+
 
 
 
@@ -62,7 +86,7 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
         AppDescription_title.title = it
     }
 
-
+    createChannel(navController)
     val db = Firebase.firestore
     var existeix_entitat by remember { mutableStateOf(false) }
     db.collection("usersEntitat")
@@ -182,7 +206,9 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                     }
                     Spacer(modifier = Modifier.width(16.dp))
                     Button(
-                        onClick = { /* Acción del segundo botón */ },
+                        onClick = {
+
+                            enviarSolicitutValoracio(navController) },
                     ) {
                         Text(text = "Optar")
                     }
@@ -192,6 +218,53 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
         }
     }
 }
+
+fun createChannel(navController: NavController) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val channel = NotificationChannel(
+            "ASWA",
+            "MySuperChannel",
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
+            description = "SUSCRIBETE"
+        }
+
+        val notificationManager: NotificationManager =
+            navController.context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        notificationManager.createNotificationChannel(channel)
+    }
+}
+
+private fun enviarSolicitutValoracio(navController: NavController) {
+    var builder = NotificationCompat.Builder(navController.context, "ASWA")
+        .setSmallIcon(android.R.drawable.alert_light_frame)
+        .setContentTitle("My title")
+        .setContentText("Esto es un ejemplo <3")
+
+    with(NotificationManagerCompat.from(navController.context)) {
+        if (ActivityCompat.checkSelfPermission(
+                navController.context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
+        }
+        notify(1, builder.build())
+    }
+}
+
+
+
+
+
 
 object AppDescription {
     var description: String = ""
