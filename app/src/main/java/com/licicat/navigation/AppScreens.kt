@@ -22,15 +22,18 @@ sealed class AppScreens(val route: String, val title: String, val icon: Int) {
     object EditPerfilScreen: AppScreens("profile_edit_screen","Editar_Perfil", R.drawable.baseline_favorite_24)
 
     companion object {
-        fun withArgs(location: String?, title:String?, description:String?, price:String?): String {
+        fun withArgs(location: String?, title:String?, description:String?, price:String?, denomination:String?, enllac_publicacio:String?): String {
             return buildString {
                 append(LicitacioScreen.route)
                 append("/$location")
                 append("/$title")
                 append("/$description")
                 append("/$price")
+                append("/$denomination")
+                append("/$enllac_publicacio")
             }
         }
+
         fun Args(location: String?, title:String?): String {
             return buildString {
                 append(MapScreen.route)
