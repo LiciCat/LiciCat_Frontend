@@ -47,6 +47,7 @@ import java.util.*
 
 import androidx.compose.material.Text
 import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -189,7 +190,8 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                     }
                     Spacer(modifier = Modifier.width(16.dp)) // Espacio horizontal entre botones
                     MyShareButton(enllac_publicacio)
-
+                    Spacer(modifier = Modifier.width(13.dp))
+                    DescarregarPdfBoto()
                 }
             }
 
@@ -271,7 +273,19 @@ private fun enviarSolicitutValoracio(navController: NavController, title: String
 
 
 @Composable
-fun MyButton(enllac_publicacio: String?, navController: NavController, title:String?) {
+fun DescarregarPdfBoto() {
+    IconButton(onClick = {
+        //Crida api per descarregar pdf
+        Log.d("Descarregar","aaaaaaaaaaaaaaaaa")
+    }) {
+        Icon(imageVector = Icons.Filled.Download, contentDescription = "Descarregar", tint = Color.DarkGray)
+    }
+}
+
+
+@Composable
+fun MyButton(enllac_publicacio: String?) {
+
     val context = LocalContext.current
     val intent = remember { Intent(Intent.ACTION_VIEW, Uri.parse(enllac_publicacio)) }
 
