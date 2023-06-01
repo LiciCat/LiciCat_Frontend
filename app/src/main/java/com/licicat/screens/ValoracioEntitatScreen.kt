@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
+
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -41,6 +42,9 @@ import com.licicat.navigation.AppScreens
 import java.util.*
 
 import androidx.compose.material.Text
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,65 +60,178 @@ import com.licicat.components.BottomBarNavigationEntitat
 
 import com.licicat.*
 
+
+
+
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun ValoracioEntitatScreen(navController: NavController, intent: Intent) {
-    var rating by remember { mutableStateOf(0f) }
-    var comment by remember { mutableStateOf("") }
-    var destination = ""
-    var nom_entitat = ""
-    if (intent.hasExtra("destinacion")) {
-         destination = intent.getStringExtra("destinacion").toString()
-        println("ara estem a la vista : $destination")
-        nom_entitat = intent.getStringExtra("nom_entitat").toString()
-        println("Nom entitat: ${intent.getStringExtra("nom_entitat")}")
+    val ratingItems = remember {
+        mutableStateListOf(
+            RatingItem("Amabilidad"),
+            RatingItem("Rapidez"),
+            RatingItem("Buena Comunicación")
+            // Agrega más elementos de valoración según tus necesidades
+        )
     }
 
+    val averageRatingState = remember { mutableStateOf(0f) }
+    var comment by remember { mutableStateOf("") }
+    var backgroundColor by remember { mutableStateOf(Color(android.graphics.Color.rgb(219, 41, 59))) }
     Scaffold(
         bottomBar = {
             BottomBarNavigation(navController)
         }
-    )
-    {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text(
-                text = nom_entitat,
-                style = MaterialTheme.typography.h6,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
+    ) {
 
-            // Calificación
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 16.dp)
-            ) {
-                Text("Calificación:")
+        Column(){
+            Column(modifier = Modifier
+                .fillMaxWidth()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(120.dp)
+                        .background(
+                            backgroundColor,
+                            shape = RoundedCornerShape(bottomEnd = 300.dp, bottomStart = 300.dp)
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = averageRatingState.value.format(1),
+                        style = MaterialTheme.typography.h4,
+                        color = Color.White
+                    )
+                }
             }
 
-            // Comentario
-            TextField(
-                value = comment,
-                onValueChange = { newComment -> comment = newComment },
-                label = { Text("Comentario") },
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp)
-            )
-
-            // Botón de enviar
-            Button(
-                onClick = { },
-                modifier = Modifier.align(Alignment.End)
+                    .padding(16.dp)
             ) {
-                Text(text = "Enviar")
+                // Nota media en tiempo real
+                backgroundColor = getBackgroundColor(averageRatingState.value)
+
+
+
+                // Elementos de valoración
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    ratingItems.forEach { ratingItem ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            elevation = 4.dp
+                        ) {
+                            RatingItemRow(
+                                ratingItem = ratingItem,
+                                onRatingChanged = { newRating ->
+                                    ratingItem.rating = newRating
+                                    updateAverageRating(ratingItems, averageRatingState)
+                                }
+                            )
+                        }
+                    }
+
+                }
+
+                // Comentario extra opcional
+                TextField(
+                    value = comment,
+                    onValueChange = { newComment -> comment = newComment },
+                    label = { Text("Comentario adicional (opcional)") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp)
+                )
+
+                // Botón de enviar
+                Button(
+                    onClick = { },
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    Text(text = "Enviar")
+                }
             }
         }
 
     }
-
-
 }
+
+
+
+private fun getBackgroundColor(averageRating: Float): Color {
+    return when {
+        averageRating >= 7f -> Color(android.graphics.Color.rgb(127, 223, 17))
+        averageRating >= 4f -> Color(android.graphics.Color.rgb(242, 142, 37))
+        else -> Color(android.graphics.Color.rgb(219, 41, 59))
+    }
+}
+
+private fun updateAverageRating(ratingItems: List<RatingItem>, averageRatingState: MutableState<Float>) {
+    val totalRating = ratingItems.sumBy { it.rating.toInt() }
+    val totalRatingsCount = ratingItems.size
+    val averageRating = if (totalRatingsCount > 0) totalRating.toFloat() / totalRatingsCount else 0f
+    averageRatingState.value = averageRating * 2 // Escala de 0 a 10
+}
+
+
+
+
+
+@Composable
+fun RatingItemRow(ratingItem: RatingItem, onRatingChanged: (Float) -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(bottom = 16.dp)
+    ) {
+        Text(text = ratingItem.title)
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        RatingBar(
+            rating = ratingItem.rating,
+            onRatingChanged = onRatingChanged
+        )
+    }
+}
+
+
+@Composable
+fun RatingBar(rating: Float, onRatingChanged: (Float) -> Unit) {
+    val maxRating = 5 // Número máximo de estrellas
+    val selectedRating = remember { mutableStateOf(rating) }
+
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        for (i in 1..maxRating) {
+            val starColor = if (i <= selectedRating.value) {
+                MaterialTheme.colors.primary
+            } else {
+                Color.LightGray
+            }
+
+            Icon(
+                imageVector = Icons.Filled.Star,
+                contentDescription = null,
+                tint = starColor,
+                modifier = Modifier
+                    .clickable {
+                        selectedRating.value = i.toFloat()
+                        onRatingChanged(selectedRating.value)
+                    }
+            )
+        }
+    }
+}
+
+data class RatingItem(
+    val title: String,
+    var rating: Float = 0f
+)
+
+fun Float.format(decimals: Int): String {
+    return "%.${decimals}f".format(this)
+}
+
+
