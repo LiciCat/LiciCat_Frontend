@@ -282,7 +282,6 @@ fun DescarregarPdfBoto() {
 
 
 @Composable
-
 fun MyButton(
     enllac_publicacio: String?, navController: NavController, title: String?,
     description: String?, price: String?, location: String?, date: String?
