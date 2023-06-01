@@ -10,6 +10,7 @@ data class usersEmpresa(
     val NIF: String,
     val Telefon: String,
     val favorits: List<Int>,
+    val optats: List<Int>,
     val descripcio: String
 ){
     fun toMap(): MutableMap<String, Any>{
@@ -22,6 +23,7 @@ data class usersEmpresa(
             "telefon" to this.Telefon,
             "avatar_url" to this.avatarUrl,
             "favorits" to this.favorits,
+            "optats" to this.optats,
             "descripcio" to this.descripcio
         )
     }

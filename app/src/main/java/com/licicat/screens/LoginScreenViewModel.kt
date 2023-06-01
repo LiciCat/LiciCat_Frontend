@@ -148,6 +148,7 @@ class LoginScreenViewModel: ViewModel() {
             Telefon = telefon,
             id = null,
             favorits =  emptyList<Int>(),
+            optats =  emptyList<Int>(),
             descripcio = "Descripció empresa"
         ).toMap()
 

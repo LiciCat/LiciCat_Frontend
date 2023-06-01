@@ -70,8 +70,9 @@ fun CardLicitacio(
             .padding(16.dp)
             .fillMaxWidth()
             .clickable (onClick = {
-                val encodedEnlace = Uri.encode(enllac_publicacio);
-                navController.navigate(AppScreens.withArgs(location,title,description,price, denomination,encodedEnlace))}),
+                val encodedEnlace = Uri.encode(enllac_publicacio)
+                val data = Uri.encode(date)
+                navController.navigate(AppScreens.withArgs(Uri.encode(location),Uri.encode(title),Uri.encode(description),Uri.encode(price),Uri.encode(denomination),Uri.encode(enllac_publicacio),Uri.encode(date)))}),
         elevation = 8.dp
     ) {
         Log.d("app", "enllac_publicacio:"+ enllac_publicacio)
@@ -264,7 +265,14 @@ fun CardLicitacio(
                     }
                 }
             }
-            if (description != null) {
+            if (denomination != null) {
+                Text(
+                    text = denomination,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(top = 12.dp)
+                )
+            } else if (description != null) {
                 Text(
                     text = description,
                     maxLines = 2,
