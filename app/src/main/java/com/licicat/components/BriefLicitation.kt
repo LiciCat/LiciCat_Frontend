@@ -3,6 +3,7 @@ package com.licicat.components
 
 import android.content.Context
 import android.location.Geocoder
+import android.net.Uri
 import android.widget.Toast
 import java.io.IOException
 import androidx.compose.foundation.background
@@ -29,6 +30,8 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import android.util.Log
 import androidx.compose.foundation.clickable
+import com.licicat.AppType
+import com.licicat.UserType
 import kotlin.random.Random
 
 
@@ -59,16 +62,19 @@ fun CardLicitacio(
     denomination: String?,
     date_inici: String?,
     date_adjudicacio: String?,
-    tipus_contracte: String?
+    tipus_contracte: String?,
+    enllac_publicacio: String?
 ) {
     Card(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxWidth()
             .clickable (onClick = {
-                navController.navigate(AppScreens.withArgs(location,title,description,price))}),
+                val encodedEnlace = Uri.encode(enllac_publicacio);
+                navController.navigate(AppScreens.withArgs(location,title,description,price, denomination,encodedEnlace))}),
         elevation = 8.dp
     ) {
+        Log.d("app", "enllac_publicacio:"+ enllac_publicacio)
         var isFavorite by remember { mutableStateOf(false) }
         var id_lic by remember { mutableStateOf(Random.nextLong(1, 2147483647).toInt()) }
         val db = Firebase.firestore
@@ -157,91 +163,104 @@ fun CardLicitacio(
                         .height(48.dp)
                         .align(Alignment.CenterVertically)
                 ) {
-                    IconButton(
-                        onClick = {
-                            if (isFavorite) {
-                                db.collection("licitacionsFavorits")
-                                    .whereEqualTo("title", title)
-                                    .whereEqualTo("description", description)
-                                    .whereEqualTo("date", date)
-                                    .whereEqualTo("price", price)
-                                    .whereArrayContains("users_ids", current_user?.uid.toString())
-                                    .get()
-                                    .addOnSuccessListener { documents ->
-                                        for (document in documents) {
-                                            val usersIds = document.get("users_ids") as MutableList<String>
-                                            usersIds.remove(current_user?.uid.toString())
-                                            document.reference.update("users_ids", usersIds)
-                                        }
-                                    }
-                                db.collection("usersEmpresa")
-                                    .whereEqualTo("user_id", current_user?.uid)
-                                    .get()
-                                    .addOnSuccessListener { documents ->
-                                        for (document in documents) {
-                                            val favsIds = document.get("favorits") as MutableList<Int>
-                                            val newfavsIds = favsIds.filter { it != id_lic.toInt() }
-                                            document.reference.update("favorits", newfavsIds )
-                                        }
-                                    }
-                            }
-                            else {
-                                db.collection("licitacionsFavorits")
-                                    .whereEqualTo("title", title)
-                                    .whereEqualTo("description", description)
-                                    .whereEqualTo("date", date)
-                                    .whereEqualTo("price", price)
-                                    .get()
-                                    .addOnSuccessListener { documents ->
-                                        if (!documents.isEmpty) {
+                    if (AppType.getUserType() == UserType.EMPRESA) {
+                        IconButton(
+                            onClick = {
+                                if (isFavorite) {
+                                    db.collection("licitacionsFavorits")
+                                        .whereEqualTo("title", title)
+                                        .whereEqualTo("description", description)
+                                        .whereEqualTo("date", date)
+                                        .whereEqualTo("price", price)
+                                        .whereArrayContains(
+                                            "users_ids",
+                                            current_user?.uid.toString()
+                                        )
+                                        .get()
+                                        .addOnSuccessListener { documents ->
                                             for (document in documents) {
-                                                val usersIds = document.get("users_ids") as MutableList<String>
-                                                usersIds.add(current_user?.uid.toString())
+                                                val usersIds =
+                                                    document.get("users_ids") as MutableList<String>
+                                                usersIds.remove(current_user?.uid.toString())
                                                 document.reference.update("users_ids", usersIds)
                                             }
-                                        } else {
-                                            val users = listOf(current_user?.uid.toString())
-                                            id_lic = Random.nextLong(1, 2147483647).toInt()
-                                            val data = hashMapOf(
-                                                "title" to title,
-                                                "description" to description,
-                                                "date" to date,
-                                                "price" to price,
-                                                "lic_id" to id_lic,
-                                                "location" to location,
-                                                "denomination" to denomination,
-                                                "date_inici" to date_inici,
-                                                "date_adjudicacio" to date_adjudicacio,
-                                                "tipus_contracte" to tipus_contracte,
-                                                "users_ids" to users
-                                            )
-                                            db.collection("licitacionsFavorits").add(data)
+                                        }
+                                    db.collection("usersEmpresa")
+                                        .whereEqualTo("user_id", current_user?.uid)
+                                        .get()
+                                        .addOnSuccessListener { documents ->
+                                            for (document in documents) {
+                                                val favsIds =
+                                                    document.get("favorits") as MutableList<Int>
+                                                val newfavsIds =
+                                                    favsIds.filter { it != id_lic.toInt() }
+                                                document.reference.update("favorits", newfavsIds)
+                                            }
+                                        }
+                                } else {
+                                    db.collection("licitacionsFavorits")
+                                        .whereEqualTo("title", title)
+                                        .whereEqualTo("description", description)
+                                        .whereEqualTo("date", date)
+                                        .whereEqualTo("price", price)
+                                        .get()
+                                        .addOnSuccessListener { documents ->
+                                            if (!documents.isEmpty) {
+                                                for (document in documents) {
+                                                    val usersIds =
+                                                        document.get("users_ids") as MutableList<String>
+                                                    usersIds.add(current_user?.uid.toString())
+                                                    document.reference.update("users_ids", usersIds)
+                                                }
+                                            } else {
+                                                val users = listOf(current_user?.uid.toString())
+                                                id_lic = Random.nextLong(1, 2147483647).toInt()
+                                                val data = hashMapOf(
+                                                    "title" to title,
+                                                    "description" to description,
+                                                    "date" to date,
+                                                    "price" to price,
+                                                    "lic_id" to id_lic,
+                                                    "location" to location,
+                                                    "denomination" to denomination,
+                                                    "date_inici" to date_inici,
+                                                    "date_adjudicacio" to date_adjudicacio,
+                                                    "tipus_contracte" to tipus_contracte,
+                                                    "users_ids" to users,
+                                                    "enllac_publicacio" to enllac_publicacio,
+                                                )
+                                                db.collection("licitacionsFavorits").add(data)
+                                            }
+
+                                            db.collection("usersEmpresa")
+                                                .whereEqualTo("user_id", current_user?.uid)
+                                                .get()
+                                                .addOnSuccessListener { documents ->
+                                                    for (document in documents) {
+
+                                                        println("id_lic es igual a $id_lic")
+
+                                                        val favsIds =
+                                                            document.get("favorits") as MutableList<Int>
+                                                        favsIds.add(id_lic)
+                                                        document.reference.update(
+                                                            "favorits",
+                                                            favsIds
+                                                        )
+                                                    }
+                                                }
                                         }
 
-                                        db.collection("usersEmpresa")
-                                            .whereEqualTo("user_id", current_user?.uid)
-                                            .get()
-                                            .addOnSuccessListener { documents ->
-                                                for (document in documents) {
-
-                                                    println("id_lic es igual a $id_lic")
-
-                                                    val favsIds = document.get("favorits") as MutableList<Int>
-                                                    favsIds.add(id_lic)
-                                                    document.reference.update("favorits", favsIds)
-                                                }
-                                            }
-                                    }
-
-                            }
-                            isFavorite = !isFavorite
-                        },
-                        modifier = Modifier.align(Alignment.Center)
-                    ) {
-                        Icon(
-                            imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                            contentDescription = "Botón de favorito"
-                        )
+                                }
+                                isFavorite = !isFavorite
+                            },
+                            modifier = Modifier.align(Alignment.Center)
+                        ) {
+                            Icon(
+                                imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                contentDescription = "Botón de favorito"
+                            )
+                        }
                     }
                 }
             }
@@ -281,6 +300,5 @@ fun CardLicitacio(
         }
     }
 }
-
 
 
