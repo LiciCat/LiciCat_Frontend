@@ -1,10 +1,21 @@
 package com.licicat.screens
 
 
+import android.Manifest
 import android.annotation.SuppressLint
+
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+
+
 import android.net.Uri
 import android.util.Log
+
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,7 +33,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -30,13 +40,11 @@ import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.licicat.R
 import com.licicat.components.BottomBarNavigation
 import com.licicat.model.Chat
 import com.licicat.navigation.AppScreens
 import java.util.*
 
-import androidx.compose.material.Snackbar
 import androidx.compose.material.Text
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Download
@@ -46,13 +54,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import kotlinx.coroutines.delay
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 
-import com.licicat.AppType
-import com.licicat.UserType
-import com.licicat.components.BottomBarNavigation
+import com.google.firebase.messaging.RemoteMessage.Notification.*
+
 import com.licicat.components.BottomBarNavigationEntitat
 
+import com.licicat.*
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -67,7 +77,7 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
         AppDescription_title.title = it
     }
 
-
+    createChannel(navController)
     val db = Firebase.firestore
     var existeix_entitat by remember { mutableStateOf(false) }
     db.collection("usersEntitat")
@@ -174,8 +184,9 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                 ) {
                     ObrirChatButton(navController = navController, existeix_entitat = existeix_entitat)
                     Spacer(modifier = Modifier.width(16.dp))
+
                     if (AppType.getUserType() == UserType.EMPRESA){
-                        MyButton(enllac_publicacio)
+                        MyButton(enllac_publicacio, navController, title)
                     }
                     Spacer(modifier = Modifier.width(16.dp)) // Espacio horizontal entre botones
                     MyShareButton(enllac_publicacio)
@@ -187,6 +198,79 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
         }
     }
 }
+
+
+fun createChannel(navController: NavController) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val channel = NotificationChannel(
+            "ASWAC",
+            "MySuperChannel",
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
+            description = "SUSCRIBETE"
+        }
+
+        val notificationManager: NotificationManager =
+            navController.context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        notificationManager.createNotificationChannel(channel)
+    }
+}
+
+
+private fun enviarSolicitutValoracio(navController: NavController, title: String?) {
+
+    val intent = Intent(navController.context, MainActivity::class.java).apply {
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+       putExtra("destinacion", "type_valoracio_entitat")
+        putExtra("nom_entitat", title)
+    }
+
+    val destination = intent.getStringExtra("destinacion")
+    println("Abans de enviar destinacion new: $destination")
+    val entitat = intent.getStringExtra("nom_entitat")
+    println("Abans de enviar entitat new: $entitat")
+
+    val flag = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_IMMUTABLE else 0
+    val pendingIntent: PendingIntent = PendingIntent.getActivity(
+        navController.context,
+        0,
+        intent,
+        PendingIntent.FLAG_UPDATE_CURRENT or flag
+    )
+
+    var builder = NotificationCompat.Builder(navController.context, "ASWAC")
+        .setSmallIcon(android.R.drawable.alert_light_frame)
+        .setContentTitle("Ja queda un pas menys!")
+        .setContentIntent(pendingIntent)
+        .setStyle(
+            NotificationCompat.BigTextStyle()
+                .bigText("Recorda valorar a l'entitat $title. Les opinions com la teva serveixen a les entitats per millorar el seu servei.")
+        )
+
+    with(NotificationManagerCompat.from(navController.context)) {
+        if (ActivityCompat.checkSelfPermission(
+                navController.context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
+        }
+        notify(1, builder.build())
+    }
+}
+
+
+
+
+
 
 @Composable
 fun DescarregarPdfBoto() {
@@ -201,10 +285,12 @@ fun DescarregarPdfBoto() {
 
 @Composable
 fun MyButton(enllac_publicacio: String?) {
+
     val context = LocalContext.current
     val intent = remember { Intent(Intent.ACTION_VIEW, Uri.parse(enllac_publicacio)) }
 
-    Button(onClick = { context.startActivity(intent) },
+    Button(onClick = { context.startActivity(intent)
+    enviarSolicitutValoracio(navController, title)},
         colors = ButtonDefaults.buttonColors(
             backgroundColor = Color.DarkGray,
             contentColor = Color.White)
@@ -249,6 +335,7 @@ fun MyShareButton(enlacePublicacion: String?) {
         Icon(imageVector = Icons.Filled.Share, contentDescription = "Compartir", tint = Color.DarkGray)
     }
 }
+
 
 object AppDescription {
     var description: String = ""

@@ -1,5 +1,6 @@
 package com.licicat.navigation
 
+import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavType
@@ -11,11 +12,11 @@ import com.licicat.navigation.AppScreens
 import com.licicat.screens.*
 
 //elemento composable encargado de dirigir la navegacion correcta entre las pantallas
-@Preview
 @Composable
-fun AppNavigation() {
+fun AppNavigation(intent: Intent) {
     val navController = rememberNavController() //controla estado de navegacion actual entre pantallas (propagar entre pantallas)
-    NavHost(navController= navController, startDestination =AppScreens.InicioScreen.route) {
+    var aux = if(intent.hasExtra("destinacion")) AppScreens.ValoracioEntitatScreen.route else AppScreens.InicioScreen.route
+    NavHost(navController= navController, startDestination = aux) {
         //tantos composables como diferentes pantallas accesibles
         composable(route = AppScreens.HomeScreen.route) {
             HomeScreen(navController)
@@ -47,6 +48,10 @@ fun AppNavigation() {
         }
         composable(route = AppScreens.EditPerfilScreen.route) {
             EditPerfilScreen(navController)
+        }
+
+        composable(route = AppScreens.ValoracioEntitatScreen.route) {
+            ValoracioEntitatScreen(navController, intent)
         }
 
         composable(
