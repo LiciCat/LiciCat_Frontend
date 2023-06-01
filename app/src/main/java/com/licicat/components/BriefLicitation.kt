@@ -71,8 +71,8 @@ fun CardLicitacio(
             .fillMaxWidth()
             .clickable (onClick = {
                 val encodedEnlace = Uri.encode(enllac_publicacio)
-                val data = date?.replace("/","")
-                navController.navigate(AppScreens.withArgs(location,title,description,price,denomination,encodedEnlace,data))}),
+                val data = Uri.encode(date)
+                navController.navigate(AppScreens.withArgs(Uri.encode(location),Uri.encode(title),Uri.encode(description),Uri.encode(price),Uri.encode(denomination),Uri.encode(enllac_publicacio),Uri.encode(date)))}),
         elevation = 8.dp
     ) {
         Log.d("app", "enllac_publicacio:"+ enllac_publicacio)

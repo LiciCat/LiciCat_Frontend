@@ -278,10 +278,7 @@ fun MyButton(
 ) {
     val context = LocalContext.current
     val intent = remember { Intent(Intent.ACTION_VIEW, Uri.parse(enllac_publicacio)) }
-    val builder = StringBuilder(date)
-    builder.insert(2, "/")
-    builder.insert(5, "/")
-    val datadate = builder.toString()
+    val datadate = date //Uri.parse(date)
     val db = Firebase.firestore
     val current_user = FirebaseAuth.getInstance().currentUser
     var id_lic: Int
