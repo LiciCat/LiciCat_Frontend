@@ -284,7 +284,7 @@ fun DescarregarPdfBoto() {
 
 
 @Composable
-fun MyButton(enllac_publicacio: String?) {
+fun MyButton(enllac_publicacio: String?, navController: NavController, title:String?) {
 
     val context = LocalContext.current
     val intent = remember { Intent(Intent.ACTION_VIEW, Uri.parse(enllac_publicacio)) }
