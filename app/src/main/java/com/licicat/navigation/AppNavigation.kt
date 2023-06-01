@@ -71,15 +71,16 @@ fun AppNavigation(intent: Intent) {
         }
 
         composable(
-            route = AppScreens.withArgs("{location}","{title}", "{description}","{price}","{denomination}", "{enllac_publicacio}"),
+            route = AppScreens.withArgs("{location}","{title}", "{description}","{price}","{denomination}", "{enllac_publicacio}", "{date}"),
             arguments = listOf(
                 navArgument("location") { type = NavType.StringType },
                 navArgument("title") { type = NavType.StringType },
                 navArgument("description") { type = NavType.StringType },
                 navArgument("price") { type = NavType.StringType },
                 navArgument("denomination") { type = NavType.StringType },
-                navArgument("enllac_publicacio") { type = NavType.StringType }
-            )
+                navArgument("enllac_publicacio") { type = NavType.StringType },
+                navArgument("date") { type = NavType.StringType }
+                )
         ) { backStackEntry ->
             val location = backStackEntry.arguments?.getString("location") ?: ""
             val title = backStackEntry.arguments?.getString("title") ?: ""
@@ -87,6 +88,7 @@ fun AppNavigation(intent: Intent) {
             val price = backStackEntry.arguments?.getString("price") ?: ""
             val denomination = backStackEntry.arguments?.getString("denomination") ?: ""
             val enllac_publicacio = backStackEntry.arguments?.getString("enllac_publicacio") ?: ""
+            val date = backStackEntry.arguments?.getString("date") ?: ""
             LicitacioScreen(
                 navController = navController,
                 location = location,
@@ -94,7 +96,8 @@ fun AppNavigation(intent: Intent) {
                 description = description,
                 price = price,
                 denomination = denomination,
-                enllac_publicacio = enllac_publicacio
+                enllac_publicacio = enllac_publicacio,
+                date = date
             )        }
 
         composable(

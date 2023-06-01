@@ -26,7 +26,7 @@ sealed class AppScreens(val route: String, val title: String, val icon: Int) {
 
 
     companion object {
-        fun withArgs(location: String?, title:String?, description:String?, price:String?, denomination:String?, enllac_publicacio:String?): String {
+        fun withArgs(location: String?, title:String?, description:String?, price:String?, denomination:String?, enllac_publicacio:String?, date:String?): String {
             return buildString {
                 append(LicitacioScreen.route)
                 append("/$location")
@@ -35,6 +35,7 @@ sealed class AppScreens(val route: String, val title: String, val icon: Int) {
                 append("/$price")
                 append("/$denomination")
                 append("/$enllac_publicacio")
+                append("/$date")
             }
         }
 
