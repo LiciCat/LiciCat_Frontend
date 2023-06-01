@@ -47,6 +47,7 @@ import java.util.*
 
 import androidx.compose.material.Text
 import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -267,7 +268,15 @@ private fun enviarSolicitutValoracio(navController: NavController, title: String
 }
 
 
-
+@Composable
+fun DescarregarPdfBoto() {
+    IconButton(onClick = {
+        //Crida api per descarregar pdf
+        Log.d("Descarregar","aaaaaaaaaaaaaaaaa")
+    }) {
+        Icon(imageVector = Icons.Filled.Download, contentDescription = "Descarregar", tint = Color.DarkGray)
+    }
+}
 
 
 
