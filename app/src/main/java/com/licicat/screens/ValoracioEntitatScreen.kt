@@ -53,14 +53,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.google.firebase.firestore.FieldValue
 
 import com.google.firebase.messaging.RemoteMessage.Notification.*
 
 import com.licicat.components.BottomBarNavigationEntitat
 
 import com.licicat.*
-
-
+import java.text.SimpleDateFormat
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -68,17 +68,33 @@ import com.licicat.*
 fun ValoracioEntitatScreen(navController: NavController, intent: Intent) {
     val ratingItems = remember {
         mutableStateListOf(
-            RatingItem("Amabilidad"),
-            RatingItem("Rapidez"),
-            RatingItem("Buena Comunicación")
+            RatingItem("Amabalitat"),
+            RatingItem("Rapidesa"),
+            RatingItem("Bona Comunicació"),
+            RatingItem("Informació Present")
             // Agrega más elementos de valoración según tus necesidades
         )
     }
+    val entityName = intent.getStringExtra("nom_entitat") ?: ""
 
     val averageRatingState = remember { mutableStateOf(0f) }
     var comment by remember { mutableStateOf("") }
     var backgroundColor by remember { mutableStateOf(Color(android.graphics.Color.rgb(219, 41, 59))) }
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(text = "Valorant a " + entityName, style = MaterialTheme.typography.h6)
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigate(AppScreens.HomeScreen.route) {
+                        popUpTo(AppScreens.HomeScreen.route) { inclusive = true }
+                    } }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
+        },
         bottomBar = {
             BottomBarNavigation(navController)
         }
@@ -90,7 +106,7 @@ fun ValoracioEntitatScreen(navController: NavController, intent: Intent) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(120.dp)
+                        .height(110.dp)
                         .background(
                             backgroundColor,
                             shape = RoundedCornerShape(bottomEnd = 300.dp, bottomStart = 300.dp)
@@ -121,7 +137,7 @@ fun ValoracioEntitatScreen(navController: NavController, intent: Intent) {
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 8.dp),
+                                .padding(12.dp),
                             elevation = 4.dp
                         ) {
                             RatingItemRow(
@@ -140,7 +156,7 @@ fun ValoracioEntitatScreen(navController: NavController, intent: Intent) {
                 TextField(
                     value = comment,
                     onValueChange = { newComment -> comment = newComment },
-                    label = { Text("Comentario adicional (opcional)") },
+                    label = { Text("Comentari addicional (opcional)") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 16.dp)
@@ -148,7 +164,10 @@ fun ValoracioEntitatScreen(navController: NavController, intent: Intent) {
 
                 // Botón de enviar
                 Button(
-                    onClick = { },
+                    onClick = { enviarValoracion(entityName, ratingItems, comment, averageRatingState);
+                              navController.navigate(AppScreens.HomeScreen.route) {
+                            popUpTo(AppScreens.HomeScreen.route) { inclusive = true }
+                        }},
                     modifier = Modifier.align(Alignment.End)
                 ) {
                     Text(text = "Enviar")
@@ -184,15 +203,20 @@ private fun updateAverageRating(ratingItems: List<RatingItem>, averageRatingStat
 fun RatingItemRow(ratingItem: RatingItem, onRatingChanged: (Float) -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(bottom = 16.dp)
+        modifier = Modifier.padding(16.dp)
     ) {
-        Text(text = ratingItem.title)
+
+
+        Text(text = ratingItem.title, modifier = Modifier.weight(1f))
 
         Spacer(modifier = Modifier.width(16.dp))
 
         RatingBar(
             rating = ratingItem.rating,
-            onRatingChanged = onRatingChanged
+            onRatingChanged = onRatingChanged,
+
+
+
         )
     }
 }
@@ -203,7 +227,7 @@ fun RatingBar(rating: Float, onRatingChanged: (Float) -> Unit) {
     val maxRating = 5 // Número máximo de estrellas
     val selectedRating = remember { mutableStateOf(rating) }
 
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.End) {
         for (i in 1..maxRating) {
             val starColor = if (i <= selectedRating.value) {
                 MaterialTheme.colors.primary
@@ -232,6 +256,82 @@ data class RatingItem(
 
 fun Float.format(decimals: Int): String {
     return "%.${decimals}f".format(this)
+}
+
+
+fun enviarValoracion(nom_entitat: String, ratingItems: List<RatingItem>, comment: String, rating: MutableState<Float>) {
+    val db = Firebase.firestore
+
+    val current_user = FirebaseAuth.getInstance().currentUser
+    val id_user = current_user?.uid
+
+    val collectionRef = db.collection("usersEntitat")
+    val collectionRef2 = db.collection("valoracioEmpresaToEntitat")
+    val collectionRef3 = db.collection("usersEntitat")
+
+    val entidadNombre = nom_entitat
+    var entidadId: String = ""
+    var valoracionId: String = ""
+    val ratingTotal = rating.value
+    collectionRef
+        .whereEqualTo("entitat", entidadNombre)
+        .get()
+        .addOnSuccessListener { documents ->
+            for (document in documents) {
+                entidadId = document.getString("user_id") ?: ""
+                println("El ID de la entidad $entidadNombre es $entidadId")
+
+                val valoracion = hashMapOf(
+                    "comment" to comment,
+                    "data" to obtenerFechaActualString(),
+                    "id_empresa" to id_user,
+                    "id_entitat" to entidadId,
+                    "pointsAm" to ratingItems[0].rating.toInt(),
+                    "pointsBC" to ratingItems[1].rating.toInt(),
+                    "pointsIF" to ratingItems[2].rating.toInt(),
+                    "pointsRa" to ratingItems[3].rating.toInt(),
+                    "ratingTotal" to ratingTotal
+                )
+                collectionRef2
+                    .add(valoracion)
+                    .addOnSuccessListener { documentReference ->
+                        valoracionId = documentReference.id
+                        println("Valoración añadida con ID: $valoracionId")
+
+
+                        val query = collectionRef3.whereEqualTo("user_id", entidadId)
+
+                        query.get().addOnSuccessListener { documents ->
+                            for (document in documents) {
+                                val documentId = document.id
+
+                                val atributoArray = FieldValue.arrayUnion(valoracionId)
+                                collectionRef3.document(documentId)
+                                    .update("valoracions", atributoArray)
+                                    .addOnSuccessListener {
+                                        println("ID de valoración agregado al usuarioEntitat correctamente")
+                                    }
+                                    .addOnFailureListener { exception ->
+                                        println("Error al agregar el ID de valoración al usuarioEntitat: $exception")
+                                    }
+                            }
+                        }
+                    }
+                    .addOnFailureListener { exception ->
+                        println("Error al añadir la valoración: $exception")
+                    }
+            }
+        }
+        .addOnFailureListener { exception ->
+            println("Error al obtener el ID de la entidad: $exception")
+        }
+}
+
+
+fun obtenerFechaActualString(): String {
+    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    val fechaActual = Date()
+    return dateFormat.format(fechaActual)
 }
 
 
