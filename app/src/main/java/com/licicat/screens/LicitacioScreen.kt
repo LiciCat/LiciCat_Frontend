@@ -57,17 +57,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import kotlin.random.Random
+
 
 import com.google.firebase.messaging.RemoteMessage.Notification.*
 
 import com.licicat.components.BottomBarNavigationEntitat
-
 import com.licicat.*
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun LicitacioScreen(navController: NavController, location:String?, title:String?, description:String?, price:String?, denomination:String?, enllac_publicacio:String?) {
+fun LicitacioScreen(navController: NavController, location:String?, title:String?, description:String?, price:String?, denomination:String?, enllac_publicacio:String?, date:String?) {
 
     description?.let {
         AppDescription.description = it
@@ -186,7 +187,7 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                     Spacer(modifier = Modifier.width(16.dp))
 
                     if (AppType.getUserType() == UserType.EMPRESA){
-                        MyButton(enllac_publicacio, navController, title)
+                        MyButton(enllac_publicacio, navController, title, description, price, location, date)
                     }
                     Spacer(modifier = Modifier.width(16.dp)) // Espacio horizontal entre botones
                     MyShareButton(enllac_publicacio)
@@ -268,10 +269,6 @@ private fun enviarSolicitutValoracio(navController: NavController, title: String
 }
 
 
-
-
-
-
 @Composable
 fun DescarregarPdfBoto() {
     IconButton(onClick = {
@@ -283,14 +280,89 @@ fun DescarregarPdfBoto() {
 }
 
 
-@Composable
-fun MyButton(enllac_publicacio: String?, navController: NavController, title:String?) {
 
+@Composable
+fun MyButton(
+    enllac_publicacio: String?, navController: NavController, title: String?,
+    description: String?, price: String?, location: String?, date: String?
+) {
     val context = LocalContext.current
     val intent = remember { Intent(Intent.ACTION_VIEW, Uri.parse(enllac_publicacio)) }
+    val db = Firebase.firestore
+    val current_user = FirebaseAuth.getInstance().currentUser
+    var id_lic: Int = 0
+    var isOptat by remember { mutableStateOf(false) }
+    println("1")
+    db.collection("licitacionsOptades")
+        .whereEqualTo("title", title)
+        .whereEqualTo("description", description)
+        .whereEqualTo("date", date)
+        .whereEqualTo("price", price)
+        .whereArrayContains("users_ids", current_user?.uid.toString())
+        .get()
+        .addOnSuccessListener { documents ->
+            if (!documents.isEmpty) {
+                isOptat = true
+            }
+            for (document in documents) {
+                id_lic = document.getLong("lic_id")?.toInt() ?: 0
+            }
+        }
+        .addOnFailureListener { exception ->
+            Log.w("app", "Error getting documentsMYBUTTON: ", exception)
+        }
+    println("2")
 
-    Button(onClick = { context.startActivity(intent)
-    enviarSolicitutValoracio(navController, title)},
+    Button(onClick = {
+            if (!isOptat) {
+                db.collection("licitacionsOptades")
+                    .whereEqualTo("title", title)
+                    .whereEqualTo("description", description)
+                    .whereEqualTo("date", date)
+                    .whereEqualTo("price", price)
+                    .get()
+                    .addOnSuccessListener { documents ->
+                        if (!documents.isEmpty) {
+                            for (document in documents) {
+                                val usersIds =
+                                    document.get("users_ids") as MutableList<String>
+                                usersIds.add(current_user?.uid.toString())
+                                document.reference.update("users_ids", usersIds)
+                                id_lic = document.getLong("lic_id")?.toInt() ?: 0
+                            }
+                        } else {
+                            val users = listOf(current_user?.uid.toString())
+                            id_lic = Random.nextLong(1, 2147483647).toInt()
+                            val data = hashMapOf(
+                                "title" to title,
+                                "description" to description,
+                                "date" to date,
+                                "price" to price,
+                                "lic_id" to id_lic,
+                                "location" to location,
+                                "users_ids" to users,
+                                "enllac_publicacio" to enllac_publicacio,
+                            )
+                            db.collection("licitacionsOptades").add(data)
+                        }
+                        db.collection("usersEmpresa")
+                            .whereEqualTo("user_id", current_user?.uid)
+                            .get()
+                            .addOnSuccessListener { documents ->
+                                for (document in documents) {
+                                    val optatsIds =
+                                        document.get("optats") as MutableList<Int>
+                                    optatsIds.add(id_lic)
+                                    document.reference.update(
+                                        "optats",
+                                        optatsIds
+                                    )
+                                }
+                            }
+                        }
+            }
+        context.startActivity(intent)
+        enviarSolicitutValoracio(navController, title) },
         colors = ButtonDefaults.buttonColors(
             backgroundColor = Color.DarkGray,
             contentColor = Color.White)
