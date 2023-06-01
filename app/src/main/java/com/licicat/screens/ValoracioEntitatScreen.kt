@@ -48,6 +48,7 @@ import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.core.app.ActivityCompat
@@ -60,6 +61,7 @@ import com.google.firebase.messaging.RemoteMessage.Notification.*
 import com.licicat.components.BottomBarNavigationEntitat
 
 import com.licicat.*
+import com.licicat.R
 import java.text.SimpleDateFormat
 
 
@@ -156,7 +158,7 @@ fun ValoracioEntitatScreen(navController: NavController, intent: Intent) {
                 TextField(
                     value = comment,
                     onValueChange = { newComment -> comment = newComment },
-                    label = { Text("Comentari addicional (opcional)") },
+                    label = { Text(stringResource(R.string.comentari_valoracio)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 16.dp)
