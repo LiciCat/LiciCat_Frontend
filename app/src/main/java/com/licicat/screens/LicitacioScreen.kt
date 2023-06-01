@@ -5,10 +5,11 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,7 +27,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -34,13 +34,11 @@ import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.licicat.R
 import com.licicat.components.BottomBarNavigation
 import com.licicat.model.Chat
 import com.licicat.navigation.AppScreens
 import java.util.*
 
-import androidx.compose.material.Snackbar
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -50,28 +48,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.core.content.ContextCompat.getSystemService
-import com.google.firebase.messaging.FirebaseMessaging
 
 import com.google.firebase.messaging.RemoteMessage.Notification.*
 
-import com.licicat.AppType
-import com.licicat.UserType
-import com.licicat.components.BottomBarNavigation
 import com.licicat.components.BottomBarNavigationEntitat
 
-import com.google.android.gms.tasks.OnCompleteListener
-
-import com.google.firebase.messaging.RemoteMessage
-import com.google.firebase.messaging.ktx.remoteMessage
-import com.google.firebase.messaging.ktx.messaging
-
-
-
-
-
-
+import com.licicat.*
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -207,8 +189,7 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                     Spacer(modifier = Modifier.width(16.dp))
                     Button(
                         onClick = {
-
-                            enviarSolicitutValoracio(navController) },
+                            enviarSolicitutValoracio(navController, title) },
                     ) {
                         Text(text = "Optar")
                     }
@@ -222,7 +203,7 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
 fun createChannel(navController: NavController) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         val channel = NotificationChannel(
-            "ASWA",
+            "ASWAC",
             "MySuperChannel",
             NotificationManager.IMPORTANCE_DEFAULT
         ).apply {
@@ -236,11 +217,36 @@ fun createChannel(navController: NavController) {
     }
 }
 
-private fun enviarSolicitutValoracio(navController: NavController) {
-    var builder = NotificationCompat.Builder(navController.context, "ASWA")
+
+private fun enviarSolicitutValoracio(navController: NavController, title: String?) {
+
+    val intent = Intent(navController.context, MainActivity::class.java).apply {
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+       putExtra("destinacion", "type_valoracio_entitat")
+        putExtra("nom_entitat", title)
+    }
+
+    val destination = intent.getStringExtra("destinacion")
+    println("Abans de enviar destinacion new: $destination")
+    val entitat = intent.getStringExtra("nom_entitat")
+    println("Abans de enviar entitat new: $entitat")
+
+    val flag = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+    val pendingIntent: PendingIntent = PendingIntent.getActivity(
+        navController.context,
+        0,
+        intent,
+        PendingIntent.FLAG_UPDATE_CURRENT
+    )
+
+    var builder = NotificationCompat.Builder(navController.context, "ASWAC")
         .setSmallIcon(android.R.drawable.alert_light_frame)
-        .setContentTitle("My title")
-        .setContentText("Esto es un ejemplo <3")
+        .setContentTitle("Ja queda un pas menys!")
+        .setContentIntent(pendingIntent)
+        .setStyle(
+            NotificationCompat.BigTextStyle()
+                .bigText("Recorda valorar a l'entitat $title. Les opinions com la teva serveixen a les entitats per millorar el seu servei.")
+        )
 
     with(NotificationManagerCompat.from(navController.context)) {
         if (ActivityCompat.checkSelfPermission(
