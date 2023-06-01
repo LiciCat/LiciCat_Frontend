@@ -12,7 +12,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 
-import android.content.Intent
+
 import android.net.Uri
 import android.util.Log
 
@@ -185,7 +185,7 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                     Spacer(modifier = Modifier.width(16.dp))
 
                     if (AppType.getUserType() == UserType.EMPRESA){
-                        MyButton(enllac_publicacio)
+                        MyButton(enllac_publicacio, navController, title)
                     }
                     Spacer(modifier = Modifier.width(16.dp)) // Espacio horizontal entre botones
                     MyShareButton(enllac_publicacio)
@@ -271,7 +271,7 @@ private fun enviarSolicitutValoracio(navController: NavController, title: String
 
 
 @Composable
-fun MyButton(enllac_publicacio: String?) {
+fun MyButton(enllac_publicacio: String?, navController: NavController, title:String?) {
     val context = LocalContext.current
     val intent = remember { Intent(Intent.ACTION_VIEW, Uri.parse(enllac_publicacio)) }
 
