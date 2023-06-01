@@ -278,16 +278,15 @@ fun MyButton(
 ) {
     val context = LocalContext.current
     val intent = remember { Intent(Intent.ACTION_VIEW, Uri.parse(enllac_publicacio)) }
-    val datadate = date //Uri.parse(date)
     val db = Firebase.firestore
     val current_user = FirebaseAuth.getInstance().currentUser
-    var id_lic: Int
+    var id_lic: Int = 0
     var isOptat by remember { mutableStateOf(false) }
     println("1")
     db.collection("licitacionsOptades")
         .whereEqualTo("title", title)
         .whereEqualTo("description", description)
-        .whereEqualTo("date", datadate)
+        .whereEqualTo("date", date)
         .whereEqualTo("price", price)
         .whereArrayContains("users_ids", current_user?.uid.toString())
         .get()
@@ -305,40 +304,53 @@ fun MyButton(
     println("2")
 
     Button(onClick = {
-
-        if (!isOptat) {
-            println("3")
-            val users = listOf(current_user?.uid.toString())
-            id_lic = Random.nextLong(1, 2147483647).toInt()
-            val data = hashMapOf(
-                "title" to title,
-                "description" to description,
-                "date" to datadate,
-                "price" to price,
-                "lic_id" to id_lic,
-                "location" to location,
-                "users_ids" to users,
-                "enllac_publicacio" to enllac_publicacio,
-            )
-            db.collection("licitacionsOptades").add(data)
-
-            db.collection("usersEmpresa")
-                .whereEqualTo("user_id", current_user?.uid)
-                .get()
-                .addOnSuccessListener { documents ->
-                    for (document in documents) {
-                        val optatsIds =
-                            document.get("optats") as MutableList<Int>
-                        optatsIds.add(id_lic)
-                        document.reference.update(
-                            "optats",
-                            optatsIds
-                        )
-                    }
-                }
-        }
-        println("4")
-
+            if (!isOptat) {
+                db.collection("licitacionsOptades")
+                    .whereEqualTo("title", title)
+                    .whereEqualTo("description", description)
+                    .whereEqualTo("date", date)
+                    .whereEqualTo("price", price)
+                    .get()
+                    .addOnSuccessListener { documents ->
+                        if (!documents.isEmpty) {
+                            for (document in documents) {
+                                val usersIds =
+                                    document.get("users_ids") as MutableList<String>
+                                usersIds.add(current_user?.uid.toString())
+                                document.reference.update("users_ids", usersIds)
+                                id_lic = document.getLong("lic_id")?.toInt() ?: 0
+                            }
+                        } else {
+                            val users = listOf(current_user?.uid.toString())
+                            id_lic = Random.nextLong(1, 2147483647).toInt()
+                            val data = hashMapOf(
+                                "title" to title,
+                                "description" to description,
+                                "date" to date,
+                                "price" to price,
+                                "lic_id" to id_lic,
+                                "location" to location,
+                                "users_ids" to users,
+                                "enllac_publicacio" to enllac_publicacio,
+                            )
+                            db.collection("licitacionsOptades").add(data)
+                        }
+                        db.collection("usersEmpresa")
+                            .whereEqualTo("user_id", current_user?.uid)
+                            .get()
+                            .addOnSuccessListener { documents ->
+                                for (document in documents) {
+                                    val optatsIds =
+                                        document.get("optats") as MutableList<Int>
+                                    optatsIds.add(id_lic)
+                                    document.reference.update(
+                                        "optats",
+                                        optatsIds
+                                    )
+                                }
+                            }
+                        }
+            }
         context.startActivity(intent)
         enviarSolicitutValoracio(navController, title) },
         colors = ButtonDefaults.buttonColors(

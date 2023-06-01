@@ -272,6 +272,13 @@ fun CardLicitacio(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(top = 12.dp)
                 )
+            } else if (description != null) {
+                Text(
+                    text = description,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(top = 12.dp)
+                )
             }
             Row(
                 modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
