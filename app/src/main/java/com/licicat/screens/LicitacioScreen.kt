@@ -191,7 +191,8 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                     }
                     Spacer(modifier = Modifier.width(16.dp)) // Espacio horizontal entre botones
                     MyShareButton(enllac_publicacio)
-
+                    Spacer(modifier = Modifier.width(13.dp))
+                    DescarregarPdfBoto()
                 }
             }
 
@@ -231,12 +232,12 @@ private fun enviarSolicitutValoracio(navController: NavController, title: String
     val entitat = intent.getStringExtra("nom_entitat")
     println("Abans de enviar entitat new: $entitat")
 
-    val flag = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+    val flag = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_IMMUTABLE else 0
     val pendingIntent: PendingIntent = PendingIntent.getActivity(
         navController.context,
         0,
         intent,
-        PendingIntent.FLAG_UPDATE_CURRENT
+        PendingIntent.FLAG_UPDATE_CURRENT or flag
     )
 
     var builder = NotificationCompat.Builder(navController.context, "ASWAC")
@@ -281,6 +282,7 @@ fun DescarregarPdfBoto() {
 
 
 @Composable
+
 fun MyButton(
     enllac_publicacio: String?, navController: NavController, title: String?,
     description: String?, price: String?, location: String?, date: String?

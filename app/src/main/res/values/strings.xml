@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">LiciCat</string>
+    <string name="comentari_valoracio">Comentari addicional (opcional)</string>
 </resources>
