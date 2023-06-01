@@ -120,6 +120,7 @@ fun trobar_lic(numeros: List<Int>) {
                     licitacio.data_publicacio_anunci=document.get("date_inici") as String;
                     licitacio.data_publicacio_adjudicacio=document.get("date_adjudicacio") as String;
                     licitacio.tipus_contracte=document.get("tipus_contracte") as String;
+                    licitacio.enllac_publicacio=document.get("enllac_publicacio") as String;
                     val listaActual = licitacions_favs.value?.toMutableList() ?: mutableListOf()
                     listaActual.add(licitacio)
                     licitacions_favs.value = listaActual
