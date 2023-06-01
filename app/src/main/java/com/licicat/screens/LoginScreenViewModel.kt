@@ -179,7 +179,7 @@ class LoginScreenViewModel: ViewModel() {
             id = null,
             seguidors =  emptyList<Int>(),
             descripcio = "Descripció administració pública",
-            valoracio = 0F,
+            valoracio = 0.00001,
             numSeguidors = 0
         ).toMap()
 

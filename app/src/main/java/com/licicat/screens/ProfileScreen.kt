@@ -1,6 +1,7 @@
 package com.licicat.screens
 
 import android.annotation.SuppressLint
+import android.icu.text.DecimalFormat
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -95,8 +96,11 @@ fun ProfileScreen(navController: NavController) {
                             Log.d("appEntitat", "${document.id} => ${document.data}")
                             entitat = entitat + document.get("entitat") as String
                             descripcio = descripcio + document.get("descripcio") as String
-                            valoracio =  (document.get("valoracio") as Long).toFloat()
+                            valoracio =  (document.get("valoracio") as Double).toFloat()
                             numSeguidors =  (document.get("numSeguidors") as Long).toInt()
+                            val decimalFormat = DecimalFormat("#.#")
+                            val formattedNumber = decimalFormat.format(valoracio)
+                            valoracio = formattedNumber.toFloat()
                         }
 
                     }

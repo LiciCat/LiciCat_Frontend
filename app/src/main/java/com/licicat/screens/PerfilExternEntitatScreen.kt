@@ -1,6 +1,7 @@
 package com.licicat.screens
 
 import android.annotation.SuppressLint
+import android.icu.text.DecimalFormat
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -78,8 +79,11 @@ fun ProfileEntitatScreen(navController: NavController, entitat:String?) {
                         Log.d("appEntitat", "${document.id} => ${document.data}")
 
                         descripcio = descripcio + document.get("descripcio") as String
-                        valoracio =  (document.get("valoracio") as Long).toFloat()
+                        valoracio =  (document.get("valoracio") as Double).toFloat()
                         numSeguidors =  (document.get("numSeguidors") as Long).toInt()
+                        val decimalFormat = DecimalFormat("#.#")
+                        val formattedNumber = decimalFormat.format(valoracio)
+                        valoracio = formattedNumber.toFloat()
                     }
 
                 }
