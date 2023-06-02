@@ -47,6 +47,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -55,6 +56,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import com.licicat.AppType
+import com.licicat.R
 import com.licicat.UserType
 import com.licicat.components.BottomBarNavigationEntitat
 import com.licicat.model.usersEmpresa
@@ -153,12 +155,12 @@ fun Cerca_Licitacio(
 fun getUsuaris(callback: (List<Usuari>) -> Unit) {
     val listaActual: MutableList<Usuari> = mutableListOf()
     val db = Firebase.firestore
-    db.collection("usersEmpresa").get()
+    db.collection("usersEntitat").get()
         .addOnSuccessListener { usuaris ->
             for (u in usuaris) {
                 val usu = Usuari()
                 usu.user_id = u.get("user_id") as? String ?: ""
-                usu.empresa = u.get("empresa") as? String ?: ""
+                usu.empresa = u.get("entitat") as? String ?: ""
                 usu.email = u.get("email") as? String ?: ""
                 usu.nif = (u.get("nif") as? String) ?: ""
                 usu.telefon = (u.get("telefon") as? String) ?: ""
@@ -278,13 +280,13 @@ fun HomeScreen(navController: NavController) {
                         selected = selectedTabIndex.value == 0,
                         onClick = { selectedTabIndex.value = 0 }
                     ) {
-                        Text("Usuaris")
+                        Text(stringResource(R.string.tab_usuari_home))
                     }
                     Tab(
                         selected = selectedTabIndex.value == 1,
                         onClick = { selectedTabIndex.value = 1 }
                     ) {
-                        Text("Licitacions")
+                        Text(stringResource(R.string.licitacions_tab_home))
                     }
                     Tab(
                         selected = selectedTabIndex.value == 2,
@@ -292,7 +294,7 @@ fun HomeScreen(navController: NavController) {
                             selectedTabIndex.value = 2
                         }
                     ) {
-                        Text("Licitacions Similars")
+                        Text(stringResource(R.string.liciSimilars_tab_home))
                     }
                 }
 
@@ -308,7 +310,7 @@ fun HomeScreen(navController: NavController) {
                     OutlinedTextField(
                         value = searchText,
                         onValueChange = { searchText = it },
-                        placeholder = { Text("Cerca") },
+                        placeholder = { Text(stringResource(R.string.placeholder_cerca_home)) },
                         modifier = Modifier
                             .weight(1f)
                             .padding(16.dp),

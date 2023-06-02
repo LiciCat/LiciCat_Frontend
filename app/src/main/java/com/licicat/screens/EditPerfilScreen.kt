@@ -15,8 +15,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.licicat.AppType
+import com.licicat.R
 import com.licicat.UserType
 import com.licicat.components.*
 
@@ -49,21 +51,21 @@ fun EditPerfilScreen(navController: NavController) {
             OutlinedTextField(
                 value = descripcio,
                 onValueChange = { descripcio = it },
-                label = { Text("Descripció") },
+                label = { Text(stringResource(R.string.placeholder_descripcio_editprofile)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
             OutlinedTextField(
                 value = nomCognoms,
                 onValueChange = { nomCognoms = it },
-                label = { Text("Nom i Cognoms") },
+                label = { Text(stringResource(R.string.placeholder_nom_editprefil)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
             OutlinedTextField(
                 value = telefon,
                 onValueChange = { telefon = it },
-                label = { Text("Telèfon") },
+                label = { Text(stringResource(R.string.placeholder_tlf_editperfil)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -125,7 +127,7 @@ fun EditPerfilScreen(navController: NavController) {
                 },
                 modifier = Modifier.align(Alignment.End)
             ) {
-                Text(text = "Editar")
+                Text(text = stringResource(R.string.boton_confirmar_edicion))
             }
         }
     }
