@@ -66,7 +66,7 @@ fun ProfileEntitatScreen(navController: NavController, entitat:String?) {
 
         var descripcio by remember { mutableStateOf("") }
         var valoracio by remember { mutableStateOf(0F) }
-        var numSeguidors by remember { mutableStateOf(0) }
+
 
         LaunchedEffect(true) {
 
@@ -80,7 +80,6 @@ fun ProfileEntitatScreen(navController: NavController, entitat:String?) {
 
                         descripcio = descripcio + document.get("descripcio") as String
                         valoracio =  (document.get("valoracio") as Double).toFloat()
-                        numSeguidors =  (document.get("numSeguidors") as Long).toInt()
                         val decimalFormat = DecimalFormat("#.#")
                         val formattedNumber = decimalFormat.format(valoracio)
                         valoracio = formattedNumber.toFloat()
@@ -128,7 +127,7 @@ fun ProfileEntitatScreen(navController: NavController, entitat:String?) {
                             tint = Color.White
                         )
                     }
-                    Spacer(Modifier.width(8.dp))
+                    Spacer(Modifier.width(30.dp))
                     var licit = licitacions.size
                     Column(modifier = Modifier.padding(8.dp).padding(start = 16.dp)) {
                         Text(
@@ -144,7 +143,7 @@ fun ProfileEntitatScreen(navController: NavController, entitat:String?) {
                             fontWeight = FontWeight.Bold
                         )
                     }
-                    Spacer(Modifier.width(8.dp))
+                    Spacer(Modifier.width(16.dp))
                     Column(modifier = Modifier.padding(8.dp)) {
                         Text(
                             text = valoracio.toString(),
@@ -160,20 +159,7 @@ fun ProfileEntitatScreen(navController: NavController, entitat:String?) {
                         )
                     }
                     Spacer(Modifier.width(8.dp))
-                    Column(modifier = Modifier.padding(8.dp)) {
-                        Text(
-                            text = numSeguidors.toString(),
-                            style = MaterialTheme.typography.h5,
-                            modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 8.dp),
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = "Seguidors",
-                            style = MaterialTheme.typography.body1,
-                            modifier = Modifier.padding(bottom = 8.dp),
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+
 
 
                 }
@@ -197,23 +183,7 @@ fun ProfileEntitatScreen(navController: NavController, entitat:String?) {
                     fontWeight = FontWeight.Bold
 
                 )
-                Button(
-                    onClick = { /* Accio de seguir  */ },
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .height(36.dp)
-                        .width(120.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = Color(0xFFFF454A),
-                        disabledBackgroundColor = Color(0xFFF78058),
-                        contentColor = Color.White,
-                        disabledContentColor = Color.White
 
-                    )
-                ) {
-                    Text(text = "Seguir")
-                }
                 Divider(modifier = Modifier.padding(vertical = 8.dp))
             }
             if (licitacions.isNotEmpty()) {
