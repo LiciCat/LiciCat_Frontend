@@ -155,12 +155,12 @@ fun Cerca_Licitacio(
 fun getUsuaris(callback: (List<Usuari>) -> Unit) {
     val listaActual: MutableList<Usuari> = mutableListOf()
     val db = Firebase.firestore
-    db.collection("usersEmpresa").get()
+    db.collection("usersEntitat").get()
         .addOnSuccessListener { usuaris ->
             for (u in usuaris) {
                 val usu = Usuari()
                 usu.user_id = u.get("user_id") as? String ?: ""
-                usu.empresa = u.get("empresa") as? String ?: ""
+                usu.empresa = u.get("entitat") as? String ?: ""
                 usu.email = u.get("email") as? String ?: ""
                 usu.nif = (u.get("nif") as? String) ?: ""
                 usu.telefon = (u.get("telefon") as? String) ?: ""

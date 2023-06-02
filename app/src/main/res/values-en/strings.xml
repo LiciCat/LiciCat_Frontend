@@ -42,7 +42,7 @@
     <string name="label_inform_no_licitacions_entitat">No tenders available</string>
     <string name="label_licitacions_profile_screen">Tenders</string>
     <string name="label_valoracio_profile">Evaluation</string>
-    <string name="label_no_licitacions_disponibles">No bids available</string>
+    <string name="label_no_licitacions_disponibles">No tenders available</string>
     <string name="boto_configuracio">Configuration</string>
     <string name="label_registre_empresa">Company registration</string>
     <string name="placeholder_contrasenya_registre">Password</string>
