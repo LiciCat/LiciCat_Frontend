@@ -374,14 +374,17 @@ fun HomeScreen(navController: NavController) {
 
 
 
-                LazyColumn {
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(bottom = 56.dp)) {
                     when (selectedTabIndex.value) {
                         0 -> items(items = usuaris) { u ->
                             CardUsuari(
                                 icon = Icons.Filled.AccountCircle,
                                 title = u.empresa,
                                 correu = u.email,
-                                telefon = u.telefon
+                                telefon = u.telefon,
+                                navController
                             )
                         }
 
