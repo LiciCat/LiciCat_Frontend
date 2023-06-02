@@ -71,10 +71,10 @@ import java.text.SimpleDateFormat
 fun ValoracioEntitatScreen(navController: NavController, intent: Intent) {
     val ratingItems = remember {
         mutableStateListOf(
-            RatingItem("Amabalitat"),
-            RatingItem("Rapidesa"),
-            RatingItem("Bona Comunicació"),
-            RatingItem("Informació Present")
+            RatingItem(navController.context.getString(R.string.label_item_amabilitat)),
+            RatingItem(navController.context.getString(R.string.label_item_rapidesa)),
+            RatingItem(navController.context.getString(R.string.label_item_bona_comunicacio)),
+            RatingItem(navController.context.getString(R.string.label_item_info_present))
             // Agrega más elementos de valoración según tus necesidades
         )
     }
@@ -87,7 +87,7 @@ fun ValoracioEntitatScreen(navController: NavController, intent: Intent) {
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "Valorant a " + entityName, style = MaterialTheme.typography.h6)
+                    Text(text = stringResource(R.string.label_titol_valorant_a) + entityName, style = MaterialTheme.typography.h6)
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigate(AppScreens.HomeScreen.route) {
@@ -190,7 +190,7 @@ fun ValoracioEntitatScreen(navController: NavController, intent: Intent) {
                         }},
                     modifier = Modifier.align(Alignment.End)
                 ) {
-                    Text(text = "Enviar")
+                    Text(text = stringResource(R.string.boto_enviar))
                 }
             }
         }

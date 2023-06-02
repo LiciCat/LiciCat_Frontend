@@ -50,11 +50,13 @@ import com.google.firebase.storage.ktx.storage
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.RemoteMessage
 import com.licicat.AppType
+import com.licicat.R
 import com.licicat.UserType
 import com.licicat.components.BottomBarNavigationEntitat
 
@@ -273,7 +275,7 @@ fun WhatsScreen(navController: NavController, chat_id: String, id_Empresa: Strin
                             .weight(4f)
                             .padding(end = 8.dp),
                         placeholder = {
-                            Text(text = "Escribe un mensaje...")
+                            Text(text = stringResource(R.string.placeholder_escribir_msg))
                         }
                     )
                     Button(

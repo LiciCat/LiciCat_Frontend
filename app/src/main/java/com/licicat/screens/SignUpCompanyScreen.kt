@@ -35,6 +35,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
@@ -109,7 +110,7 @@ fun UserSignUpForm(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
-            Text(text = "Registre d'empresa",
+            Text(text = stringResource(R.string.label_registre_empresa),
                 style = MaterialTheme.typography.h4,
                 color = Color(0xFFFF454A),
                 textAlign = TextAlign.Center,
@@ -140,7 +141,7 @@ fun UserSignUpForm(
         item {
             PasswordInput(
                 passwordState = password,
-                labelId = "Contrsenya",
+                labelId = stringResource(R.string.placeholder_contrasenya_registre),
                 passwordVisible = passwordVisible
             )
 
@@ -172,7 +173,7 @@ fun UserSignUpForm(
 @Composable
 fun TelefonInput(
     TelefonState: MutableState<String>,
-    labelId : String = "Telèfon",
+    labelId : String = stringResource(R.string.placeholder_telefon_registre),
     isSingleLine: Boolean = true
 ) {
     OutlinedTextField(
@@ -190,7 +191,7 @@ fun TelefonInput(
 @Composable
 fun NifInput(
     NifState: MutableState<String>,
-    labelId : String = "NIF",
+    labelId : String = stringResource(R.string.placeholder_nif_registre),
     isSingleLine: Boolean = true
 ) {
     OutlinedTextField(
@@ -208,7 +209,7 @@ fun NifInput(
 @Composable
 fun NomInput(
     NomState: MutableState<String>,
-    labelId : String = "Nom i Cognoms",
+    labelId : String = stringResource(R.string.placeholder_nom_registre),
     isSingleLine: Boolean = true
 ) {
     OutlinedTextField(
@@ -226,7 +227,7 @@ fun NomInput(
 @Composable
 fun EmpresaInput(
     empresaState: MutableState<String>,
-    labelId : String = "Empresa",
+    labelId : String = stringResource(R.string.placeholder_empresa_registre),
     isSingleLine: Boolean = true
 ) {
     OutlinedTextField(
@@ -261,7 +262,7 @@ fun SignUpButton(
         ), enabled = inputValido,
         onClick = onClic
     ) {
-        Text(text = "Registrar-se")
+        Text(text = stringResource(R.string.boto_registrar))
     }
 
 }

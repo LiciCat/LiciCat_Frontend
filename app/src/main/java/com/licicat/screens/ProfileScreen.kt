@@ -45,6 +45,8 @@ import com.licicat.LicitacionsRepository
 import com.licicat.components.BottomBarNavigation
 import com.licicat.components.CardLicitacio
 import androidx.compose.material.icons.*
+import androidx.compose.ui.res.stringResource
+import com.licicat.R
 import kotlinx.coroutines.delay
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -55,7 +57,7 @@ fun ProfileScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Perfil") },
+                title = { Text(stringResource(R.string.label_perfil_screen_perfil)) },
                 actions = {
                     IconButton(onClick = {  navController.navigate("configuration_screen") }) {
                         Icon(Icons.Default.Settings, contentDescription = "Ajustes")
@@ -153,7 +155,7 @@ fun ProfileScreen(navController: NavController) {
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "Licitacions",
+                                text = stringResource(R.string.label_licitacions_profile_screen),
                                 style = MaterialTheme.typography.body1,
                                 modifier = Modifier.padding(bottom = 8.dp),
                                 fontWeight = FontWeight.Bold
@@ -168,7 +170,7 @@ fun ProfileScreen(navController: NavController) {
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "Valoració",
+                                text = stringResource(R.string.label_valoracio_profile),
                                 style = MaterialTheme.typography.body1,
                                 modifier = Modifier.padding(bottom = 8.dp),
                                 fontWeight = FontWeight.Bold
@@ -222,7 +224,7 @@ fun ProfileScreen(navController: NavController) {
                 } else{
                     item {
                         Text(
-                            text = "No hi ha licitacions disponibles",
+                            text = stringResource(R.string.label_no_licitacions_disponibles),
                             style = MaterialTheme.typography.body1,
                             textAlign = TextAlign.Center,
                             modifier = Modifier
@@ -257,7 +259,7 @@ fun Configuration(navController: NavController) {
 
         )
     ) {
-        Text(text = "Configuració")
+        Text(text = stringResource(R.string.boto_configuracio))
     }
 
 }

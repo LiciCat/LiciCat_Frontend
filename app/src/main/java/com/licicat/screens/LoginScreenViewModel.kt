@@ -15,6 +15,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.licicat.AppType
+import com.licicat.R
 import com.licicat.UserType
 import com.licicat.model.usersEmpresa
 import com.licicat.model.usersEntitat
@@ -57,12 +58,12 @@ class LoginScreenViewModel: ViewModel() {
                        else{
                            Log.d("Licicat", "Error: ${task.result.toString()}")
 
-                           Toast.makeText(context, "Inici de sessió incorrecte.",
+                           Toast.makeText(context, context.getString(R.string.msg_error_inici_sessio),
                                Toast.LENGTH_SHORT).show()
                        }
                    } catch (e: Exception) {
                        Log.d("Licicat", "Excepcion-log: ${e.message}")
-                       Toast.makeText(context, "Inici de sessió incorrecte.",
+                       Toast.makeText(context, context.getString(R.string.msg_error_inici_sessio),
                            Toast.LENGTH_SHORT).show()
                    }
                }
@@ -70,7 +71,7 @@ class LoginScreenViewModel: ViewModel() {
        }
         catch (e:Exception){
             Log.d("Licicat", "Excepcion-log: ${e.message}")
-            Toast.makeText(context, "Inici de sessió incorrecte.",
+            Toast.makeText(context, context.getString(R.string.msg_error_inici_sessio),
                 Toast.LENGTH_SHORT).show()
         }
 
@@ -88,14 +89,14 @@ class LoginScreenViewModel: ViewModel() {
                         }
                         else{
                             Log.d("Licicat", "Error: ${task.result.toString()}")
-                            Toast.makeText(context, "Registre incorrecte.",
+                            Toast.makeText(context, context.getString(R.string.msg_error_registre),
                                 Toast.LENGTH_SHORT).show()
                         }
                         _loading.value = false
                     }
                     catch (e: Exception) {
                         Log.d("Licicat", "Excepcion-log: ${e.message}")
-                       Toast.makeText(context, "Registre incorrecte.",
+                       Toast.makeText(context, context.getString(R.string.msg_error_registre),
                             Toast.LENGTH_SHORT).show()
                     }
 
@@ -115,14 +116,14 @@ class LoginScreenViewModel: ViewModel() {
                         }
                         else{
                             Log.d("Licicat", "Error: ${task.result.toString()}")
-                            Toast.makeText(context, "Registre incorrecte.",
+                            Toast.makeText(context, context.getString(R.string.msg_error_registre),
                                 Toast.LENGTH_SHORT).show()
                         }
                         _loading.value = false
                     }
                     catch (e: Exception) {
                         Log.d("Licicat", "Excepcion-log: ${e.message}")
-                        Toast.makeText(context, "Registre incorrecte.",
+                        Toast.makeText(context, context.getString(R.string.msg_error_registre),
                             Toast.LENGTH_SHORT).show()
                     }
 
