@@ -30,7 +30,9 @@ import com.licicat.LicitacionsRepository
 import com.licicat.components.BottomBarNavigation
 import com.licicat.components.CardLicitacio
 import androidx.compose.material.icons.*
+import androidx.compose.ui.res.stringResource
 import com.licicat.AppType
+import com.licicat.R
 import com.licicat.UserType
 import com.licicat.components.BottomBarNavigationEntitat
 import kotlinx.coroutines.delay
@@ -46,7 +48,7 @@ fun ProfileEntitatScreen(navController: NavController, entitat:String?) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Perfil") },
+                title = { Text(stringResource(R.string.label_perfil_screen_perfil)) },
                 actions = {
                     IconButton(onClick = {  navController.navigate("configuration_screen") }) {
                         Icon(Icons.Default.Settings, contentDescription = "Ajustes")
@@ -137,7 +139,7 @@ fun ProfileEntitatScreen(navController: NavController, entitat:String?) {
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "Licitacions",
+                            text = stringResource(R.string.laberl_licitacions_perfil_entitat),
                             style = MaterialTheme.typography.body1,
                             modifier = Modifier.padding(bottom = 8.dp),
                             fontWeight = FontWeight.Bold
@@ -152,7 +154,7 @@ fun ProfileEntitatScreen(navController: NavController, entitat:String?) {
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "Valoració",
+                            text = stringResource(R.string.label_valoracio_perfil_entitat),
                             style = MaterialTheme.typography.body1,
                             modifier = Modifier.padding(bottom = 8.dp),
                             fontWeight = FontWeight.Bold
@@ -209,7 +211,7 @@ fun ProfileEntitatScreen(navController: NavController, entitat:String?) {
             } else{
                 item {
                     Text(
-                        text = "No hi ha licitacions disponibles",
+                        text = stringResource(R.string.label_inform_no_licitacions_entitat),
                         style = MaterialTheme.typography.body1,
                         textAlign = TextAlign.Center,
                         modifier = Modifier

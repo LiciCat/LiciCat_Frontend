@@ -39,9 +39,15 @@ import com.google.firebase.ktx.Firebase
 import com.licicat.LicitacionsRepository
 import com.licicat.components.CardLicitacio
 import androidx.compose.material.icons.*
+
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 import java.util.concurrent.atomic.AtomicInteger
+
+import androidx.compose.ui.res.stringResource
+import com.licicat.R
+import kotlinx.coroutines.delay
+
 
 val licitacions_opt: MutableLiveData<List<Licitacio>> = MutableLiveData(emptyList())
 var presentacio_opt =  mutableStateOf(false)
@@ -55,7 +61,7 @@ fun ProfileScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Perfil") },
+                title = { Text(stringResource(R.string.label_perfil_screen_perfil)) },
                 actions = {
                     IconButton(onClick = {  navController.navigate("configuration_screen") }) {
                         Icon(Icons.Default.Settings, contentDescription = "Ajustes")
@@ -289,7 +295,7 @@ fun ProfileScreen(navController: NavController) {
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "Licitacions",
+                                text = stringResource(R.string.label_licitacions_profile_screen),
                                 style = MaterialTheme.typography.body1,
                                 modifier = Modifier.padding(bottom = 8.dp),
                                 fontWeight = FontWeight.Bold
@@ -306,7 +312,7 @@ fun ProfileScreen(navController: NavController) {
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "Valoració",
+                                text = stringResource(R.string.label_valoracio_profile),
                                 style = MaterialTheme.typography.body1,
                                 modifier = Modifier.padding(bottom = 8.dp),
                                 fontWeight = FontWeight.Bold
@@ -360,7 +366,7 @@ fun ProfileScreen(navController: NavController) {
                 } else{
                     item {
                         Text(
-                            text = "No hi ha licitacions disponibles",
+                            text = stringResource(R.string.label_no_licitacions_disponibles),
                             style = MaterialTheme.typography.body1,
                             textAlign = TextAlign.Center,
                             modifier = Modifier
@@ -377,6 +383,7 @@ fun ProfileScreen(navController: NavController) {
 
     }
 }
+
 
 
 

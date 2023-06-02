@@ -13,12 +13,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-
+import com.licicat.R
 
 
 @Composable
@@ -87,7 +88,7 @@ fun SliderPrecio(
     var range by remember { mutableStateOf(precioMinimo..precioMaximo) }
 
     Column(modifier = modifier) {
-        Text(text = "Precio: ${range.start}€ - ${range.endInclusive}€", modifier = Modifier.padding(16.dp))
+        Text(text = stringResource(R.string.tag_preu_filtrar) + "${range.start}€ - ${range.endInclusive}€", modifier = Modifier.padding(16.dp))
         RangeSlider(
             value = range,
             onValueChange = { range = it; onRangeChanged(Pair(range.start, range.endInclusive)) },
@@ -123,7 +124,7 @@ fun FilterButtons(
             onClick = {
                 onApplyFilter(opcionesSeleccionadas.joinToString(", "), rangoPrecio, dia, mes, any, opcionesSeleccionadasTipus.joinToString(", "))
                 onDismiss()
-            }) { Text(text = "Aplicar filtres") }
+            }) { Text(text = stringResource(R.string.boto_aplicar_filtres)) }
 
         Button(
             modifier = Modifier.padding(8.dp),
@@ -133,7 +134,7 @@ fun FilterButtons(
             }
 
         ) {
-            Text(text = "Cancel·lar")
+            Text(text = stringResource(R.string.boto_cancelar_filtrar))
         }
     }
 }
@@ -166,16 +167,16 @@ fun DatePickerDialog(onDateSelected: (year: Int, month: Int, day: Int) -> Unit) 
                     Button(onClick = {  dialogOpen = false
                         onDateSelected(0,0,0)} ,
                         modifier = Modifier.padding(8.dp)) {
-                        Text(text = "Cancel·lar")
+                        Text(text = stringResource(R.string.boto_cancelar_filtrar))
                     }
                     Button(onClick = { selectDate() },
                         modifier = Modifier.padding(8.dp)) {
-                        Text(text = "Seleccionar")
+                        Text(text = stringResource(R.string.boto_seleccionar_data_filtres))
                     }
                 }
             },
             title = {
-                Text(text = "Selecciona un limit de termini de presentació")
+                Text(text = stringResource(R.string.text_limit_data_filtre))
             },
             text = {
                 AndroidView(
@@ -221,7 +222,7 @@ fun PantallaSeleccion(onApplyFilter: (String?, Pair<Float, Float>?, Int?, Int?, 
     ) {
         Spacer(modifier = Modifier.height(16.dp))
         Column(modifier = Modifier.fillMaxWidth().padding(16.dp)){
-            Text(text = "Filtres", fontSize = 36.sp, fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.titol_filtres_screen), fontSize = 36.sp, fontWeight = FontWeight.Bold)
         }
 
         SliderPrecio(precioMinimo = 0f, precioMaximo = 5000000f , onRangeChanged = {
@@ -238,7 +239,7 @@ fun PantallaSeleccion(onApplyFilter: (String?, Pair<Float, Float>?, Int?, Int?, 
                 }
             },
             onDismissRequest = { },
-            titol = "Selecciona lloc d'execució"
+            titol = stringResource(R.string.boto_selecciona_lloc_execucio)
         )
 
         FilterDropdownMenu(
@@ -252,7 +253,7 @@ fun PantallaSeleccion(onApplyFilter: (String?, Pair<Float, Float>?, Int?, Int?, 
                 }
             },
             onDismissRequest = { },
-            titol = "Selecciona tipus de contracte"
+            titol = stringResource(R.string.boto_selecciona_tipus_contracte)
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -261,7 +262,7 @@ fun PantallaSeleccion(onApplyFilter: (String?, Pair<Float, Float>?, Int?, Int?, 
             modifier = Modifier.padding(8.dp).fillMaxWidth(),
             onClick = {
                 isDatePickerOpen.value = true
-            }) { Text(text = "Seleccionar data presentació") }
+            }) { Text(text = stringResource(R.string.boto_seleccionar_data_presentacio)) }
 
         // DatePickerDialog
         if (isDatePickerOpen.value) {

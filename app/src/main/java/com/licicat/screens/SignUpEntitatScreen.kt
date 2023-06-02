@@ -35,6 +35,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
@@ -109,7 +110,7 @@ fun UserSignUpFormEntitat(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
-            Text(text = "Registre d'entitat",
+            Text(text = stringResource(R.string.label_registre_entitat),
                 style = MaterialTheme.typography.h4,
                 color = Color(0xFFFF454A),
                 textAlign = TextAlign.Center,
@@ -140,7 +141,7 @@ fun UserSignUpFormEntitat(
         item {
             PasswordInput(
                 passwordState = password,
-                labelId = "Contrsenya",
+                labelId = stringResource(R.string.placeholder_contrasenya_registre),
                 passwordVisible = passwordVisible
             )
 
@@ -178,7 +179,7 @@ fun UserSignUpFormEntitat(
 @Composable
 fun EntitatInput(
     entitatState: MutableState<String>,
-    labelId : String = "Entitat",
+    labelId : String = stringResource(R.string.placeholder_entitat_registre),
     isSingleLine: Boolean = true
 ) {
     OutlinedTextField(
