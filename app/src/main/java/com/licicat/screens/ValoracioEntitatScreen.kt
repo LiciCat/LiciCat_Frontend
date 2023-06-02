@@ -120,11 +120,9 @@ fun ValoracioEntitatScreen(navController: NavController, intent: Intent) {
                     Log.w("app", "Error getting documents: ", exception)
                 }
         }
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 56.dp)) {
-            item {
+        Column(){
+            Column(modifier = Modifier
+                .fillMaxWidth()) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -143,16 +141,18 @@ fun ValoracioEntitatScreen(navController: NavController, intent: Intent) {
                 }
             }
 
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    // Nota media en tiempo real
-                    backgroundColor = getBackgroundColor(averageRatingState.value)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                // Nota media en tiempo real
+                backgroundColor = getBackgroundColor(averageRatingState.value)
 
-                    // Elementos de valoración
+
+
+                // Elementos de valoración
+                Column(modifier = Modifier.fillMaxWidth()) {
                     ratingItems.forEach { ratingItem ->
                         Card(
                             modifier = Modifier
@@ -170,31 +170,30 @@ fun ValoracioEntitatScreen(navController: NavController, intent: Intent) {
                         }
                     }
 
-                    // Comentario extra opcional
-                    TextField(
-                        value = comment,
-                        onValueChange = { newComment -> comment = newComment },
-                        label = { Text(stringResource(R.string.comentari_valoracio)) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 16.dp)
-                    )
+                }
 
+                // Comentario extra opcional
+                TextField(
+                    value = comment,
+                    onValueChange = { newComment -> comment = newComment },
+                    label = { Text(stringResource(R.string.comentari_valoracio)) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp)
+                )
 
                 // Botón de enviar
                 Button(
                     onClick = { enviarValoracion(entityName, ratingItems, comment, averageRatingState, valoracio);
-                              navController.navigate(AppScreens.HomeScreen.route) {
+                        navController.navigate(AppScreens.HomeScreen.route) {
                             popUpTo(AppScreens.HomeScreen.route) { inclusive = true }
                         }},
                     modifier = Modifier.align(Alignment.End)
                 ) {
                     Text(text = stringResource(R.string.boto_enviar))
-
                 }
             }
         }
-
 
     }
 }
@@ -238,7 +237,7 @@ fun RatingItemRow(ratingItem: RatingItem, onRatingChanged: (Float) -> Unit) {
 
 
 
-        )
+            )
     }
 }
 
@@ -305,7 +304,7 @@ fun enviarValoracion(nom_entitat: String, ratingItems: List<RatingItem>, comment
                 val documentId = document.id
                 var valoracioNova = 0F
                 if(valoracioPrevia == 0.00001F){
-                     valoracioNova = ratingTotal + valoracioPrevia
+                    valoracioNova = ratingTotal + valoracioPrevia
                 }
                 else {
                     valoracioNova = (ratingTotal + valoracioPrevia) / 2
@@ -376,5 +375,4 @@ fun obtenerFechaActualString(): String {
     val fechaActual = Date()
     return dateFormat.format(fechaActual)
 }
-
 

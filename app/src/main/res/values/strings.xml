@@ -56,7 +56,7 @@
     <string name="label_item_rapidesa">Rapidesa</string>
     <string name="label_item_bona_comunicacio">Bona Comunicació</string>
     <string name="label_item_info_present">Informació Present</string>
-    <string name="label_titol_valorant_a">\"Valorant a \"</string>
+    <string name="label_titol_valorant_a">Valorant a \"</string>
     <string name="boto_enviar">Enviar</string>
     <string name="placeholder_escribir_msg">Escribe un mensaje...</string>
     <string name="placeholder_descripcio_editprofile">Descripció</string>
