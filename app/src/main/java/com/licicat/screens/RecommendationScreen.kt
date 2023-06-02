@@ -24,6 +24,8 @@ import com.google.firebase.firestore.QuerySnapshot
 
 import kotlin.math.log
 
+
+var mcUbi:MutableMap<String, Pair<Double, Double> > = mutableMapOf()
 // Función para calcular el TF-IDF entre dos documentos
 fun calcularTFIDF(doc1: String, doc2: String, corpus: List<String>): Double {
     // Tokenización de los documentos en términos individuales (palabras)
@@ -113,7 +115,7 @@ fun ajustarSimilitud(similitud: Double, umbral: Double): Double {
 private fun calcularSimilitud(licitacion1: Licitacio, licitacion2: Licitacio, context: Context, corpus: List<Pair<String,String>>): Double {
 
     val similitudPrecio = calcularSimilitudPrecio(licitacion1.pressupost_licitacio, licitacion2.pressupost_licitacio)
-    val similitudUbicacio = 0.0//calcularSimilitudUbi(licitacion1.lloc_execucio, licitacion2.lloc_execucio, context)
+    val similitudUbicacio = calcularSimilitudUbi(licitacion1.lloc_execucio, licitacion2.lloc_execucio, context)
     val similitudDescripcio = 0.0//calcularTFIDF(licitacion1.objecte_contracte ?: "", licitacion2.objecte_contracte ?: "", corpus.map { it.first })
     val similitudOrgan = calcularTFIDF(licitacion1.nom_organ ?: "", licitacion2.nom_organ ?: "", corpus.map { it.second })
 
@@ -121,8 +123,8 @@ private fun calcularSimilitud(licitacion1: Licitacio, licitacion2: Licitacio, co
     //val similitudFitedDescripcio = ajustarSimilitud(similitudDescripcio, umbral)
 
     // Ponderar y combinar las similitudes según su importancia relativa
-    val pesoPrecio = 0.2
-    val pesoUbicacio = 0.6
+    val pesoPrecio = 0.25
+    val pesoUbicacio = 0.55
     val pesoDescripcio = 0.0
     val pesoOrgan = 0.15
 
@@ -164,16 +166,25 @@ private fun getDistanceBetweenPoints(latitude1: Double, longitude1: Double, lati
 
 private fun getCoordinates(ubi: String?, context: Context): Pair<Double, Double> {
 
-    val geocoder = Geocoder(context)
-    val result = ubi?.let { geocoder.getFromLocationName(it, 1) }
-    lateinit var latLng: LatLng
-    if (result != null && result.isNotEmpty()) {
-        val location = result[0]
-        latLng = LatLng(location.latitude, location.longitude)
-        println("Latitud: ${latLng.latitude} Longitud: ${latLng.longitude}")
-        return Pair(latLng.latitude, latLng.longitude)
+    if (mcUbi.contains(ubi)){
+        println("ACCEDINT A CACHE")
+        return mcUbi.get(ubi)!!
+
     }
-    return Pair(0.0, 0.0)
+    else {
+        val geocoder = Geocoder(context)
+        val result = ubi?.let { geocoder.getFromLocationName(it, 1) }
+        lateinit var latLng: LatLng
+        if (result != null && result.isNotEmpty()) {
+            val location = result[0]
+            latLng = LatLng(location.latitude, location.longitude)
+            println("Latitud: ${latLng.latitude} Longitud: ${latLng.longitude}")
+            mcUbi.put(ubi, Pair(latLng.latitude, latLng.longitude))
+            println("ACCES A API")
+            return Pair(latLng.latitude, latLng.longitude)
+        }
+        return Pair(0.0, 0.0)
+    }
 }
 
 
@@ -182,8 +193,10 @@ private fun calcularSimilitudUbi(ubi1: String?, ubi2: String?, context: Context)
         println("ES null")
         return 0.0
     } else {
+
         val ubiP1 = getCoordinates(ubi1, context)
         val ubiP2 = getCoordinates(ubi2, context)
+        println("Funciona ubi aqui")
         val distancia = getDistanceBetweenPoints(ubiP1.first, ubiP1.second, ubiP2.first, ubiP2.second)
         val maximaDistancia = 50.0 // Definir la máxima distancia considerada como "similitud" (en kilómetros)
         val normalizada = 1.0 - (distancia / maximaDistancia)
