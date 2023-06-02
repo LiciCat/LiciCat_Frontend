@@ -183,7 +183,12 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier.fillMaxWidth().padding(bottom = 70.dp)
                 ) {
-                    ObrirChatButton(navController = navController, existeix_entitat = existeix_entitat)
+                    if (AppType.getUserType() == UserType.EMPRESA) {
+                        ObrirChatButton(
+                            navController = navController,
+                            existeix_entitat = existeix_entitat
+                        )
+                    }
                     Spacer(modifier = Modifier.width(16.dp))
 
                     if (AppType.getUserType() == UserType.EMPRESA){

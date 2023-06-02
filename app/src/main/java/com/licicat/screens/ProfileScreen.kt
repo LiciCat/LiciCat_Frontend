@@ -1,6 +1,7 @@
 package com.licicat.screens
 
 import android.annotation.SuppressLint
+import android.icu.text.DecimalFormat
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -84,7 +85,6 @@ fun ProfileScreen(navController: NavController) {
             var entitat by remember { mutableStateOf("") }
             var descripcio by remember { mutableStateOf("") }
             var valoracio by remember { mutableStateOf(0F) }
-            var numSeguidors by remember { mutableStateOf(0) }
 
             LaunchedEffect(true) {
                 db.collection("usersEntitat")
@@ -95,8 +95,10 @@ fun ProfileScreen(navController: NavController) {
                             Log.d("appEntitat", "${document.id} => ${document.data}")
                             entitat = entitat + document.get("entitat") as String
                             descripcio = descripcio + document.get("descripcio") as String
-                            valoracio =  (document.get("valoracio") as Long).toFloat()
-                            numSeguidors =  (document.get("numSeguidors") as Long).toInt()
+                            valoracio =  (document.get("valoracio") as Double).toFloat()
+                            val decimalFormat = DecimalFormat("#.#")
+                            val formattedNumber = decimalFormat.format(valoracio)
+                            valoracio = formattedNumber.toFloat()
                         }
 
                     }
@@ -141,7 +143,7 @@ fun ProfileScreen(navController: NavController) {
                                 tint = Color.White
                             )
                         }
-                        Spacer(Modifier.width(8.dp))
+                        Spacer(Modifier.width(30.dp))
                         var licit = licitacions.size
                         Column(modifier = Modifier.padding(8.dp).padding(start = 16.dp)) {
                             Text(
@@ -157,7 +159,7 @@ fun ProfileScreen(navController: NavController) {
                                 fontWeight = FontWeight.Bold
                             )
                         }
-                        Spacer(Modifier.width(8.dp))
+                        Spacer(Modifier.width(16.dp))
                         Column(modifier = Modifier.padding(8.dp)) {
                             Text(
                                 text = valoracio.toString(),
@@ -173,20 +175,7 @@ fun ProfileScreen(navController: NavController) {
                             )
                         }
                         Spacer(Modifier.width(8.dp))
-                        Column(modifier = Modifier.padding(8.dp)) {
-                            Text(
-                                text = numSeguidors.toString(),
-                                style = MaterialTheme.typography.h5,
-                                modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 8.dp),
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                text = "Seguidors",
-                                style = MaterialTheme.typography.body1,
-                                modifier = Modifier.padding(bottom = 8.dp),
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
+
 
 
                     }

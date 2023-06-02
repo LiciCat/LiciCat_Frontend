@@ -11,7 +11,7 @@ data class usersEntitat(
     val Telefon: String,
     val seguidors: List<Int>,
     val descripcio: String,
-    val valoracio: Float,
+    val valoracio: Double,
     val numSeguidors: Int
 ){
     fun toMap(): MutableMap<String, Any>{
