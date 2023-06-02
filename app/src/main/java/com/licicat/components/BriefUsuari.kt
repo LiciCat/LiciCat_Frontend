@@ -35,13 +35,14 @@ fun CardUsuari(
     icon: ImageVector,
     title: String?,
     correu: String?,
-    telefon: String?
+    telefon: String?,
+    navController: NavController
 ) {
     Card(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxWidth()
-            .clickable(onClick = { /* Navegació al perfil de l'usuari */ })
+            .clickable(onClick = { navController.navigate(AppScreens.Args2(title)) })
             .padding(vertical = 2.dp, horizontal = 16.dp), // Espaiat intern del contingut de la Card
         elevation = 8.dp
     ) {
