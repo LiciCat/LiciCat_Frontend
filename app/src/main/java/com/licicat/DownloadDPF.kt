@@ -50,7 +50,18 @@ class DownloadDPF {
                     val inputStream = response.body()?.byteStream()
 
                     val downloadsFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                    val destinationPath = downloadsFolder.absolutePath + "/licitacio.pdf"
+
+                    var fileName = "licitacio.pdf"
+                    var destinationFile = File(downloadsFolder, fileName)
+                    var counter = 1
+
+                    while (destinationFile.exists()) {
+                        fileName = "licitacio($counter).pdf"
+                        destinationFile = File(downloadsFolder, fileName)
+                        counter++
+                    }
+
+                    val destinationPath = downloadsFolder.absolutePath + "/$fileName"
 
                     val outputStream = FileOutputStream(destinationPath)
                     val bufferedOutputStream = BufferedOutputStream(outputStream)
