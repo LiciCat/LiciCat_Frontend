@@ -15,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -120,7 +121,7 @@ fun ChatScreen(navController: NavController) {
                 modifier = Modifier.fillMaxSize()
             ) {
                 Text(
-                    text = "Xats",
+                    text = stringResource(R.string.label_xats),
                     style = TextStyle(
                         fontWeight = FontWeight.Bold,
                         fontSize = 24.sp,
@@ -150,7 +151,7 @@ fun ChatScreen(navController: NavController) {
                                 modifier = Modifier.padding(start = 0.dp, end = 8.dp)
                             )
                             Text(
-                                text = "Buscar",
+                                text = stringResource(R.string.placeholder_buscar_xats),
                                 color = Color.Gray,
                                 modifier = Modifier.padding(end = 12.dp)
                             )

@@ -13,8 +13,10 @@ import androidx.compose.material.Scaffold
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.licicat.AppType
+import com.licicat.R
 import com.licicat.UserType
 import com.licicat.components.BottomBarNavigation
 import com.licicat.components.BottomBarNavigationEntitat
@@ -52,7 +54,7 @@ fun ConfigurationScreen(navController: NavController) {
                 colors = ButtonDefaults.buttonColors(backgroundColor = redLicicat),
                 contentPadding = PaddingValues(16.dp)
             ) {
-                Text(text = "Tancar sessió", color = Color.White)
+                Text(text = stringResource(R.string.boto_tancar_sessio), color = Color.White)
             }
 
             Button(
@@ -65,7 +67,7 @@ fun ConfigurationScreen(navController: NavController) {
                 colors = ButtonDefaults.buttonColors(backgroundColor = redLicicat),
                 contentPadding = PaddingValues(16.dp)
             ) {
-                Text(text = "Editar perfil", color = Color.White)
+                Text(text = stringResource(R.string.boto_editar_perfil), color = Color.White)
             }
         }
     }

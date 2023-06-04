@@ -52,6 +52,7 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.core.app.ActivityCompat
@@ -64,8 +65,12 @@ import com.google.firebase.messaging.RemoteMessage.Notification.*
 
 import com.licicat.components.BottomBarNavigationEntitat
 import com.licicat.*
+
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
+
+import com.licicat.R
+
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -113,7 +118,7 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
             if (!existeix_entitat) {
                 item{
                     Text(
-                        text = "Entitat no registrada",
+                        text = stringResource(R.string.label_entitat_no_registrada),
                         style = TextStyle(fontWeight = FontWeight.Bold),
                         modifier = Modifier.padding(start = 16.dp)
                     )
@@ -126,7 +131,7 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                 ) {
                     if (description != null) {
                         DescripcionCard(
-                            title = "Descripció:",
+                            title = stringResource(R.string.label_descripcio_licitacio),
                             description = description
                         )
                     }
@@ -138,7 +143,7 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     DescripcionCard(
-                        title = "Objecte del Contracte:",
+                        title = stringResource(R.string.label_objecte_contracte_licitacio),
                         description = "L'objecte del contracte són els serveis de suport a la gestió..."
                     )
                 }
@@ -150,13 +155,13 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                 ) {
                     if (price != null) {
                         smallCard(
-                            title = "Pressupost:",
+                            title = stringResource(R.string.label_pressupost_licitacio),
                             description = price,
                         )
                     }
                     if (location != null) {
                         smallCard(
-                            title = "Lloc execució:",
+                            title = stringResource(R.string.label_lloc_execucio),
                             description = location,
                         )
                     }
@@ -174,7 +179,7 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                 ) {
                     if (!existeix_entitat) {
                         Text(
-                            text = "No es pot crear xat. No està registrada l'entitat",
+                            text = stringResource(R.string.label_error_crear_xat),
                             style = TextStyle(fontWeight = FontWeight.Bold)
                         )
                     }
@@ -185,7 +190,12 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier.fillMaxWidth().padding(bottom = 70.dp)
                 ) {
-                    ObrirChatButton(navController = navController, existeix_entitat = existeix_entitat)
+                    if (AppType.getUserType() == UserType.EMPRESA) {
+                        ObrirChatButton(
+                            navController = navController,
+                            existeix_entitat = existeix_entitat
+                        )
+                    }
                     Spacer(modifier = Modifier.width(16.dp))
 
                     if (AppType.getUserType() == UserType.EMPRESA){
@@ -244,11 +254,12 @@ private fun enviarSolicitutValoracio(navController: NavController, title: String
 
     var builder = NotificationCompat.Builder(navController.context, "ASWAC")
         .setSmallIcon(android.R.drawable.alert_light_frame)
-        .setContentTitle("Ja queda un pas menys!")
+        .setContentTitle(navController.context.getString(R.string.titol_notificacio_valoracio))
         .setContentIntent(pendingIntent)
         .setStyle(
             NotificationCompat.BigTextStyle()
-                .bigText("Recorda valorar a l'entitat $title. Les opinions com la teva serveixen a les entitats per millorar el seu servei.")
+                .bigText(navController.context.getString(R.string.cos1_notificacio_valoracio) + "$title"+ navController.context.getString(
+                                    R.string.co2_notificacio_valoracio))
         )
 
     with(NotificationManagerCompat.from(navController.context)) {
@@ -379,7 +390,7 @@ fun MyButton(
             backgroundColor = Color.DarkGray,
             contentColor = Color.White)
     ) {
-        Text(text = "Optar")
+        Text(text = stringResource(R.string.boto_optar))
     }
 }
 

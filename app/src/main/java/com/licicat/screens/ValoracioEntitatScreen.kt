@@ -10,6 +10,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
 import android.widget.RatingBar
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -70,10 +71,10 @@ import java.text.SimpleDateFormat
 fun ValoracioEntitatScreen(navController: NavController, intent: Intent) {
     val ratingItems = remember {
         mutableStateListOf(
-            RatingItem("Amabalitat"),
-            RatingItem("Rapidesa"),
-            RatingItem("Bona Comunicació"),
-            RatingItem("Informació Present")
+            RatingItem(navController.context.getString(R.string.label_item_amabilitat)),
+            RatingItem(navController.context.getString(R.string.label_item_rapidesa)),
+            RatingItem(navController.context.getString(R.string.label_item_bona_comunicacio)),
+            RatingItem(navController.context.getString(R.string.label_item_info_present))
             // Agrega más elementos de valoración según tus necesidades
         )
     }
@@ -86,7 +87,7 @@ fun ValoracioEntitatScreen(navController: NavController, intent: Intent) {
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "Valorant a " + entityName, style = MaterialTheme.typography.h6)
+                    Text(text = stringResource(R.string.label_titol_valorant_a) + entityName, style = MaterialTheme.typography.h6)
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigate(AppScreens.HomeScreen.route) {
@@ -101,7 +102,24 @@ fun ValoracioEntitatScreen(navController: NavController, intent: Intent) {
             BottomBarNavigation(navController)
         }
     ) {
+        var valoracio by remember { mutableStateOf(0F) }
+        val db = Firebase.firestore
+        LaunchedEffect(true){
+            db.collection("usersEntitat")
+                .whereEqualTo("entitat", entityName)
+                .get()
+                .addOnSuccessListener { documents ->
+                    for (document in documents) {
+                        Log.d("appEntitat", "${document.id} => ${document.data}")
+                        valoracio =  (document.get("valoracio") as Double).toFloat()
 
+                    }
+
+                }
+                .addOnFailureListener { exception ->
+                    Log.w("app", "Error getting documents: ", exception)
+                }
+        }
         Column(){
             Column(modifier = Modifier
                 .fillMaxWidth()) {
@@ -166,13 +184,13 @@ fun ValoracioEntitatScreen(navController: NavController, intent: Intent) {
 
                 // Botón de enviar
                 Button(
-                    onClick = { enviarValoracion(entityName, ratingItems, comment, averageRatingState);
-                              navController.navigate(AppScreens.HomeScreen.route) {
+                    onClick = { enviarValoracion(entityName, ratingItems, comment, averageRatingState, valoracio);
+                        navController.navigate(AppScreens.HomeScreen.route) {
                             popUpTo(AppScreens.HomeScreen.route) { inclusive = true }
                         }},
                     modifier = Modifier.align(Alignment.End)
                 ) {
-                    Text(text = "Enviar")
+                    Text(text = stringResource(R.string.boto_enviar))
                 }
             }
         }
@@ -219,7 +237,7 @@ fun RatingItemRow(ratingItem: RatingItem, onRatingChanged: (Float) -> Unit) {
 
 
 
-        )
+            )
     }
 }
 
@@ -261,7 +279,7 @@ fun Float.format(decimals: Int): String {
 }
 
 
-fun enviarValoracion(nom_entitat: String, ratingItems: List<RatingItem>, comment: String, rating: MutableState<Float>) {
+fun enviarValoracion(nom_entitat: String, ratingItems: List<RatingItem>, comment: String, rating: MutableState<Float>, valoracioPrevia: Float) {
     val db = Firebase.firestore
 
     val current_user = FirebaseAuth.getInstance().currentUser
@@ -275,6 +293,7 @@ fun enviarValoracion(nom_entitat: String, ratingItems: List<RatingItem>, comment
     var entidadId: String = ""
     var valoracionId: String = ""
     val ratingTotal = rating.value
+
     collectionRef
         .whereEqualTo("entitat", entidadNombre)
         .get()
@@ -282,6 +301,27 @@ fun enviarValoracion(nom_entitat: String, ratingItems: List<RatingItem>, comment
             for (document in documents) {
                 entidadId = document.getString("user_id") ?: ""
                 println("El ID de la entidad $entidadNombre es $entidadId")
+                val documentId = document.id
+                var valoracioNova = 0F
+                if(valoracioPrevia == 0.00001F){
+                    valoracioNova = ratingTotal + valoracioPrevia
+                }
+                else {
+                    valoracioNova = (ratingTotal + valoracioPrevia) / 2
+                }
+
+
+                val updateData = hashMapOf(
+                    "valoracio" to valoracioNova
+                )
+                collectionRef.document(documentId)
+                    .update(updateData as Map<String, Any>)
+                    .addOnSuccessListener {
+                        println("El campo valoracion se actualizó correctamente.")
+                    }
+                    .addOnFailureListener { e ->
+                        println("Error al actualizar el campo valoracion: $e")
+                    }
 
                 val valoracion = hashMapOf(
                     "comment" to comment,
@@ -335,5 +375,4 @@ fun obtenerFechaActualString(): String {
     val fechaActual = Date()
     return dateFormat.format(fechaActual)
 }
-
 

@@ -29,6 +29,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
@@ -99,7 +100,7 @@ fun UserForm(
         Spacer(modifier = Modifier.padding(4.dp))
         PasswordInput(
             passwordState = password,
-            labelId = "Contrasenya",
+            labelId = stringResource(R.string.placeholder_contrasenya_login),
             passwordVisible = passwordVisible
         )
         Spacer(modifier = Modifier.padding(8.dp))
@@ -168,7 +169,7 @@ fun PasswordVisibleIcon(
 @Composable
 fun EmailInput(
     emailState: MutableState<String>,
-    labelId : String = "Email",
+    labelId : String = stringResource(R.string.placeholder_email_login),
     isSingleLine: Boolean = true
 ) {
     OutlinedTextField(
@@ -205,14 +206,14 @@ fun LoginButton(
         onClick = onClic
 
     ) {
-        Text(text = "Iniciar sessió")
+        Text(text = stringResource(R.string.boto_iniciar_sessio))
     }
 }
 
 @Composable
 fun ForgotPassword(context: Context , mail: String, modifier: Modifier) {
     Text(
-        text = "Has oblidat la contrasenya?",
+        text = stringResource(R.string.boto_oblidar_psswd),
         modifier = modifier.clickable {reset_password(context, mail)},
         fontSize = 12.sp,
         fontWeight = FontWeight.Bold,
@@ -223,16 +224,16 @@ fun ForgotPassword(context: Context , mail: String, modifier: Modifier) {
 fun reset_password(context: Context, mail: String){
     var auth: FirebaseAuth
     auth = FirebaseAuth.getInstance();
-    if (mail.isNullOrEmpty()) showToast(context ,"Introduixi un mail per poder enviar el correu de reinici de contrasenya.")
+    if (mail.isNullOrEmpty()) showToast(context ,context.getString(R.string.label_info_reset_psswd))
     else {
         auth.sendPasswordResetEmail(mail)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    showToast(context, "S'ha enviat el reinici de contrasenya al correu.")
+                    showToast(context, context.getString(R.string.label_info_reset_psswd_ok))
                 } else {
                     showToast(
                         context,
-                        "Introdueixi un correu loguejat per poder enviar el reinici de contrasenya."
+                        context.getString(R.string.label_infor_introduir_email)
                     )
                 }
             }
@@ -246,7 +247,7 @@ fun showToast(context: Context,message: String) {
 @Composable
 fun CreaCompteEmpresa(modifier: Modifier, navController: NavController) {
     Text(
-        text = "Crear compte d'empresa",
+        text = stringResource(R.string.boto_crear_compte_empresa),
         modifier = modifier.clickable {navController.navigate(route = AppScreens.SignUpCompanyScreen.route)  },
         fontSize = 12.sp,
         fontWeight = FontWeight.Bold,
@@ -257,7 +258,7 @@ fun CreaCompteEmpresa(modifier: Modifier, navController: NavController) {
 @Composable
 fun CreaCompteEntitatPublica(modifier: Modifier, navController: NavController) {
     Text(
-        text = "Crear compte d'entitat pública",
+        text = stringResource(R.string.boto_crear_compte_entitat),
         modifier = modifier.clickable {navController.navigate(route = AppScreens.SignUpEntitatScreen.route) },
         fontSize = 12.sp,
         fontWeight = FontWeight.Bold,

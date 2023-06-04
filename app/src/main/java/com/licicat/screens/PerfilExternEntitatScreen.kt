@@ -1,6 +1,7 @@
 package com.licicat.screens
 
 import android.annotation.SuppressLint
+import android.icu.text.DecimalFormat
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -29,7 +30,9 @@ import com.licicat.LicitacionsRepository
 import com.licicat.components.BottomBarNavigation
 import com.licicat.components.CardLicitacio
 import androidx.compose.material.icons.*
+import androidx.compose.ui.res.stringResource
 import com.licicat.AppType
+import com.licicat.R
 import com.licicat.UserType
 import com.licicat.components.BottomBarNavigationEntitat
 import kotlinx.coroutines.delay
@@ -45,7 +48,7 @@ fun ProfileEntitatScreen(navController: NavController, entitat:String?) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Perfil") },
+                title = { Text(stringResource(R.string.label_perfil_screen_perfil)) },
                 actions = {
                     IconButton(onClick = {  navController.navigate("configuration_screen") }) {
                         Icon(Icons.Default.Settings, contentDescription = "Ajustes")
@@ -65,7 +68,7 @@ fun ProfileEntitatScreen(navController: NavController, entitat:String?) {
 
         var descripcio by remember { mutableStateOf("") }
         var valoracio by remember { mutableStateOf(0F) }
-        var numSeguidors by remember { mutableStateOf(0) }
+
 
         LaunchedEffect(true) {
 
@@ -78,8 +81,10 @@ fun ProfileEntitatScreen(navController: NavController, entitat:String?) {
                         Log.d("appEntitat", "${document.id} => ${document.data}")
 
                         descripcio = descripcio + document.get("descripcio") as String
-                        valoracio =  (document.get("valoracio") as Long).toFloat()
-                        numSeguidors =  (document.get("numSeguidors") as Long).toInt()
+                        valoracio =  (document.get("valoracio") as Double).toFloat()
+                        val decimalFormat = DecimalFormat("#.#")
+                        val formattedNumber = decimalFormat.format(valoracio)
+                        valoracio = formattedNumber.toFloat()
                     }
 
                 }
@@ -124,7 +129,7 @@ fun ProfileEntitatScreen(navController: NavController, entitat:String?) {
                             tint = Color.White
                         )
                     }
-                    Spacer(Modifier.width(8.dp))
+                    Spacer(Modifier.width(30.dp))
                     var licit = licitacions.size
                     Column(modifier = Modifier.padding(8.dp).padding(start = 16.dp)) {
                         Text(
@@ -134,13 +139,13 @@ fun ProfileEntitatScreen(navController: NavController, entitat:String?) {
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "Licitacions",
+                            text = stringResource(R.string.laberl_licitacions_perfil_entitat),
                             style = MaterialTheme.typography.body1,
                             modifier = Modifier.padding(bottom = 8.dp),
                             fontWeight = FontWeight.Bold
                         )
                     }
-                    Spacer(Modifier.width(8.dp))
+                    Spacer(Modifier.width(16.dp))
                     Column(modifier = Modifier.padding(8.dp)) {
                         Text(
                             text = valoracio.toString(),
@@ -149,27 +154,14 @@ fun ProfileEntitatScreen(navController: NavController, entitat:String?) {
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "Valoració",
+                            text = stringResource(R.string.label_valoracio_perfil_entitat),
                             style = MaterialTheme.typography.body1,
                             modifier = Modifier.padding(bottom = 8.dp),
                             fontWeight = FontWeight.Bold
                         )
                     }
                     Spacer(Modifier.width(8.dp))
-                    Column(modifier = Modifier.padding(8.dp)) {
-                        Text(
-                            text = numSeguidors.toString(),
-                            style = MaterialTheme.typography.h5,
-                            modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 8.dp),
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = "Seguidors",
-                            style = MaterialTheme.typography.body1,
-                            modifier = Modifier.padding(bottom = 8.dp),
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+
 
 
                 }
@@ -193,23 +185,7 @@ fun ProfileEntitatScreen(navController: NavController, entitat:String?) {
                     fontWeight = FontWeight.Bold
 
                 )
-                Button(
-                    onClick = { /* Accio de seguir  */ },
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .height(36.dp)
-                        .width(120.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = Color(0xFFFF454A),
-                        disabledBackgroundColor = Color(0xFFF78058),
-                        contentColor = Color.White,
-                        disabledContentColor = Color.White
 
-                    )
-                ) {
-                    Text(text = "Seguir")
-                }
                 Divider(modifier = Modifier.padding(vertical = 8.dp))
             }
             if (licitacions.isNotEmpty()) {
@@ -235,7 +211,7 @@ fun ProfileEntitatScreen(navController: NavController, entitat:String?) {
             } else{
                 item {
                     Text(
-                        text = "No hi ha licitacions disponibles",
+                        text = stringResource(R.string.label_inform_no_licitacions_entitat),
                         style = MaterialTheme.typography.body1,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
