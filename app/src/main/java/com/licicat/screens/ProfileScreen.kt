@@ -193,7 +193,7 @@ fun ProfileScreen(navController: NavController) {
                                 price = licitacio.pressupost_licitacio_asString,
                                 navController = navController, // Nuevo parámetro agregado
                                 location = licitacio.lloc_execucio, // ubicación de la licitación
-                                denomination = null,
+                                denomination = licitacio.denominacio,
                                 date_inici = null,
                                 date_adjudicacio = null,
                                 tipus_contracte = null,
@@ -404,6 +404,7 @@ fun trobar_opt(numeros: List<Int>) {
                     licitacio.pressupost_licitacio_asString = document.get("price") as String
                     licitacio.lloc_execucio = document.get("location") as String
                     licitacio.enllac_publicacio = document.get("enllac_publicacio") as String
+                    licitacio.denominacio = document.get("denomination") as String
                     val listaActual = licitacions_opt.value?.toMutableList() ?: mutableListOf()
                     listaActual.add(licitacio)
                     licitacions_opt.value = listaActual

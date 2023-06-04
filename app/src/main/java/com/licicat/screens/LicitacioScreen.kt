@@ -124,6 +124,21 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                     )
                 }
             }
+
+            if ((denomination != null) && (denomination != "null")) {
+                item {
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        DescripcionCard(
+                            title = stringResource(R.string.label_objecte_contracte_licitacio),
+                            description = denomination
+                        )
+                    }
+                }
+            }
+
             item {
                 Row(
                     horizontalArrangement = Arrangement.Center,
@@ -137,17 +152,7 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                     }
                 }
             }
-            item {
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    DescripcionCard(
-                        title = stringResource(R.string.label_objecte_contracte_licitacio),
-                        description = "L'objecte del contracte són els serveis de suport a la gestió..."
-                    )
-                }
-            }
+
             item {
                 Row(
                     horizontalArrangement = Arrangement.Center,
@@ -167,6 +172,7 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                     }
                 }
             }
+
             item    {
                 Column(
                     modifier = Modifier
@@ -199,7 +205,7 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                     Spacer(modifier = Modifier.width(16.dp))
 
                     if (AppType.getUserType() == UserType.EMPRESA){
-                        MyButton(enllac_publicacio, navController, title, description, price, location, date)
+                        MyButton(enllac_publicacio, navController, title, description, price, location, date, denomination)
                     }
                     Spacer(modifier = Modifier.width(16.dp)) // Espacio horizontal entre botones
                     MyShareButton(enllac_publicacio)
@@ -307,7 +313,7 @@ fun DescarregarPdfBoto(
 @Composable
 fun MyButton(
     enllac_publicacio: String?, navController: NavController, title: String?,
-    description: String?, price: String?, location: String?, date: String?
+    description: String?, price: String?, location: String?, date: String?, denomination: String?
 ) {
     val context = LocalContext.current
     val intent = remember { Intent(Intent.ACTION_VIEW, Uri.parse(enllac_publicacio)) }
@@ -359,6 +365,7 @@ fun MyButton(
                             val data = hashMapOf(
                                 "title" to title,
                                 "description" to description,
+                                "denomination" to denomination,
                                 "date" to date,
                                 "price" to price,
                                 "lic_id" to id_lic,
@@ -525,7 +532,7 @@ fun PerfilCard(navController: NavController ,text: String, existeix: Boolean) {
 
             Text(
                 text = text,
-                maxLines = 1,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.h6,
                 modifier = Modifier.padding(start = 8.dp)
