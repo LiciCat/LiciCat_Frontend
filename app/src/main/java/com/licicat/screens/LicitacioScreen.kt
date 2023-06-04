@@ -64,23 +64,8 @@ import com.google.firebase.messaging.RemoteMessage.Notification.*
 
 import com.licicat.components.BottomBarNavigationEntitat
 import com.licicat.*
-import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.MutableLiveData
-import com.example.licicat.Licitacio
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import java.io.File
-import java.io.FileOutputStream
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -209,7 +194,7 @@ fun LicitacioScreen(navController: NavController, location:String?, title:String
                     Spacer(modifier = Modifier.width(16.dp)) // Espacio horizontal entre botones
                     MyShareButton(enllac_publicacio)
                     Spacer(modifier = Modifier.width(13.dp))
-                    DescarregarPdfBoto()
+                    DescarregarPdfBoto(location, title, description, price, denomination, date)
                 }
             }
 
@@ -287,12 +272,19 @@ private fun enviarSolicitutValoracio(navController: NavController, title: String
 
 
 @Composable
-fun DescarregarPdfBoto() {
+fun DescarregarPdfBoto(
+    location: String?,
+    title: String?,
+    description: String?,
+    price: String?,
+    denomination: String?,
+    date: String?
+) {
     IconButton(onClick = {
         //Crida api per descarregar pdf
         Log.d("Descarregar","DOWNLOADING")
         val downloader = DownloadDPF()
-        downloader.download()
+        downloader.download(location, title, description, price, denomination, date)
     }) {
         Icon(imageVector = Icons.Filled.Download, contentDescription = "Descarregar", tint = Color.DarkGray)
     }

@@ -1,36 +1,33 @@
 package com.licicat
 
 import android.os.Environment
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContentProviderCompat.requireContext
-import com.example.licicat.Licitacio
-import kotlinx.coroutines.*
 import okhttp3.*
-import org.json.JSONArray
-import org.json.JSONObject
-import org.json.JSONTokener
 import java.io.BufferedOutputStream
 import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.*
 
 import java.io.File
 import java.io.FileOutputStream
-import java.net.HttpURLConnection
 
 private val okHttpClient = OkHttpClient()
 
 class DownloadDPF {
 
-    fun download() {
-        val url = "https://us-central1-apilicicat.cloudfunctions.net/generatePDF"
-        //val body: RequestBody = RequestBody.create(JSON, refreshToken)
+    fun download(
+        location: String?,
+        title: String?,
+        description: String?,
+        price: String?,
+        denomination: String?,
+        date: String?
+    ) {
+        val url = "https://us-central1-apilicicat.cloudfunctions.net/generatePDFLicitacio"
         val formBody = FormBody.Builder()
-            .add("nom", "Jurassic Park")
-            .add("hora", "00:00")
-            .add("esdeveniment", "hola Replace 'API_URL' with the actual URL of your API endpoint")
+            .add("Location", location)
+            .add("title", title)
+            .add("description", description)
+            .add("price", price)
+            .add("denomination", denomination)
+            .add("date", date)
             .build()
         val request = Request.Builder()
             .url(url)
